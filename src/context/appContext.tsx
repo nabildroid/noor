@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useEffect, useReducer } from "react";
+import React, { createContext, useEffect, useReducer } from "react";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  Auth,
+  onAuthStateChanged,
+} from "firebase/auth";
 import appAction from "../actions/appAction";
 import {
   AppStateInit,
@@ -6,18 +13,60 @@ import {
   LoginCredential,
 } from "../models/app_model";
 import Repository from "../repository";
+import { firebaseApp } from "../main";
 
 export const AppContext = createContext<IAppProvider>(null!);
+
+let auth: Auth;
 
 const AppProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(appAction, AppStateInit);
 
-  async function login(credential: LoginCredential) {
-    
+  useEffect(() => {
+    auth = getAuth(firebaseApp);
+    console.log("initnig the app context");
+    return onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("loggin in");
+
+        dispatch({ type: "login", payload: user });
+      } else {
+        console.log("loggin out");
+        dispatch({ type: "logout" });
+      }
+      console.log(user);
+    });
+  }, [dispatch]);
+
+  async function login(credential: LoginCredential): Promise<boolean> {
+    const { operation, data } = await Repository.instance.checkLoginInformation(
+      state.loginFormParams!,
+      credential
+    );
+
+    if (operation == "success") {
+      signInWithEmailAndPassword(
+        auth,
+        credential.name + "@noor.com",
+        credential.password
+      )
+        .catch((e) => {
+          return createUserWithEmailAndPassword(
+            auth,
+            credential.name + "@noor.com",
+            credential.password
+          );
+        })
+        .catch((e) => {
+          // todo catch this error
+        });
+        return true;
+    }
+
+    return false;
   }
 
   async function loadLoginParams() {
-    dispatch({ type: "loading_on" });
     const params = await Repository.instance.getLoginFormParams();
 
     dispatch({ type: "loginFormParams", payload: params });

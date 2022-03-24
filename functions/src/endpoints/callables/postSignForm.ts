@@ -3,11 +3,16 @@ const cry = require("crypto-js");
 import { stringify as QueryEncode } from "querystring";
 import * as functions from "firebase-functions";
 
-import { LOGIN_ENDPOINT } from "../..";
+import { auth, db, LOGIN_ENDPOINT } from "../..";
 
-export default functions.https.onRequest(async (req, res) => {
-  const iv = cry.enc.Utf8.parse("1052099214050902");
-  const key = cry.enc.Utf8.parse("p10zpop213tpDW41");
+const iv = cry.enc.Utf8.parse("1052099214050902");
+const key = cry.enc.Utf8.parse("p10zpop213tpDW41");
+
+export default functions.https.onCall(async (data, context) => {
+  if (context.auth?.uid)
+    functions.logger.warn(
+      `authenicated user ${context.auth?.uid} is using login captcha checking!`
+    );
 
   const encr = (x: any) =>
     cry.AES.encrypt(x, key, {
@@ -17,77 +22,99 @@ export default functions.https.onRequest(async (req, res) => {
       padding: cry.pad.Pkcs7,
     }).toString();
 
-  if (req.method != "POST") {
-    res.status(301).send("unauthorise");
-  } else {
-    const {
-      __VIEWSTATEGENERATOR,
+  const {
+    __VIEWSTATEGENERATOR,
+    __VIEWSTATEENCRYPTED,
+    __EVENTVALIDATION,
+    __VIEWSTATE,
+    cookies,
+  } = data;
+  const { name, password, captcha } = data;
+
+  if (checkInputs(data)) {
+    const postData = {
+      __LASTFOCUS: "",
+      __EVENTTARGET: "",
+      __EVENTARGUMENT: "",
+      __VIEWSTATE,
       __VIEWSTATEENCRYPTED,
       __EVENTVALIDATION,
-      __VIEWSTATE,
-      cookies,
-    } = req.body;
-    const { name, password, captcha } = req.body;
-    console.log(req.body);
+      __VIEWSTATEGENERATOR,
+      hdnLanguage: 1,
+      bMtSMB1: "تسجيل الدخول",
+      tMbPAN1: name,
+      tMbPAR1: encr(password),
+      tMbPAG1: captcha,
+    };
 
-    if (false) {
-      // TODO check Data
-      res.status(301).send("error");
-    } else {
-      const postData = {
-        __LASTFOCUS: "",
-        __EVENTTARGET: "",
-        __EVENTARGUMENT: "",
-        __VIEWSTATE,
-        __VIEWSTATEENCRYPTED,
-        __EVENTVALIDATION,
-        __VIEWSTATEGENERATOR,
-        hdnLanguage: 1,
-        bMtSMB1: "تسجيل الدخول",
-        tMbPAN1: name,
-        tMbPAR1: encr(password),
-        tMbPAG1: captcha,
-      };
-
-      require("axios-debug-log")({
-        request: function (debug: any, config: any) {
-          console.log(config);
+    try {
+      await http.post(LOGIN_ENDPOINT, QueryEncode(postData), {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Referer: LOGIN_ENDPOINT,
+          "User-Agent":
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36",
+          Cookie: cookies.join("; "),
         },
+        maxRedirects: 0,
       });
-
-      try {
-        await http.post(LOGIN_ENDPOINT, QueryEncode(postData), {
-          headers: {
-            Accept:
-              "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Accept-Language": "fr-DZ,fr;q=0.9,en-US;q=0.8,en;q=0.7,ar;q=0.6",
-            "Cache-Control": "max-age=0",
-            Connection: "keep-alive",
-            "Content-Type": "application/x-www-form-urlencoded",
-            Host: "noor.moe.gov.sa",
-            Origin: "https://noor.moe.gov.sa",
-            Referer: LOGIN_ENDPOINT,
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "Linux",
-            "Sec-Fetch-Dest": "document",
-            "Sec-Fetch-Mode": "navigate",
-            "Sec-Fetch-Site": "same-origin",
-            "Sec-Fetch-User": "?1",
-            "Upgrade-Insecure-Requests": "1",
-            "User-Agent":
-              "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36",
-            Cookie: cookies.join("; "),
-          },
-          maxRedirects: 0,
-        });
-      } catch (e: any) {
-        if (e.response && e.response.status == 302) {
-          res.json({ login: "success" });
-          return;
+    } catch (e: any) {
+      if (e.response && e.response.status == 302) {
+        const cookies = e.response.headers["set-cookie"];
+        if (!(cookies instanceof Array) || !cookies.length) {
+          functions.logger.error(
+            "success login without returning cookies",
+            e.response
+          );
+          return { operation: "failed" };
         }
+
+        if (!(await auth.getUserByEmail(name + "@noor.com"))) {
+          db.collection("cookies")
+            .doc(name)
+            .set({
+              cookies,
+              expires: FirebaseFirestore.Timestamp.fromMillis(
+                Date.now() + 1000 * 60 * 60
+              ),
+            });
+        } else {
+          try {
+            await db.collection("cookies").doc(name).delete();
+          } catch (e) {}
+        }
+
+        return { operation: "success", data: cookies };
       }
-      res.json({ login: "failed" });
     }
+  } else {
+    functions.logger.warn("unvalide data", ...data);
   }
+
+  return { operation: "failed" };
 });
+
+function checkInputs(inputs: {
+  __VIEWSTATEGENERATOR: string;
+  __VIEWSTATEENCRYPTED: string;
+  __EVENTVALIDATION: string;
+  __VIEWSTATE: string;
+  cookies: string[];
+  name: string;
+  password: string;
+  captcha: number;
+}) {
+  if (!(inputs.cookies instanceof Array) || inputs.cookies.length < 2) {
+    return false;
+  }
+  if (inputs.name.length < 4) {
+    return false;
+  }
+  if (inputs.password.length < 4) {
+    return false;
+  }
+  if (inputs.captcha.toString().length != 4) {
+    return false;
+  }
+  return true;
+}

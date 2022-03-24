@@ -1,45 +1,40 @@
-import { useState } from "react";
+import { useContext } from "react";
+import { Loader } from "react-feather";
+import { BrowserRouter, Route, Navigate, Routes } from "react-router-dom";
+
+import { AppContext } from "./context/appContext";
+import Login from "./views/login";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const { user, loading } = useContext(AppContext);
+
+  if (loading) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center bg-gray-200">
+        <Loader className="w-24 h-24 animate-spin text-indigo-500" />
+      </div>
+    );
+  }
 
   return (
-    <div className="App ">
-      <header className="App-header">
-        <p>Hello Vite + React!</p>
-        <p>
-          <button
-            className="bg-fuchsia-600 animate-ping"
-            type="button"
-            onClick={() => setCount((count) => count + 1)}
-          >
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {" | "}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {!user && (
+          <>
+            <Route path="/login" element={<Login />} />
+
+            <Route path="*" element={<Navigate replace to="/login" />} />
+          </>
+        )}
+
+        {user && (
+          <>
+            <Route path="/" element={<span>hello</span>} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </>
+        )}
+      </Routes>
+    </BrowserRouter>
   );
 }
 

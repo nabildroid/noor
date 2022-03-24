@@ -32,11 +32,10 @@ export const AppStateInit: AppState = {
 export type LoginCredential = {
   name: string;
   password: string;
-  captcha: string;
-  mail: string;
+  captcha: number;
 };
 export interface IAppProvider extends AppState {
-  login(credential: LoginCredential): Promise<void>;
+  login(credential: LoginCredential): Promise<boolean>;
 
   loadLoginParams(): Promise<void>;
 

@@ -4,7 +4,7 @@ import { load as loadHtml } from "cheerio";
 import * as functions from "firebase-functions";
 import { LOGIN_ENDPOINT } from "../..";
 
-export default functions.https.onRequest(async (req, res) => {
+export default functions.https.onCall(async (_, __) => {
   const response = await http.get(LOGIN_ENDPOINT, {
     headers: {
       "user-agent":
@@ -42,9 +42,9 @@ export default functions.https.onRequest(async (req, res) => {
     params[elm.attribs.name] = elm.attribs.value;
   });
 
-  res.json({
+  return {
     captcha,
     ...params,
     cookies,
-  });
+  };
 });
