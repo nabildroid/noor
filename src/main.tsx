@@ -4,6 +4,8 @@ import App from "./app";
 import { initializeApp } from "firebase/app";
 
 import "./style/index.css";
+import AppProvider from "./context/appContext";
+
 
 export const firebaseApp = initializeApp({
   apiKey: "AIzaSyBjPAxxWuVvaCr7wXxE0nWputXZvT6bKhg",
@@ -14,9 +16,12 @@ export const firebaseApp = initializeApp({
   appId: "1:133224766800:web:6bfbf76b956112ad832055",
 });
 
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <AppProvider>
+      <App />
+    </AppProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
