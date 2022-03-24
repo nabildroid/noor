@@ -5,6 +5,7 @@ import {
   createUserWithEmailAndPassword,
   Auth,
   onAuthStateChanged,
+  connectAuthEmulator,
 } from "firebase/auth";
 import appAction from "../actions/appAction";
 import {
@@ -13,7 +14,7 @@ import {
   LoginCredential,
 } from "../models/app_model";
 import Repository from "../repository";
-import { firebaseApp } from "../main";
+import { emulator, firebaseApp } from "../main";
 
 export const AppContext = createContext<IAppProvider>(null!);
 
@@ -24,6 +25,8 @@ const AppProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     auth = getAuth(firebaseApp);
+    if (emulator) connectAuthEmulator(auth, "http://localhost:9099");
+
     console.log("initnig the app context");
     return onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -60,7 +63,7 @@ const AppProvider: React.FC = ({ children }) => {
         .catch((e) => {
           // todo catch this error
         });
-        return true;
+      return true;
     }
 
     return false;

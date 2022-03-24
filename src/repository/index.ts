@@ -5,7 +5,7 @@ import {
   connectFunctionsEmulator,
   getFunctions,
 } from "firebase/functions";
-import { firebaseApp } from "../main";
+import { emulator, firebaseApp } from "../main";
 
 export default class Repository {
   private functions: Functions;
@@ -20,7 +20,7 @@ export default class Repository {
   constructor() {
     this.functions = getFunctions(firebaseApp);
 
-    if (process.env.NODE_ENV && true) {
+    if (emulator) {
       connectFunctionsEmulator(this.functions, "localhost", 5001);
     }
   }

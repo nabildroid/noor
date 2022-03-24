@@ -3,14 +3,15 @@ const cry = require("crypto-js");
 import { stringify as QueryEncode } from "querystring";
 import * as functions from "firebase-functions";
 
-import { auth, db, LOGIN_ENDPOINT } from "../..";
+import { auth, db, LOGIN_ENDPOINT } from "../../common";
+import { firestore } from "firebase-admin";
 
 const iv = cry.enc.Utf8.parse("1052099214050902");
 const key = cry.enc.Utf8.parse("p10zpop213tpDW41");
 
 export default functions.https.onCall(async (data, context) => {
   if (context.auth?.uid)
-    functions.logger.warn(
+    console.warn(
       `authenicated user ${context.auth?.uid} is using login captcha checking!`
     );
 
@@ -62,33 +63,35 @@ export default functions.https.onCall(async (data, context) => {
       if (e.response && e.response.status == 302) {
         const cookies = e.response.headers["set-cookie"];
         if (!(cookies instanceof Array) || !cookies.length) {
-          functions.logger.error(
+          console.error(
             "success login without returning cookies",
             e.response
           );
           return { operation: "failed" };
         }
 
-        if (!(await auth.getUserByEmail(name + "@noor.com"))) {
-          db.collection("cookies")
-            .doc(name)
-            .set({
-              cookies,
-              expires: FirebaseFirestore.Timestamp.fromMillis(
-                Date.now() + 1000 * 60 * 60
-              ),
-            });
-        } else {
+        try {
+          await auth.getUserByEmail(name + "@noor.com");
           try {
             await db.collection("cookies").doc(name).delete();
           } catch (e) {}
+        } catch (e) {
+          await db
+            .collection("cookies")
+            .doc(name)
+            .set({
+              cookies,
+              expires: firestore.Timestamp.fromMillis(
+                Date.now() + 1000 * 60 * 60
+              ),
+            });
         }
 
         return { operation: "success", data: cookies };
       }
     }
   } else {
-    functions.logger.warn("unvalide data", ...data);
+    console.warn("unvalide data", ...data);
   }
 
   return { operation: "failed" };

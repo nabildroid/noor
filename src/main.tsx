@@ -6,6 +6,7 @@ import { initializeApp } from "firebase/app";
 import "./style/index.css";
 import AppProvider from "./context/appContext";
 
+export const emulator = process.env.NODE_ENV && true;
 
 export const firebaseApp = initializeApp({
   apiKey: "AIzaSyBjPAxxWuVvaCr7wXxE0nWputXZvT6bKhg",

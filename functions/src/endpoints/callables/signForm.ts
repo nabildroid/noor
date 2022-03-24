@@ -2,7 +2,7 @@ import http from "axios";
 import { load as loadHtml } from "cheerio";
 
 import * as functions from "firebase-functions";
-import { LOGIN_ENDPOINT } from "../..";
+import { LOGIN_ENDPOINT } from "../../common";
 
 export default functions.https.onCall(async (_, __) => {
   const response = await http.get(LOGIN_ENDPOINT, {
