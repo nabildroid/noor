@@ -3,6 +3,7 @@ import { load as loadHtml } from "cheerio";
 
 import * as functions from "firebase-functions";
 import { LOGIN_ENDPOINT } from "../../common";
+import { hiddenInputs } from "../../utils";
 
 export default functions.https.onCall(async (_, __) => {
   const response = await http.get(LOGIN_ENDPOINT, {
@@ -35,12 +36,7 @@ export default functions.https.onCall(async (_, __) => {
 
   const captcha = Buffer.from(data, "binary").toString("base64");
 
-  const hiddens = $("input[type='hidden']");
-  let params = {} as any;
-  hiddens.map((_, e) => {
-    const elm = e as any;
-    params[elm.attribs.name] = elm.attribs.value;
-  });
+  const params = hiddenInputs($);
 
   return {
     captcha,

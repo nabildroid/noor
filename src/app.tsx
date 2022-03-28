@@ -1,8 +1,11 @@
-import { useContext } from "react";
+import React, { useContext } from "react";
 import { Loader } from "react-feather";
 import { BrowserRouter, Route, Navigate, Routes } from "react-router-dom";
 
 import { AppContext } from "./context/appContext";
+import HomeProvider from "./context/homeContext";
+import { HomeTab } from "./models/home_model";
+import Home from "./views/home";
 import Login from "./views/login";
 
 function App() {
@@ -29,7 +32,22 @@ function App() {
 
         {user && (
           <>
-            <Route path="/" element={<span>hello</span>} />
+            <Route
+              path="/"
+              element={
+                <HomeProvider>
+                  <Home />
+                </HomeProvider>
+              }
+            >
+              <Route path={HomeTab.saveAllDegrees} element={<span>Hello tab1</span>} />
+              <Route path={HomeTab.saveReport} element={<span>Hello tab2</span>} />
+              <Route path={HomeTab.saveOneDegree} element={<span>Hello tab3</span>} />
+              <Route path={HomeTab.selectRole} element={<span>Hello tab4</span>} />
+              <Route path={HomeTab.savedReports} element={<span>Hello tab5</span>} />
+              <Route index element={<Navigate to={HomeTab.selectRole} />} />
+
+            </Route>
             <Route path="*" element={<Navigate to="/" />} />
           </>
         )}

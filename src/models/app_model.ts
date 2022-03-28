@@ -52,3 +52,8 @@ export type LoginFormParamsResponse = {
 export interface LoginFormParams extends LoginFormParamsResponse {
   captcha: string;
 }
+
+export type LoginSubmissionResponse = {
+  data: string[];
+  operation: "success" | "failer";
+};

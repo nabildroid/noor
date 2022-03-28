@@ -1,4 +1,4 @@
-import { LoginFormParams } from "../models/app_model";
+import { LoginFormParams, LoginSubmissionResponse } from "../models/app_model";
 import {
   httpsCallable,
   Functions,
@@ -39,11 +39,20 @@ export default class Repository {
     params: LoginFormParams,
     info: { name: string; password: string; captcha: number }
   ): Promise<any> {
-    const response = await this.call<LoginFormParams>("postSignForm", {
+    const response = await this.call<LoginSubmissionResponse>("postSignForm", {
       ...params,
       ...info,
     });
 
+
+    console.log(response.data);
+    await this.call("navigation",{
+      cookies:response.data.data,
+      nav1:"المهارات",
+      nav2:"إدخال نتائج الطلاب على مستوى المادة والمهارة"
+    });
     return response.data;
   }
+
+
 }
