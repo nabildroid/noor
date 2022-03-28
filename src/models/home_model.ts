@@ -44,7 +44,16 @@ export type HomeState = {
 
 export const HomeStateInit: HomeState = {
   tab: HomeTab.selectRole,
-  loading: true,
+  loading: false,
+  currentRole:"المدرس الاول",
+  teacher:{
+    currentRole:"المدرس الاول",
+    id:"dsdsd",
+    isPremium:false,
+    name:"السيد العقريب نبيل",
+    role:["مدرس ابداسبي","المشندي السابعد قبس المسان"],
+    try:1525555
+  }
 };
 
 export interface IHomeProvider extends HomeState {

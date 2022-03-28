@@ -15,22 +15,23 @@ interface Props {
 
 const SelectRole: React.FC<Props> = ({ options, current, select }) => {
   return (
-    <div className="w-72 ">
+    <div className=" max-w-xs w-full md:w-72 ">
       <Listbox value={current} onChange={select} disabled={options.length < 2}>
         <div className="relative mt-1">
-          <Listbox.Button className="relative w-full py-2 pl-3 pr-10 text-right rounded-lg  cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm">
-            <span
-              className="block truncate text-right"
-              style={{ direction: "rtl" }}
-            >
-              {current}
-            </span>
-            <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+          <Listbox.Button className="relative w-full py-2 md:pl-3 md:pr-10 text-right rounded-lg  cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm">
+          <span className="absolute inset-y-0 left-0 flex flex-row-reverse md:flex-row items-center pr-2 pointer-events-none">
               <ChevronsDown
                 className="w-5 h-5 text-indigo-500"
                 aria-hidden="true"
               />
             </span>
+            <span
+              className="block truncate text-right"
+              style={{ direction: "rtl" }}
+            >
+              {current.slice(0,40)}
+            </span>
+            
           </Listbox.Button>
           <Transition
             as={Fragment}
@@ -53,7 +54,7 @@ const SelectRole: React.FC<Props> = ({ options, current, select }) => {
                   {({ selected }) => (
                     <>
                       <span
-                        className={`block truncate ${
+                        className={`block truncate text-right ${
                           selected ? "font-medium" : "font-normal"
                         }`}
                       >

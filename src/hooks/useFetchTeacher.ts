@@ -11,14 +11,14 @@ const useFetchTeacher = ({ user }: params) => {
   const [teacher, setTeacher] = useState<Teacher>();
   useEffect(() => {
     if (user) {
-      const savedData = localStorage.getItem(user.uid);
-      if (savedData) {
-        try {
-          const saved = JSON.parse(savedData) as Teacher;
-          setTeacher(saved);
-          return;
-        } catch (e) {}
-      }
+      // const savedData = localStorage.getItem(user.uid);
+      // if (savedData) {
+      //   try {
+      //     const saved = JSON.parse(savedData) as Teacher;
+      //     setTeacher(saved);
+      //     return;
+      //   } catch (e) {}
+      // }
 
       // todo remove the subscription 
       // CHECK should i get the teacher doc everytime!

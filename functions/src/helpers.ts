@@ -1,22 +1,9 @@
-import http from "axios";
-
-
-import { stringify as QueryEncode } from "querystring";
-
 import { load as loadHtml } from "cheerio";
-import { weird } from "./types";
 
-import {
-  defaultHeader,
-  extractRoleId,
-  hiddenInputs,
-  pageNameBase64,
-} from "./utils";
+import { extractRoleId, hiddenInputs } from "./utils";
 
-export async function extractHomeData(data:string) {
-  
+export async function extractHomeData(data: string) {
   try {
-  
     const $ = loadHtml(data);
 
     const userName = $(".username").text();
@@ -62,45 +49,17 @@ async function mainNavigation(data: string) {
     .toArray() as any as { text: string; id: string }[];
 }
 
-export async function redirect(config: {
-  from: string;
-  to: string;
-  cookies: string[];
-  weirdData: weird;
-  target?: string;
-}) {
-  const { cookies, from, to, weirdData, target } = config;
-  const requestData = {
-    ...weirdData,
-    ctl00$hdnData_Data: "",
-    ctl00$hdnData_Operation: "",
-    ctl00$hdnPageName: pageNameBase64(from), // HomePage
-    ctl00$hdnStopInterval: "True",
-    ctl00$hdPageIDBookMarks: "",
-    ctl00$hdPageControlsBookMarks: "",
-    ctl00$hdFolderIDBookMarks: "",
-    __EVENTARGUMENT: to,
-    __EVENTTARGET: target ?? weirdData.__EVENTTARGET,
-  };
+export function checkValidity(data: string) {
+  const $ = loadHtml(data);
 
-  const {
-    data: responseData,
-    headers,
-    request,
-  } = await http.post(from, QueryEncode(requestData), {
-    headers: {
-      ...defaultHeader(cookies),
-      Referer: from,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  });
+  const span = $("span.ValidationClass");
 
-  
+  if (
+    span.length &&
+    span.text().includes("لا يوجد لديك صلاحيات لإدخال المهارات")
+  ) {
+    return false;
+  }
 
-  return {
-    responseData,
-    weirdData: hiddenInputs(loadHtml(responseData)),
-    cookies: headers["set-cookie"],
-    redirected: request.res.responseUrl as string,
-  };
+  return true;
 }

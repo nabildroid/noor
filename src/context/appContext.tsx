@@ -25,7 +25,6 @@ const AppProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     auth = getAuth(firebaseApp);
-    auth
     
     if (emulator) connectAuthEmulator(auth, "http://localhost:9099");
 

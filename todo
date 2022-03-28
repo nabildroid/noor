@@ -18,7 +18,7 @@
 
 
 # problems
-- [ ] Redirection logic
+- [X] Redirection logic
 - [ ] dealing with tables
 - [ ] form submission 
 - [ ] stream of options 

@@ -45,12 +45,7 @@ export default class Repository {
     });
 
 
-    console.log(response.data);
-    await this.call("navigation",{
-      cookies:response.data.data,
-      nav1:"المهارات",
-      nav2:"إدخال نتائج الطلاب على مستوى المادة والمهارة"
-    });
+
     return response.data;
   }
 

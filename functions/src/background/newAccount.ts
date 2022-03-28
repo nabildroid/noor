@@ -2,6 +2,7 @@ import * as functions from "firebase-functions";
 
 import { auth, db } from "../common";
 import { extractHomeData } from "../helpers";
+import Redirect from "../redirect";
 
 export default functions.auth.user().onCreate(async (user) => {
   if (!user.email) {
@@ -15,8 +16,12 @@ export default functions.auth.user().onCreate(async (user) => {
   try {
     const cookieDoc = await db.collection("cookies").doc(name).get();
     const cookies = (cookieDoc.data() as any).cookies as string[];
-
-    const homedata = (await extractHomeData(cookies))!;
+    const homePage =await Redirect.start({
+      from:"https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
+      cookies
+    })
+    const homedata = (await extractHomeData(homePage.stop().html))!;
+    
     const { userName, allAccounts, currentAccount } = homedata;
     const { weirdData } = homedata;
 
@@ -46,7 +51,6 @@ export default functions.auth.user().onCreate(async (user) => {
         weirdData,
       });
   } catch (e) {
-    auth.deleteUser(user.uid);
     console.error("user created without a cookie collection", user, e);
   }
 });
