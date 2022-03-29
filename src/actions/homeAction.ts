@@ -14,7 +14,7 @@ export default (state: HomeState, action: HomeActions): HomeState => {
   else if (action.type == "setTeacher")
     return {
       ...state,
-      teacher:action.payload,
+      teacher: action.payload,
       loading: false,
     };
   else if (action.type == "loading_off")
@@ -26,6 +26,16 @@ export default (state: HomeState, action: HomeActions): HomeState => {
     return {
       ...state,
       tab: action.payload,
+    };
+  else if (action.type == "setTabs")
+    return {
+      ...state,
+      tabs: action.payload,
+    };
+  else if (action.type == "setTeacherType")
+    return {
+      ...state,
+      teacherType: action.payload,
     };
   else return state;
 };

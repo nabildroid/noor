@@ -44,8 +44,6 @@ export default class Repository {
       ...info,
     });
 
-
-
     return response.data;
   }
 

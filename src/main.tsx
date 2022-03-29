@@ -1,10 +1,8 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
-import App from "./app";
 import { initializeApp } from "firebase/app";
 
 import "./style/index.css";
-import AppProvider from "./context/appContext";
 
 export const emulator = process.env.NODE_ENV && true;
 
@@ -17,12 +15,16 @@ export const firebaseApp = initializeApp({
   appId: "1:133224766800:web:6bfbf76b956112ad832055",
 });
 
+const App = React.lazy(() => import("./app"));
+const AppProvider = React.lazy(() => import("./context/appContext"));
 
 ReactDOM.render(
   <React.StrictMode>
-    <AppProvider>
-      <App />
-    </AppProvider>
+    <Suspense fallback={<span></span>}>
+      <AppProvider>
+        <App />
+      </AppProvider>
+    </Suspense>
   </React.StrictMode>,
   document.getElementById("root")
 );

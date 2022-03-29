@@ -17,7 +17,7 @@ const PhoneMenu: React.FC<props> = ({ items, selected }) => {
 
       <Menu.Items className="fixed  py-12  right-0 top-0 h-full   bg-indigo-400 shadow-md">
         {items.map((i) => (
-          <Menu.Item>
+          <Menu.Item key={i}>
             {({ active }) => (
               <Link to={i} className="flex w-56">
                 {(active || i == selected) && (

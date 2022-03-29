@@ -12,7 +12,7 @@ const Menu: React.FC<props> = ({items,selected}) => {
     <ul className="mt-4 font-arabic space-y-2">
       {items
         .map((i) => (
-          <li className="flex items-stretch">
+          <li key={i} className="flex items-stretch">
             {i == selected && (
               <div className="w-1 rounded-r-full bg-indigo-200 h-auto"></div>
             )}
