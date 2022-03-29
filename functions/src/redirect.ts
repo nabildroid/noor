@@ -1,6 +1,6 @@
 import http from "axios";
 import { stringify as QueryEncode } from "querystring";
-import { load, load as loadHtml } from "cheerio";
+import {  load as loadHtml } from "cheerio";
 import { weird } from "./types";
 
 import {

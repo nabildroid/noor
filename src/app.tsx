@@ -3,8 +3,12 @@ import { BrowserRouter, Route, Navigate, Routes } from "react-router-dom";
 import Loading from "./components/loading";
 
 import { AppContext } from "./context/appContext";
+import SaveAllProvider from "./context/home/saveAllContext";
+import SaveCustomProvider from "./context/home/saveCustomContext";
 import { HomeTab } from "./models/home_model";
 import Onboarding from "./views/home/onboarding";
+import SaveAll from "./views/home/saveAll";
+import SaveCustom from "./views/home/saveCustom";
 import Login from "./views/login";
 
 const Home = React.lazy(() => import("./views/home"));
@@ -42,7 +46,20 @@ function App() {
             >
               <Route
                 path={HomeTab.saveAllDegrees}
-                element={<span>Hello tab1</span>}
+                element={
+                  <SaveAllProvider>
+                    <SaveAll />
+                  </SaveAllProvider>
+                }
+              />
+
+              <Route
+                path={HomeTab.saveCustom}
+                element={
+                  <SaveCustomProvider>
+                    <SaveCustom />
+                  </SaveCustomProvider>
+                }
               />
               <Route
                 path={HomeTab.saveReport}

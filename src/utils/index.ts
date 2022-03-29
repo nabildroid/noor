@@ -1,4 +1,4 @@
-import { HomeTab } from "../models/home_model";
+import { HomeTab, TeacherType } from "../models/home_model";
 
 export const tabBarTitle = (tab: HomeTab) =>
   ({
@@ -7,4 +7,14 @@ export const tabBarTitle = (tab: HomeTab) =>
     [HomeTab.saveReport]: "ةقرير جديد",
     [HomeTab.savedReports]: "الةقرارير",
     [HomeTab.selectRole]: "اخةيار الحسياب",
+    [HomeTab.saveCustom]: "رصد وحدة ومهارة",
   }[tab]);
+
+
+export const teacherTypeArabic = (type:TeacherType)=>{
+  if(type == TeacherType.kindergarten)
+  return "الروضة"
+  else if(type == TeacherType.primary)
+    return "الابةدائية"
+  else return "المةوسطة"
+}

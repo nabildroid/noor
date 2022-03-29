@@ -12,7 +12,7 @@ import PhoneMenu from "../../components/home/navigation/phoneMenu";
 import Menu from "../../components/home/navigation/menu";
 
 const Home: React.FC = ({ children }) => {
-  const { teacher, selectTab, tab, tabs, selectRole, currentRole } =
+  const { teacher, loading, selectTab, tab, tabs, selectRole, currentRole } =
     useContext(HomeContext);
 
   const { pathname } = useLocation();
@@ -20,6 +20,7 @@ const Home: React.FC = ({ children }) => {
 
   const correctNavigation = useCallback(
     (route: string) => {
+      console.log(route,tabs);
       if (tabs.some((e) => e == route) && route != tab) {
         selectTab(route as any);
       } else if (route != undefined) {
@@ -39,11 +40,11 @@ const Home: React.FC = ({ children }) => {
       <div className="flex-1 flex flex-col">
         <div className="px-4 flex-col-reverse p-2 bg-white md:bg-transparent md:flex-row font-arabic md:h-16 w-full  flex items-center justify-between">
           <div className="w-full pr-2 md:w-auto justify-end flex">
-              <SelectRole
-                current={currentRole}
-                options={teacher?.role}
-                select={selectRole}
-              />
+            <SelectRole
+              current={currentRole}
+              options={teacher?.role}
+              select={selectRole}
+            />
             <PhoneMenu items={tabs} selected={tab} />
           </div>
           <div className="flex w-full md:w-auto md:space-x-2 justify-between md:justify-center">
@@ -60,6 +61,7 @@ const Home: React.FC = ({ children }) => {
       </div>
       <nav className="max-w-xs hidden md:block w-full bg-slate-50 shadow-md">
         <div className="pr-4 h-16 w-full bg-indigo-400 flex items-center justify-end">
+          {loading && <Loader className="animate-spin" />}
           <span className="font-arabic text-2xl  text-center">نور</span>
         </div>
 

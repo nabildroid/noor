@@ -14,11 +14,15 @@ export type Teacher = {
 };
 
 export enum HomeTab {
-  selectRole = "select",
+  selectRole = "/",
   saveOneDegree = "save",
   saveAllDegrees = "saveall",
+  editSkill = "saveall",
+  notSaved = "notsaved",
+  studentsNotAccepted = "notaccepted",
   savedReports = "reports",
   saveReport = "newreport",
+  saveCustom = "savecustom",
 }
 
 export type HomeActions =
@@ -49,6 +53,7 @@ export type HomeActions =
       type: "loading_on";
     };
 
+
 export type HomeState = {
   currentRole?: string;
   teacher?: Teacher;
@@ -57,6 +62,8 @@ export type HomeState = {
   tab: HomeTab;
   tabs: HomeTab[];
 };
+
+
 
 export const HomeStateInit: HomeState = {
   tab: HomeTab.selectRole,

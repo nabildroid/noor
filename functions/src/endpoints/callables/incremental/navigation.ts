@@ -1,42 +1,36 @@
 import * as functions from "firebase-functions";
 
-import { IncrementalData, weird } from "../../types";
-import { extractRoleIds } from "../../utils";
+import { IncrementalData } from "../../../types";
+import { extractRoleIds } from "../../../utils";
 import { load } from "cheerio";
-import { extractHomeData } from "../../helpers";
-import Redirect from "../../redirect";
-import Form from "../../form";
+import { extractHomeData } from "../../../helpers";
+import Redirect from "../../../redirect";
+import Form from "../../../form";
 
 interface NavigationData extends IncrementalData {
-  currentAccount: string;
+  account: string;
   nav1: string;
   nav2: string;
+  cookies: string[];
+  from?: string;
 }
 
-export default functions.https.onRequest(async (req, res) => {
-  // if (
-  //   // !context.auth ||
-  //   !(data.cookies instanceof Array) ||
-  //   !data.cookies.length ||
-  //   !data.nav1 ||
-  //   !data.nav2
-  // ) {
-  //   console.warn("unaccepted request from", context.auth);
-  //   return {};
-  // }
+export default functions.https.onCall(async (data: NavigationData, context) => {
+  // const data = {
+  //   cookies: [
+  //     "ASP.NET_SessionId=1iijxtyntwrd3icuivci0rnz; path=/; secure; HttpOnly; SameSite=Lax",
+  //   ],
+  //   nav1: "المهارات",
+  //   nav2: "إدخال نتائج المهارة على مستوى طفل ووحدة",
+  //   account:
+  //     "معلم -الروضة الثانية عشرة بمكة المكرمة - الإدارة العامة للتعليم بمنطقة مكة المكرمة  - (بنات)",
+  // };
 
-  const data = {
-    cookies: [
-      "ASP.NET_SessionId=1iijxtyntwrd3icuivci0rnz; path=/; secure; HttpOnly; SameSite=Lax",
-    ],
-    nav1: "المهارات",
-    nav2: "إدخال نتائج المهارة على مستوى طفل ووحدة",
-    account:
-      "معلم -الروضة الثانية عشرة بمكة المكرمة - الإدارة العامة للتعليم بمنطقة مكة المكرمة  - (بنات)",
-  };
-
+  console.log(data);
   const homePage = await Redirect.start({
-    from: "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
+    from:
+      data.from ??
+      "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
     cookies: data.cookies,
   });
 
@@ -86,21 +80,14 @@ export default functions.https.onRequest(async (req, res) => {
     };
   });
 
-  res.setHeader("redirectedUrl", secondNav.stop().redirected);
+  const { prevCookies, redirected, html } = secondNav.stop();
+  const form = new Form(html);
 
-  const form = new Form(secondNav.stop().html);
-
-  await form.fetchFromOption(
-    {
-      id: "ctl00$PlaceHolderMain$UpdatePanel1",
-      name: "ctl00$PlaceHolderMain$ddlClass",
-      value: "23",
-    },
-    [],
-    secondNav
-  );
-
-  res.json(form.toJson());
+  return {
+    redirected,
+    cookies: prevCookies,
+    form: form.toJson(),
+  };
 });
 
 async function innerNavigation(data: string) {

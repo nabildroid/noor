@@ -15,7 +15,7 @@ const PhoneMenu: React.FC<props> = ({ items, selected }) => {
         <Humberger className="text-indigo-500" />
       </Menu.Button>
 
-      <Menu.Items className="fixed  py-12  right-0 top-0 h-full   bg-indigo-400 shadow-md">
+      <Menu.Items className="fixed  z-50 py-12  right-0 top-0 h-full   bg-indigo-400 shadow-md">
         {items.map((i) => (
           <Menu.Item key={i}>
             {({ active }) => (

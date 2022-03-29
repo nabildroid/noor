@@ -8,13 +8,14 @@ import {
   Teacher,
   TeacherType,
 } from "../models/home_model";
+import Repository from "../repository";
 import { AppContext } from "./appContext";
 
 export const HomeContext = createContext<IHomeProvider>(null!);
 
 const HomeProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(homeAction, HomeStateInit);
-  const { user } = useContext(AppContext);
+  const { user, logout } = useContext(AppContext);
 
   const teacher = useFetchTeacher({ user });
 
@@ -26,21 +27,22 @@ const HomeProvider: React.FC = ({ children }) => {
   }, [teacher]);
 
   useEffect(() => {
-    console.log("changing teacher role!");
     const type = getTeacherType(state.currentRole);
     dispatch({ type: "setTeacherType", payload: type });
     dispatch({ type: "setTabs", payload: getTeacherTabs(type) });
+    dispatch({ type: "setTab", payload: HomeTab.selectRole });
   }, [state.currentRole]);
 
   const getTeacherTabs = (type: TeacherType) => {
     if (type == TeacherType.elementery)
-      return [HomeTab.saveAllDegrees, HomeTab.saveReport];
+      return [HomeTab.saveAllDegrees, HomeTab.saveReport, HomeTab.saveCustom];
     else if (type == TeacherType.kindergarten)
-      return [HomeTab.saveAllDegrees, HomeTab.selectRole];
+      return [HomeTab.saveAllDegrees, HomeTab.saveCustom, HomeTab.selectRole];
     return [
       HomeTab.saveAllDegrees,
       HomeTab.saveOneDegree,
       HomeTab.savedReports,
+      HomeTab.saveCustom,
     ];
   };
 
@@ -52,9 +54,10 @@ const HomeProvider: React.FC = ({ children }) => {
     return TeacherType.elementery;
   };
 
-  function selectTab(tab: HomeTab) {
+  async function selectTab(tab: HomeTab) {
     dispatch({ type: "setTab", payload: tab });
   }
+
   function selectRole(role: string) {
     // todo save the role back to firestore
     dispatch({ type: "setRole", payload: role });

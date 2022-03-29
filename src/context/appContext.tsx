@@ -8,13 +8,10 @@ import {
   connectAuthEmulator,
 } from "firebase/auth";
 import appAction from "../actions/appAction";
-import {
-  AppStateInit,
-  IAppProvider,
-  LoginCredential,
-} from "../models/app_model";
+import { AppStateInit, IAppProvider } from "../models/app_model";
 import Repository from "../repository";
 import { emulator, firebaseApp } from "../main";
+import { LoginCredential } from "../types/login_types";
 
 export const AppContext = createContext<IAppProvider>(null!);
 
@@ -25,20 +22,15 @@ const AppProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     auth = getAuth(firebaseApp);
-    
+
     if (emulator) connectAuthEmulator(auth, "http://localhost:9099");
 
-    console.log("initnig the app context");
     return onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("loggin in");
-
         dispatch({ type: "login", payload: user });
       } else {
-        console.log("loggin out");
         dispatch({ type: "logout" });
       }
-      console.log(user);
     });
   }, [dispatch]);
 
@@ -47,6 +39,7 @@ const AppProvider: React.FC = ({ children }) => {
       state.loginFormParams!,
       credential
     );
+
 
     if (operation == "success") {
       signInWithEmailAndPassword(
@@ -76,7 +69,10 @@ const AppProvider: React.FC = ({ children }) => {
     dispatch({ type: "loginFormParams", payload: params });
   }
 
-  async function logout() {}
+  async function logout() {
+    dispatch({ type: "logout" });
+    auth.signOut();
+  }
 
   const values: IAppProvider = {
     ...state,
