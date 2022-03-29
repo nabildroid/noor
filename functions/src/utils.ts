@@ -7,6 +7,12 @@ export function extractRoleId(str: string) {
   return left;
 }
 
+export function mergeNodeTexts(nodes: cheerio.Cheerio, root: cheerio.Root) {
+  return nodes
+    .map((_, s) => root(s).text())
+    .toArray()
+    .reduce((acc, e) => `${acc} ${e}`, "") as string;
+}
 export function extractRoleIds(str: string) {
   const right = str.split("(").pop() as string;
   const [left] = right.split(")");
@@ -33,8 +39,34 @@ export function defaultHeader(cookies: string[]) {
   };
 }
 
-
-
-export function pageNameBase64(url:string){
+export function pageNameBase64(url: string) {
   return Buffer.from(url.split("/").pop()!.split(".")[0]!).toString("base64");
+}
+
+export function mergeCookies(...cookies: string[][]) {
+  const items = cookies
+    .filter((e) => e)
+    .map((e) =>
+      e
+        .filter((e) => e)
+        .map((c) => c.split(";"))
+        .flat()
+        .map((e) => e.trim())
+    )
+    .flat();
+
+  const ob = items.reduce(
+    (acc, v) => ({
+      ...acc,
+      [v.split("=")[0]]: v.split("=")[1],
+    }),
+    {}
+  );
+
+  console.log(ob);
+
+  return Object.entries(ob).reduce((acc, v) => {
+    if (!v[1]) return acc;
+    return [...acc, `${v[0]}=${v[1]}`];
+  }, []);
 }

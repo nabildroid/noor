@@ -3,8 +3,9 @@ import * as functions from "firebase-functions";
 import { IncrementalData, weird } from "../../types";
 import { extractRoleIds } from "../../utils";
 import { load } from "cheerio";
-import { extractHomeData, redirect } from "../../helpers";
+import { extractHomeData } from "../../helpers";
 import Redirect from "../../redirect";
+import Form from "../../form";
 
 interface NavigationData extends IncrementalData {
   currentAccount: string;
@@ -26,11 +27,12 @@ export default functions.https.onRequest(async (req, res) => {
 
   const data = {
     cookies: [
-      "ASP.NET_SessionId=lna4cev4fg4yhhbpgbhxvx54; path=/; secure; HttpOnly; SameSite=Lax",
+      "ASP.NET_SessionId=1iijxtyntwrd3icuivci0rnz; path=/; secure; HttpOnly; SameSite=Lax",
     ],
     nav1: "المهارات",
-    nav2: "إدخال نتائج الطلاب على مستوى المادة والمهارة",
-    account: "معلم  - مركز الحيانية لمحو الامية",
+    nav2: "إدخال نتائج المهارة على مستوى طفل ووحدة",
+    account:
+      "معلم -الروضة الثانية عشرة بمكة المكرمة - الإدارة العامة للتعليم بمنطقة مكة المكرمة  - (بنات)",
   };
 
   const homePage = await Redirect.start({
@@ -43,12 +45,14 @@ export default functions.https.onRequest(async (req, res) => {
       const home = await extractHomeData(config.html);
       console.log(home.currentAccount);
       console.log(home.allAccounts);
-      console.log(home.currentAccount ==  data.account);
+      console.log(home.currentAccount == data.account);
       return home.currentAccount.trim() != data.account.trim();
     },
     async (config) => {
       const home = await extractHomeData(config.html);
-      const accountId = home.allAccounts.find((e) => e.text == data.account)!.id;
+      const accountId = home.allAccounts.find(
+        (e) => e.text == data.account
+      )!.id;
 
       return {
         target: "SwitchUserTypeMenu",
@@ -83,7 +87,20 @@ export default functions.https.onRequest(async (req, res) => {
   });
 
   res.setHeader("redirectedUrl", secondNav.stop().redirected);
-  res.send(secondNav.stop().html);
+
+  const form = new Form(secondNav.stop().html);
+
+  await form.fetchFromOption(
+    {
+      id: "ctl00$PlaceHolderMain$UpdatePanel1",
+      name: "ctl00$PlaceHolderMain$ddlClass",
+      value: "23",
+    },
+    [],
+    secondNav
+  );
+
+  res.json(form.toJson());
 });
 
 async function innerNavigation(data: string) {
@@ -95,14 +112,4 @@ async function innerNavigation(data: string) {
       id: extractRoleIds($(e).attr("onclick")!),
     }))
     .toArray() as any as { text: string; id: string[] }[];
-}
-
-async function changeAccount(cookies: string[], weirdData: weird, id: string) {
-  return await redirect({
-    from: "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
-    to: "id",
-    cookies,
-    weirdData,
-    target: "",
-  });
 }

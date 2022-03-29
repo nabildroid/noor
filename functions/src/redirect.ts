@@ -3,7 +3,12 @@ import { stringify as QueryEncode } from "querystring";
 import { load, load as loadHtml } from "cheerio";
 import { weird } from "./types";
 
-import { defaultHeader, hiddenInputs, pageNameBase64 } from "./utils";
+import {
+  defaultHeader,
+  hiddenInputs,
+  mergeCookies,
+  pageNameBase64,
+} from "./utils";
 
 type RedirectionType =
   | "MenuItemRedirect"
@@ -32,6 +37,7 @@ interface RedirectionResponse {
   html: string;
   weirdData: weird;
   redirected: string;
+  prevCookies: string[];
 }
 
 export default class Redirect {
@@ -39,6 +45,7 @@ export default class Redirect {
   private to: string;
   private weirdData: weird;
   private cookies: string[];
+  private prevCookies: string[];
   private target: RedirectionType;
   private redirected: string;
   private html: string;
@@ -53,7 +60,7 @@ export default class Redirect {
   }
 
   static async start(config: RedirectionInitParams) {
-    const { data } = await http.get(config.from, {
+    const { data, headers } = await http.get(config.from, {
       headers: defaultHeader(config.cookies),
     });
 
@@ -65,6 +72,7 @@ export default class Redirect {
       weirdData: {} as any,
       html: data,
       redirected: "",
+      prevCookies: headers["set-cookie"],
     });
   }
 
@@ -78,6 +86,7 @@ export default class Redirect {
     this.weirdData = config.weirdData;
     this.html = config.html;
     this.redirected = config.redirected;
+    this.prevCookies = config.prevCookies;
   }
 
   async nextIf(
@@ -88,6 +97,7 @@ export default class Redirect {
       html: this.html,
       redirected: this.redirected,
       weirdData: this.weirdData,
+      prevCookies: this.prevCookies,
     };
     if (await condition(response)) {
       return this.next(treat);
@@ -102,6 +112,7 @@ export default class Redirect {
       html: this.html,
       redirected: this.redirected,
       weirdData: this.weirdData,
+      prevCookies: this.prevCookies,
     });
 
     this.to = navigation.to;
@@ -119,7 +130,37 @@ export default class Redirect {
       redirected: this.redirected,
       weirdData: this.weirdData,
       html: this.html,
+      prevCookies: this.prevCookies,
     };
+  }
+
+  async fork(to: string, payload: any) {
+    const cookies = mergeCookies(this.prevCookies, this.cookies);
+    console.log("--------");
+    console.log(cookies);
+    const { data, headers } = await http.post(to, QueryEncode(payload), {
+      headers: {
+        ...defaultHeader(cookies),
+        Referer: this.from,
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-MicrosoftAjax": "Delta=true",
+        "X-Requested-With": "XMLHttpRequest",
+        ADRUM: "isAjax:true",
+      },
+      // proxy:{
+      //   host:"127.0.0.1",
+      //   port:8082
+        
+      // }
+    });
+
+    this.prevCookies = mergeCookies(
+      this.cookies,
+      this.prevCookies,
+      headers["set-cookie"]
+    );
+
+    return data;
   }
 
   private async do() {
@@ -137,22 +178,23 @@ export default class Redirect {
       __EVENTTARGET: target ?? weirdData.__EVENTTARGET,
     };
 
-    const { data: responseData, request } = await http.post(
-      from,
-      QueryEncode(requestData),
-      {
-        headers: {
-          ...defaultHeader(cookies),
-          Referer: from,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
+    const {
+      data: responseData,
+      headers,
+      request,
+    } = await http.post(from, QueryEncode(requestData), {
+      headers: {
+        ...defaultHeader(cookies),
+        Referer: from,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
 
     return this.create({
       html: responseData,
       weirdData: hiddenInputs(loadHtml(responseData)),
       redirected: request.res.responseUrl as string,
+      prevCookies: headers["set-cookie"] ?? [],
     });
   }
 }
