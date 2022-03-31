@@ -70,3 +70,14 @@ export function mergeCookies(...cookies: string[][]) {
     return [...acc, `${v[0]}=${v[1]}`];
   }, []);
 }
+
+export function replaceNullValues(ob: { [key: string]: any }, repalce: any) {
+  Object.keys(ob).forEach(
+    (k) => (ob[k] = ob[k] == null || ob[k] == "null" ? repalce : ob[k])
+  );
+  return ob;
+}
+
+export function escapeQuotes(str?: string) {
+  return (str ?? "").replace(/"/g, '\\"').replace(/'/g, "\\'");
+}

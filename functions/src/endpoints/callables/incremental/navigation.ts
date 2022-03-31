@@ -11,8 +11,6 @@ interface NavigationData extends IncrementalData {
   account: string;
   nav1: string;
   nav2: string;
-  cookies: string[];
-  from?: string;
 }
 
 export default functions.https.onCall(async (data: NavigationData, context) => {

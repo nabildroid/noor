@@ -9,6 +9,7 @@ export type weird = {
 };
 
 export type IncrementalData = {
-  weirdData: weird;
+  weirdData?: weird;
   cookies: string[];
+  from?: string;
 };

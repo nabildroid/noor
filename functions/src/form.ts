@@ -3,7 +3,7 @@ import { checkValidity } from "./helpers";
 import Redirect from "./redirect";
 import { mergeNodeTexts } from "./utils";
 
-type Input = {
+export type FormInput = {
   title: string;
   value?: string;
   id: string;
@@ -33,7 +33,7 @@ export default class Form {
   }
 
   private getInputs() {
-    const inputs: Input[] = [];
+    const inputs: FormInput[] = [];
 
     const titleFields = this.$("div.feild_title");
 
@@ -80,20 +80,30 @@ export default class Form {
   }
 
   private getFormAction() {
-    const action = this.form.attr("action");
-    return `https://noor.moe.gov.sa/Noor/EduWaveSMS/${action}`.replace("./","");
+    let action = this.form.attr("action");
+    action = action.replace("https://noor.moe.gov.sa/Noor/EduWaveSMS/", "");
+
+    return `https://noor.moe.gov.sa/Noor/EduWaveSMS/${action}`.replace(
+      "./",
+      ""
+    );
   }
 
   private getWeirdData() {
     // BUG use the form!
     // todo use utils/hiddenInputs
     const hiddens = this.$("input[type='hidden']");
-    console.log(hiddens.length);
+    const hiddensSpecial = this.$("div[type='special']");
+
     let params = {} as any;
     hiddens.map((_, e) => {
       const elm = this.root(e);
-      console.log(elm.attr("name"));
       params[elm.attr("name")] = elm.attr("value");
+    });
+
+    hiddensSpecial.map((_, e) => {
+      const elm = this.root(e);
+      params[elm.attr("name")] = elm.text();
     });
 
     return params as { [key: string]: any };
@@ -126,8 +136,7 @@ export default class Form {
       ...weirdData,
       __EVENTTARGET: config.name,
       __ASYNCPOST: true,
-      ctl00$tbNameBookMarks:"" 
-
+      ctl00$tbNameBookMarks: "",
     };
 
     settings.forEach((s) => (payload[s.name] = s.value));
@@ -142,7 +151,6 @@ export default class Form {
   ) {
     const payload = this.fetchOptionRequestPayload(config, settings);
     const action = this.getFormAction();
-    console.log(action);
     const data = await redirect.fork(action, payload);
 
     this.updateForm(data);
@@ -152,19 +160,38 @@ export default class Form {
     const params = parseNewOptionsResponse(data);
     params.forEach((param) => {
       if (param[1] == "updatePanel") {
-        const id = param[2];
+        const id = param[2].replace(/_/g, "$"); //CHECK if the first time this is the case!
         const value = param[3];
-
-        this.$(`#${id} > *`).first().replaceWith(value);
+        this.$(`*[id='${id}'] > select`).first().replaceWith(value);
       } else if (param[1] == "hiddenField") {
         const name = param[2];
         const value = param[3];
         this.$(`input[name='${name}']`).attr("value", value);
+        this.$(`div[name='${name}']`).html(value);
       } else if (param[1] == "formAction") {
         const action = param[3];
         this.form.attr("action", action);
       }
     });
+  }
+
+  static fromJson(config: {
+    action: string;
+    weird: { [key: string]: string };
+    inputs: FormInput[];
+  }) {
+    const { action, weird, inputs } = config;
+    const root = loadHtml("<body></body>");
+
+    root("body").append(`<form action="${action}"></div>`);
+    const form = root("form");
+
+    Object.entries(weird)
+      .map(([k, v]) => `<div type='special' name='${k}'>${v}</div>`) // todo this is a hack
+      .forEach((e) => form.append(e));
+
+    inputs.forEach((inp) => form.append(this.createField(inp)));
+    return new Form(root.html());
   }
 
   toJson() {
@@ -175,12 +202,41 @@ export default class Form {
     return {
       action,
       weirdData,
-      inputs
-    }
+      inputs,
+    };
   }
 
+  static createField(input: FormInput) {
+    const options = input.options
+      .map(
+        (o) => `
+    <option ${o.selected ? "selected" : ""} value="${o.value}">${
+          o.text
+        }</option>
+        >
+    `
+      )
+      .join("");
 
-  static fromJson() {}
+    return `
+    <div>
+  <div class="feild_title">
+    <span>${input.title}</span>
+  </div>
+  <div class="feild_data">
+    <div id="${input.id}">
+    <span>${input.value}</span>
+      <select
+        name="${input.name}"
+      >
+      ${options}
+        
+      </select>
+    </div>
+  </div>
+</div>
+`;
+  }
 }
 
 function parseNewOptionsResponse(data: string) {

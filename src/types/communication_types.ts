@@ -1,6 +1,7 @@
 export type BouncingNavigation = {
   cookies: string[];
   from?: string;
+  weirdData?: {[key:string]:string};
 };
 
 export interface NavigateTo {
@@ -9,7 +10,13 @@ export interface NavigateTo {
   account: string;
 }
 
-type FormInput = {
+export interface FormOptions {
+  action: string;
+  inputs: FormInput[];
+  id: string;
+}
+
+export type FormInput = {
   title: string;
   value?: string;
   id: string;
@@ -21,14 +28,16 @@ type FormInput = {
   name?: string;
 };
 
+export type Form = {
+  action: string;
+  weirdData: {
+    [key: string]: any;
+  };
+  inputs: FormInput[];
+};
+
 export type NavigateResponse = {
   redirected: string;
   cookies: string[];
-  form: {
-    action: string;
-    weirdData: {
-      [key: string]: any;
-    };
-    inputs: FormInput[];
-  };
+  form: Form;
 };

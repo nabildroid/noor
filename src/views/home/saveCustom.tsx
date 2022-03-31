@@ -36,12 +36,14 @@ const options: RadioListItem[] = [
 interface SaveCustomProps {}
 
 const SaveCustom: React.FC<SaveCustomProps> = () => {
-  const { save } = useContext(SaveCustomContext);
   const { teacherType } = useContext(HomeContext);
+
+  const { save, inputs, updateInputs, loadingIndex } =
+    useContext(SaveCustomContext);
 
   const [loading, setLoading] = useState(false);
 
-  const [secondStage, setSecondStage] = useState(true);
+  const [secondStage, setSecondStage] = useState(false);
 
   const checkSave = () => {};
 
@@ -54,90 +56,24 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
 
       <div className="mt-4 b flex-1 flex flex-col max-w-sm mx-auto w-full">
         <div className="flex-1 flex flex-col w-full h-full px-4 bg-white rounded-md shadow  py-4">
-          <Transition className={"flex-1"} show={!secondStage}>
-            <div className=" space-y-2">
-              <div>
+          <Transition
+            className="flex-1 w-full grid md:grid-cols-2  gap-3"
+            show={!secondStage}
+          >
+            {inputs.map((input, i) => (
+              <div key={input.id}>
                 <SelectBox
-                  label="اخةيار الفة"
-                  options={[
-                    { id: "dsd", name: "dsdsds" },
-                    { id: "dsd1", name: "dsdsds" },
-                  ]}
+                  loading={i > loadingIndex}
+                  select={(e) => updateInputs(input.id, e)}
+                  label={input.title}
+                  options={input.options.map((e) => ({
+                    id: e.value,
+                    name: e.text,
+                    selected: e.selected,
+                  }))}
                 />
               </div>
-              <div>
-                <SelectBox
-                  label="اخةيار الفة"
-                  options={[
-                    { id: "dsd", name: "dsdsds" },
-                    { id: "dsd1", name: "dsdsds" },
-                  ]}
-                />
-              </div>
-              <div>
-                <SelectBox
-                  label="اخةيار الفة"
-                  options={[
-                    { id: "dsd", name: "dsdsds" },
-                    { id: "dsd1", name: "dsdsds" },
-                  ]}
-                />
-              </div>
-              <div>
-                <SelectBox
-                  label="اخةيار الفة"
-                  options={[
-                    { id: "dsd", name: "dsdsds" },
-                    { id: "dsd1", name: "dsdsds" },
-                  ]}
-                />
-              </div>
-              <div>
-                <SelectBox
-                  label="اخةيار الفة"
-                  options={[
-                    { id: "dsd", name: "dsdsds" },
-                    { id: "dsd1", name: "dsdsds" },
-                  ]}
-                />
-              </div>
-              <div>
-                <SelectBox
-                  label="اخةيار الفة"
-                  options={[
-                    { id: "dsd", name: "dsdsds" },
-                    { id: "dsd1", name: "dsdsds" },
-                  ]}
-                />
-              </div>
-              <div>
-                <SelectBox
-                  label="اخةيار الفة"
-                  options={[
-                    { id: "dsd", name: "dsdsds" },
-                    { id: "dsd1", name: "dsdsds" },
-                  ]}
-                />
-              </div>
-              <div>
-                <SelectBox
-                  label="اخةيار الفة"
-                  options={[
-                    { id: "dsd", name: "dsdsds" },
-                    { id: "dsd1", name: "dsdsds" },
-                  ]}
-                />
-              </div>
-              <div>
-                <SelectBox
-                  label="اخةيار الفة"
-                  options={[
-                    { id: "dsd", name: "dsdsds" },
-                    { id: "dsd1", name: "dsdsds" },
-                  ]}
-                />
-              </div>
-            </div>
+            ))}
           </Transition>
 
           <Transition className={"flex-1"} show={secondStage}>
@@ -151,7 +87,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
 
           <div className="flex mt-4 justify-center space-x-12">
             <button
-            onClick={()=>setSecondStage(false)}
+              onClick={() => setSecondStage(false)}
               className={`block w-3 h-3 rounded-full border-2 border-indigo-600 ${
                 loading ? "bg-indigo-500" : ""
               }`}

@@ -7,6 +7,7 @@ import {
 import { emulator, firebaseApp } from "../main";
 import {
   BouncingNavigation,
+  FormOptions,
   NavigateResponse,
   NavigateTo,
 } from "../types/communication_types";
@@ -64,10 +65,26 @@ export default class Repository {
       ...(this.bouncingData ?? {}),
     });
 
+    // todo refactoring is an obligation
     this.bouncingData = {
       ...response.data,
+      cookies: [
+        ...(this.bouncingData?.cookies ?? []),
+        ...response.data.cookies,
+      ],
+      from: response.data.redirected,
+      weirdData: response.data.form.weirdData,
     };
-    
+
     return response.data;
+  }
+
+  async formFetchOption(config: FormOptions) {
+    const response = await this.call<NavigateResponse>("formOption", {
+      ...config,
+      ...(this.bouncingData ?? {}),
+    });
+
+    console.log(response);
   }
 }

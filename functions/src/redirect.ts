@@ -1,7 +1,8 @@
 import http from "axios";
 import { stringify as QueryEncode } from "querystring";
-import {  load as loadHtml } from "cheerio";
+import { load as loadHtml } from "cheerio";
 import { weird } from "./types";
+import { replaceNullValues } from "./utils";
 
 import {
   defaultHeader,
@@ -20,6 +21,12 @@ interface RedirectionNavigationParams {
   to: string;
   target: RedirectionType;
   weirdData?: weird;
+}
+
+interface RedirectionLoadParams {
+  from: string;
+  cookies: string[];
+  weirdData: weird;
 }
 
 interface RedirectionInitParams {
@@ -73,6 +80,19 @@ export default class Redirect {
       html: data,
       redirected: "",
       prevCookies: headers["set-cookie"],
+    });
+  }
+
+  static load(config: RedirectionLoadParams) {
+    return new Redirect({
+      cookies: config.cookies,
+      from: config.from,
+      target: "",
+      to: "",
+      weirdData: config.weirdData,
+      html: "",
+      redirected: "",
+      prevCookies: [],
     });
   }
 
@@ -135,9 +155,11 @@ export default class Redirect {
   }
 
   async fork(to: string, payload: any) {
+
     const cookies = mergeCookies(this.prevCookies, this.cookies);
-    console.log("--------");
-    console.log(cookies);
+
+    payload = replaceNullValues(payload, "");
+
     const { data, headers } = await http.post(to, QueryEncode(payload), {
       headers: {
         ...defaultHeader(cookies),
@@ -147,11 +169,7 @@ export default class Redirect {
         "X-Requested-With": "XMLHttpRequest",
         ADRUM: "isAjax:true",
       },
-      // proxy:{
-      //   host:"127.0.0.1",
-      //   port:8082
-        
-      // }
+      
     });
 
     this.prevCookies = mergeCookies(
@@ -177,6 +195,8 @@ export default class Redirect {
       __EVENTARGUMENT: to || "",
       __EVENTTARGET: target ?? weirdData.__EVENTTARGET,
     };
+
+    replaceNullValues(requestData, "");
 
     const {
       data: responseData,

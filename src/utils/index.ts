@@ -8,6 +8,9 @@ export const tabBarTitle = (tab: HomeTab) =>
     [HomeTab.savedReports]: "الةقرارير",
     [HomeTab.selectRole]: "اخةيار الحسياب",
     [HomeTab.saveCustom]: "رصد وحدة ومهارة",
+    [HomeTab.studentsNotAccepted]: "رصد وحدة ومهارة",
+    [HomeTab.editSkill]: "رصد وحدة ومهارة",
+    [HomeTab.notSaved]: "رصد وحدة ومهارة",
   }[tab]);
 
 
