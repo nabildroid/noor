@@ -169,6 +169,10 @@ export default class Redirect {
         "X-Requested-With": "XMLHttpRequest",
         ADRUM: "isAjax:true",
       },
+      proxy:{
+        host:"127.0.0.1",
+        port:8082
+      }
       
     });
 

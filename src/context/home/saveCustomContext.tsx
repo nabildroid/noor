@@ -50,15 +50,13 @@ const SaveCustomProvider: React.FC = ({ children }) => {
     const index = inputs.findIndex((e) => e.id == id);
     setLoadinIndex(index);
 
-    try {
-      await Repository.instance.formFetchOption({
-        action: form!.action,
-        id: id,
-        inputs,
-      });
-    } catch (e) {
-      logout();
-    }
+    const { form: newForm } = await Repository.instance.formFetchOption({
+      action: form!.action,
+      id: id,
+      inputs,
+    });
+
+    setForm(newForm);
     setLoadinIndex(1000);
   }
 

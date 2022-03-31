@@ -20,6 +20,6 @@
 # problems
 - [X] Redirection logic
 - [ ] dealing with tables
-- [X] form submission 
-- [ ] stream of options 
+- [ ] form submission 
+- [X] stream of options 
 - [ ] empty messages 

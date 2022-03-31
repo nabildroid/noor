@@ -1,7 +1,7 @@
 export type BouncingNavigation = {
   cookies: string[];
   from?: string;
-  weirdData?: {[key:string]:string};
+  weirdData?: { [key: string]: string };
 };
 
 export interface NavigateTo {
@@ -36,8 +36,11 @@ export type Form = {
   inputs: FormInput[];
 };
 
-export type NavigateResponse = {
+export type NavigationResponse = {
   redirected: string;
   cookies: string[];
-  form: Form;
 };
+
+export interface FormNavigateResponse extends NavigationResponse {
+  form: Form;
+}

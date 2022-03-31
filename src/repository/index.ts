@@ -7,9 +7,10 @@ import {
 import { emulator, firebaseApp } from "../main";
 import {
   BouncingNavigation,
+  FormNavigateResponse,
   FormOptions,
-  NavigateResponse,
   NavigateTo,
+  NavigationResponse,
 } from "../types/communication_types";
 import { LoginFormParams, LoginSubmissionResponse } from "../types/login_types";
 
@@ -52,39 +53,58 @@ export default class Repository {
     });
 
     if (response.data.operation == "success") {
-      this.bouncingData = {
-        cookies: response.data.data,
-      };
+      this.updateBouncingData({ cookies: response.data.data });
     }
     return response.data;
   }
 
   async navigateTo(config: NavigateTo) {
-    const response = await this.call<NavigateResponse>("navigation", {
+    const response = await this.call<FormNavigateResponse>("navigation", {
       ...config,
       ...(this.bouncingData ?? {}),
     });
 
-    // todo refactoring is an obligation
-    this.bouncingData = {
-      ...response.data,
-      cookies: [
-        ...(this.bouncingData?.cookies ?? []),
-        ...response.data.cookies,
-      ],
+    this.updateBouncingData({
+      cookies: response.data.cookies,
       from: response.data.redirected,
       weirdData: response.data.form.weirdData,
-    };
+    });
 
     return response.data;
   }
 
   async formFetchOption(config: FormOptions) {
-    const response = await this.call<NavigateResponse>("formOption", {
+    const response = await this.call<FormNavigateResponse>("formOption", {
       ...config,
       ...(this.bouncingData ?? {}),
     });
 
-    console.log(response);
+    this.updateBouncingData({
+      cookies: response.data.cookies,
+      from: response.data.redirected,
+      weirdData: response.data.form.weirdData,
+    });
+
+    return response.data;
+  }
+
+  private updateBouncingData(config: Partial<BouncingNavigation>) {
+    if (!this.bouncingData) {
+      this.bouncingData = {
+        cookies: [],
+        ...config,
+      };
+    } else {
+      this.bouncingData = {
+        cookies: [
+          ...new Set([
+            ...(this.bouncingData?.cookies ?? []),
+            ...(config.cookies ?? []),
+          ]),
+        ],
+        from: config.from ?? this.bouncingData.from,
+        weirdData: config.weirdData ?? this.bouncingData.weirdData,
+      };
+    }
   }
 }

@@ -90,8 +90,6 @@ export default class Form {
   }
 
   private getWeirdData() {
-    // BUG use the form!
-    // todo use utils/hiddenInputs
     const hiddens = this.$("input[type='hidden']");
     const hiddensSpecial = this.$("div[type='special']");
 
@@ -162,6 +160,9 @@ export default class Form {
       if (param[1] == "updatePanel") {
         const id = param[2].replace(/_/g, "$"); //CHECK if the first time this is the case!
         const value = param[3];
+        console.log("-----------");
+        console.log(id);
+        console.log(value);
         this.$(`*[id='${id}'] > select`).first().replaceWith(value);
       } else if (param[1] == "hiddenField") {
         const name = param[2];
@@ -187,7 +188,7 @@ export default class Form {
     const form = root("form");
 
     Object.entries(weird)
-      .map(([k, v]) => `<div type='special' name='${k}'>${v}</div>`) // todo this is a hack
+      .map(([k, v]) => `<div type='special' name='${k}'>${v}</div>`)
       .forEach((e) => form.append(e));
 
     inputs.forEach((inp) => form.append(this.createField(inp)));

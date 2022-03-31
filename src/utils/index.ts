@@ -21,3 +21,8 @@ export const teacherTypeArabic = (type:TeacherType)=>{
     return "الابةدائية"
   else return "المةوسطة"
 }
+
+
+
+
+

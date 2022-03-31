@@ -35,5 +35,6 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
     homePage
   );
 
-  return form.toJson();
+  // todo include the cookies and redirected;
+  return { form: form.toJson() };
 });
