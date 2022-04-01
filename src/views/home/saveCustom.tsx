@@ -2,7 +2,7 @@ import { Transition } from "@headlessui/react";
 import React, { useContext, useEffect, useState } from "react";
 import PageTitle from "../../components/home/pageTitle";
 import RadioList from "../../components/home/radioList";
-import SavingButton from "../../components/home/savingButton";
+import CustomButton from "../../components/home/customButton";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
@@ -104,14 +104,15 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
           </div>
         </div>
 
+        {/* todo hide button instead of opacity */}
         <div
           className={`my-4 mb-16 text-center ${
             !secondStage ? "opacity-0" : "opacity-100"
           }`}
         >
-          <SavingButton loading={loading} onClick={checkSave}>
+          <CustomButton loading={loading} onClick={checkSave}>
             رصد
-          </SavingButton>
+          </CustomButton>
         </div>
       </div>
     </div>

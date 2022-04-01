@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import PageTitle from "../../components/home/pageTitle";
 import RadioList, { RadioListItem } from "../../components/home/radioList";
-import SavingButton from "../../components/home/savingButton";
+import CustomButton from "../../components/home/customButton";
 import { HomeContext } from "../../context/homeContext";
 import rates from "../../models/rating";
 import { RatingKinder } from "../../types/home_types";
@@ -37,9 +37,9 @@ const SaveAll: React.FC<SaveAllProps> = () => {
         />
 
         <div className="mt-4 text-center">
-          <SavingButton loading={loading} onClick={checkSave}>
+          <CustomButton loading={loading} onClick={checkSave}>
             رصد
-          </SavingButton>
+          </CustomButton>
         </div>
       </div>
     </div>
