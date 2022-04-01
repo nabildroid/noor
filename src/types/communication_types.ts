@@ -13,7 +13,16 @@ export interface NavigateTo {
 export interface FormOptions {
   action: string;
   inputs: FormInput[];
+  actionButtons: FormInput[];
+
   id: string;
+}
+
+export interface FormSubmit {
+  action: string;
+  inputs: FormInput[];
+  actionButton: FormInput;
+  // type: // todo submit type!
 }
 
 export type FormInput = {
@@ -34,6 +43,7 @@ export type Form = {
     [key: string]: any;
   };
   inputs: FormInput[];
+  actionButtons: FormInput[];
 };
 
 export type NavigationResponse = {

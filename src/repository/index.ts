@@ -9,6 +9,7 @@ import {
   BouncingNavigation,
   FormNavigateResponse,
   FormOptions,
+  FormSubmit,
   NavigateTo,
   NavigationResponse,
 } from "../types/communication_types";
@@ -88,6 +89,21 @@ export default class Repository {
     return response.data;
   }
 
+  async submitForm(config:FormSubmit){
+    const response = await this.call<FormNavigateResponse>("formSubmit", {
+      ...config,
+      ...(this.bouncingData ?? {}),
+    });
+
+    this.updateBouncingData({
+      cookies: response.data.cookies,
+      from: response.data.redirected,
+      weirdData: response.data.form.weirdData,
+    });
+
+    return response.data;
+  }
+
   private updateBouncingData(config: Partial<BouncingNavigation>) {
     if (!this.bouncingData) {
       this.bouncingData = {
@@ -98,8 +114,8 @@ export default class Repository {
       this.bouncingData = {
         cookies: [
           ...new Set([
-            ...(this.bouncingData?.cookies ?? []),
             ...(config.cookies ?? []),
+            ...(this.bouncingData?.cookies ?? []),
           ]),
         ],
         from: config.from ?? this.bouncingData.from,
@@ -107,4 +123,6 @@ export default class Repository {
       };
     }
   }
+
+
 }

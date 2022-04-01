@@ -1,15 +1,15 @@
 import http from "axios";
 import { stringify as QueryEncode } from "querystring";
 import { load as loadHtml } from "cheerio";
-import { weird } from "./types";
-import { replaceNullValues } from "./utils";
+import { weird } from "../types";
+import { replaceNullValues } from "../utils";
 
 import {
   defaultHeader,
   hiddenInputs,
   mergeCookies,
   pageNameBase64,
-} from "./utils";
+} from "../utils";
 
 type RedirectionType =
   | "MenuItemRedirect"
@@ -155,7 +155,6 @@ export default class Redirect {
   }
 
   async fork(to: string, payload: any) {
-
     const cookies = mergeCookies(this.prevCookies, this.cookies);
 
     payload = replaceNullValues(payload, "");
@@ -169,7 +168,10 @@ export default class Redirect {
         "X-Requested-With": "XMLHttpRequest",
         ADRUM: "isAjax:true",
       },
-      
+      proxy: {
+        host: "127.0.0.1",
+        port: 8082,
+      },
     });
 
     this.prevCookies = mergeCookies(

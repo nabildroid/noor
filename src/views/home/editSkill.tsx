@@ -17,8 +17,16 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
-  const { inputs, setForm, updateInputs, loadingIndex } = useFormOptions({
+  const {
+    inputs,
+    formAction,
+    setForm,
+    actionButton,
+    updateInputs,
+    loadingIndex,
+  } = useFormOptions({
     label: "editSkill" + teacherType,
+    actionName: "ibtnSearch",
   });
 
   useEffect(() => {
@@ -56,7 +64,13 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     }
   }, [stage]);
 
-  function fetchSkills() {}
+  async function fetchSkills() {
+    const action = await Repository.instance.submitForm({
+      action: formAction!,
+      actionButton: actionButton!,
+      inputs: inputs,
+    });
+  }
 
   const checkSave = async () => {};
 

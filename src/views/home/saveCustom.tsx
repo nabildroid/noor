@@ -21,6 +21,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
   const { inputs, setForm, updateInputs, loadingIndex } = useFormOptions({
     label: "saveCustom" + teacherType,
     excludedIds: ["PanelSkill"],
+    actionName:""
   });
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { load as loadHtml } from "cheerio";
-import { checkValidity } from "./helpers";
+import { checkValidity } from "../helpers";
 import Redirect from "./redirect";
-import { mergeNodeTexts } from "./utils";
+import { mergeNodeTexts } from "../utils";
 
 export type FormInput = {
   title: string;
@@ -31,6 +31,23 @@ export default class Form {
     this.root = loadHtml(html);
     this.form = this.root("body > form").first();
   }
+
+  private getActionButtons = () => {
+    const buttons = this.$("input[type='submit']");
+    const inputs: FormInput[] = [];
+
+    buttons.each((_, btnElm) => {
+      const btn = this.root(btnElm);
+      inputs.push({
+        id: btn.parentsUntil("div[id]").parent("div").attr("id"),
+        name: btn.attr("name"),
+        title: btn.attr("value"),
+        options: [],
+      });
+    });
+
+    return inputs;
+  };
 
   private getInputs() {
     const inputs: FormInput[] = [];
@@ -142,6 +159,26 @@ export default class Form {
     return payload;
   }
 
+  async submit(name: string, redirect: Redirect) {
+    const actionButtons = this.getActionButtons();
+    const target = actionButtons.find((e) => e.name == name)!;
+
+    const payload = this.fetchOptionRequestPayload(
+      { id: target.id, name: target.name!, value: target.title },
+      []
+    );
+
+    const action = this.getFormAction();
+
+    const data = await redirect.fork(action, {
+      ...payload,
+      [target.name!]: target.title,
+      __EVENTTARGET: "",
+    });
+
+    return data;
+  }
+
   async fetchFromOption(
     config: { id: string; name: string; value: string },
     settings: { name: string; value: string }[],
@@ -180,8 +217,9 @@ export default class Form {
     action: string;
     weird: { [key: string]: string };
     inputs: FormInput[];
+    actionButtons: FormInput[];
   }) {
-    const { action, weird, inputs } = config;
+    const { action, actionButtons, weird, inputs } = config;
     const root = loadHtml("<body></body>");
 
     root("body").append(`<form action="${action}"></div>`);
@@ -192,6 +230,11 @@ export default class Form {
       .forEach((e) => form.append(e));
 
     inputs.forEach((inp) => form.append(this.createField(inp)));
+    actionButtons.forEach((inp) =>
+      form.append(`<div id="${inp.id}"><div>
+    <input type="submit" name="${inp.name}" value="${inp.title}" />
+    </div></div>`)
+    );
     return new Form(root.html());
   }
 
@@ -199,11 +242,13 @@ export default class Form {
     const action = this.getFormAction();
     const weirdData = this.getWeirdData();
     const inputs = this.getInputs();
+    const actionButtons = this.getActionButtons();
 
     return {
       action,
       weirdData,
       inputs,
+      actionButtons,
     };
   }
 

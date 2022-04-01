@@ -5,15 +5,22 @@ import { Form, FormInput } from "../types/communication_types";
 interface Props {
   label: string;
   excludedIds?: string[];
+  actionName: string;
 }
 
-export default ({ label, excludedIds }: Props) => {
+export default ({ label, excludedIds, actionName }: Props) => {
   const [form, setForm] = useState<Form>();
   const [inputs, setInputs] = useState<FormInput[]>([]);
   const [loadingIndex, setLoadinIndex] = useState(100);
 
+  const visibleInputs = inputs.filter(
+    (e) => !withinIncludes(e.id, excludedIds)
+  );
 
-  const visibleInputs = inputs.filter((e) => !withinIncludes(e.id, excludedIds));
+  const actionButton = form?.actionButtons.find((e) =>
+    e.name?.includes(actionName)
+  );
+
   const updateInputs = async (id: string, value: string) => {
     let requireUpdate = false;
     const newInputs = inputs.map((inp, i) => {
@@ -46,6 +53,7 @@ export default ({ label, excludedIds }: Props) => {
         action: form!.action,
         id: id,
         inputs,
+        actionButtons: form!.actionButtons,
       });
 
       setForm(newForm);
@@ -63,7 +71,9 @@ export default ({ label, excludedIds }: Props) => {
     updateInputs,
     inputs: visibleInputs,
     setForm,
+    formAction: form?.action,
     loadingIndex,
+    actionButton,
   };
 };
 
