@@ -1,54 +1,58 @@
 import { Transition } from "@headlessui/react";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PageTitle from "../../components/home/pageTitle";
-import RadioList, { RadioListItem } from "../../components/home/radioList";
+import RadioList from "../../components/home/radioList";
 import SavingButton from "../../components/home/savingButton";
 import SelectBox from "../../components/home/selectBox";
-import Steper, { Step } from "../../components/home/steper";
-import { SaveCustomContext } from "../../context/home/saveCustomContext";
+import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
+import useFormOptions from "../../hooks/useFormOptions";
+import rates from "../../models/rating";
+import Repository from "../../repository";
 import { RatingKinder } from "../../types/home_types";
 import { teacherTypeArabic } from "../../utils";
-
-const options: RadioListItem[] = [
-  {
-    name: "جيد",
-    description: "الطلاب عملو بشكل جدي",
-    id: RatingKinder.good,
-  },
-  {
-    name: "سيء",
-    description: "الطلاب عملو بشكل جدي",
-    id: RatingKinder.bad,
-  },
-  {
-    name: "غير محدد",
-    description: "الطلاب عملو بشكل جدي",
-    id: RatingKinder.unknown,
-  },
-  {
-    name: "غير محدد",
-    description: "الطلاب عملو بشكل جدي",
-    id: RatingKinder.somewhat,
-  },
-];
 
 interface SaveCustomProps {}
 
 const SaveCustom: React.FC<SaveCustomProps> = () => {
-  const { teacherType } = useContext(HomeContext);
+  const { teacherType, currentRole } = useContext(HomeContext);
+  const { logout } = useContext(AppContext);
 
-  const { save, inputs, updateInputs, loadingIndex } =
-    useContext(SaveCustomContext);
+  const { inputs, setForm, updateInputs, loadingIndex } = useFormOptions({
+    label: "saveCustom" + teacherType,
+    excludedIds: ["PanelSkill"],
+  });
+
+  useEffect(() => {
+    Repository.instance
+      .navigateTo({
+        account: currentRole!,
+        nav1: "المهارات",
+        nav2: "إدخال نتائج المهارة على مستوى وحدة ومهارة",
+      })
+      .then((r) => setForm(r.form))
+      .catch(logout);
+  }, []);
+
+  const [rating, setRating] = useState<RatingKinder>();
 
   const [loading, setLoading] = useState(false);
-
   const [secondStage, setSecondStage] = useState(false);
 
-  const checkSave = () => {};
+  useEffect(() => {
+    setTimeout(() => {
+      setSecondStage(loadingIndex == inputs.length - 1);
+    }, 700);
+  }, [loadingIndex]);
+
+  const checkSave = async () => {
+    if (rating) {
+      setLoading(true);
+      console.log("saving ...");
+    }
+  };
 
   const pageTitle = `وحدة ومهارة${teacherTypeArabic(teacherType)}`;
-  // todo use form automatic submission
 
   return (
     <div className="flex flex-1 h-full flex-col">
@@ -80,8 +84,8 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
             <RadioList
               disabled={loading}
               title={pageTitle}
-              onSelect={() => {}}
-              items={options}
+              onSelect={(e) => setRating(e as any)}
+              items={rates(teacherType)}
             />
           </Transition>
 

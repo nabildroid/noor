@@ -3,9 +3,8 @@ import { BrowserRouter, Route, Navigate, Routes } from "react-router-dom";
 import Loading from "./components/loading";
 
 import { AppContext } from "./context/appContext";
-import SaveAllProvider from "./context/home/saveAllContext";
-import SaveCustomProvider from "./context/home/saveCustomContext";
 import { HomeTab } from "./models/home_model";
+import EditSkill from "./views/home/editSkill";
 import Onboarding from "./views/home/onboarding";
 import SaveAll from "./views/home/saveAll";
 import SaveCustom from "./views/home/saveCustom";
@@ -44,23 +43,10 @@ function App() {
                 </Suspense>
               }
             >
-              <Route
-                path={HomeTab.saveAllDegrees}
-                element={
-                  <SaveAllProvider>
-                    <SaveAll />
-                  </SaveAllProvider>
-                }
-              />
-
-              <Route
-                path={HomeTab.saveCustom}
-                element={
-                  <SaveCustomProvider>
-                    <SaveCustom />
-                  </SaveCustomProvider>
-                }
-              />
+              <Route path={HomeTab.saveAllDegrees} element={<SaveAll />} />
+              <Route path={HomeTab.editSkill} element={<EditSkill />} />
+              <Route path={HomeTab.saveCustom} element={<SaveCustom />} />
+              
               <Route
                 path={HomeTab.saveReport}
                 element={<span>Hello tab2</span>}

@@ -2,38 +2,14 @@ import React, { useContext, useState } from "react";
 import PageTitle from "../../components/home/pageTitle";
 import RadioList, { RadioListItem } from "../../components/home/radioList";
 import SavingButton from "../../components/home/savingButton";
-import { SaveAllContext } from "../../context/home/saveAllContext";
 import { HomeContext } from "../../context/homeContext";
+import rates from "../../models/rating";
 import { RatingKinder } from "../../types/home_types";
 import { teacherTypeArabic } from "../../utils";
-
-const options: RadioListItem[] = [
-  {
-    name: "جيد",
-    description: "الطلاب عملو بشكل جدي",
-    id: RatingKinder.good,
-  },
-  {
-    name: "سيء",
-    description: "الطلاب عملو بشكل جدي",
-    id: RatingKinder.bad,
-  },
-  {
-    name: "غير محدد",
-    description: "الطلاب عملو بشكل جدي",
-    id: RatingKinder.unknown,
-  },
-  {
-    name: "غير محدد",
-    description: "الطلاب عملو بشكل جدي",
-    id: RatingKinder.somewhat,
-  },
-];
 
 interface SaveAllProps {}
 
 const SaveAll: React.FC<SaveAllProps> = () => {
-  const { save } = useContext(SaveAllContext);
   const { teacherType } = useContext(HomeContext);
   const [selected, select] = useState<RatingKinder>();
   const [loading, setLoading] = useState(false);
@@ -42,7 +18,6 @@ const SaveAll: React.FC<SaveAllProps> = () => {
     console.log("saving", selected);
     if (selected !== undefined) {
       setLoading(true);
-      save(selected);
     }
   };
 
@@ -57,8 +32,8 @@ const SaveAll: React.FC<SaveAllProps> = () => {
         <RadioList
           disabled={loading}
           title={pageTitle}
-          onSelect={(v) => select(v as RatingKinder)}
-          items={options}
+          onSelect={(e) => select(e as any)}
+          items={rates(teacherType)}
         />
 
         <div className="mt-4 text-center">

@@ -68,7 +68,7 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
 
   const secondNav = await firstNav.next(async (config) => {
     const nav2Ids = await innerNavigation(config.html);
-    const nav2Id = nav2Ids[0].id;
+    const nav2Id = nav2Ids.find((e) => e.text == data.nav2)!.id;
 
     console.log("##### YAYYYY second step!");
 
