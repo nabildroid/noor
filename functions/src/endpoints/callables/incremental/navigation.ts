@@ -4,8 +4,8 @@ import { IncrementalData } from "../../../types";
 import { extractRoleIds } from "../../../utils";
 import { load } from "cheerio";
 import { extractHomeData } from "../../../helpers";
-import Redirect from "../../../redirect";
-import Form from "../../../form";
+import Redirect from "../../../core/redirect";
+import Form from "../../../core/form";
 
 interface NavigationData extends IncrementalData {
   account: string;
@@ -68,6 +68,7 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
 
   const secondNav = await firstNav.next(async (config) => {
     const nav2Ids = await innerNavigation(config.html);
+    console.log(nav2Ids);
     const nav2Id = nav2Ids.find((e) => e.text == data.nav2)!.id;
 
     console.log("##### YAYYYY second step!");

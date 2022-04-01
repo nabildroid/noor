@@ -1,12 +1,13 @@
 import * as functions from "firebase-functions";
 
 import { IncrementalData } from "../../../types";
-import Redirect from "../../../redirect";
-import Form, { FormInput } from "../../../form";
+import Redirect from "../../../core/redirect";
+import Form, { FormInput } from "../../../core/form";
 
 interface NavigationData extends IncrementalData {
   action: string;
   inputs: FormInput[];
+  actionButtons: FormInput[];
   id: string;
 }
 
@@ -24,6 +25,7 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
     action: data.action,
     weird: data.weirdData,
     inputs: data.inputs,
+    actionButtons: data.actionButtons,
   });
 
   const selected = data.inputs.find((e) => e.id == data.id)!;

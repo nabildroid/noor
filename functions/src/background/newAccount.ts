@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 
 import { auth, db } from "../common";
 import { extractHomeData } from "../helpers";
-import Redirect from "../redirect";
+import Redirect from "../core/redirect";
 
 export default functions.auth.user().onCreate(async (user) => {
   if (!user.email) {
