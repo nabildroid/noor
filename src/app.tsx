@@ -10,6 +10,7 @@ import Onboarding from "./views/home/onboarding";
 import SaveAll from "./views/home/saveAll";
 import SaveCustom from "./views/home/saveCustom";
 import SaveDegree from "./views/home/saveDegree";
+import SavedReports from "./views/home/savedReports";
 import SaveReport from "./views/home/saveReport";
 import Login from "./views/login";
 
@@ -49,19 +50,15 @@ function App() {
               <Route path={HomeTab.save} element={<SaveAll />} />
               <Route path={HomeTab.editSkill} element={<EditSkill />} />
               <Route path={HomeTab.saveCustom} element={<SaveCustom />} />
-              <Route path={HomeTab.saveCustom} element={<SaveCustom />} />
 
               <Route path={HomeTab.saveReport} element={<SaveReport />} />
               <Route path={HomeTab.savedegree} element={<SaveDegree />} />
               <Route path={HomeTab.didntGet} element={<DidntGet/>} />
+              <Route path={HomeTab.savedReports} element={<SavedReports/>} />
               <Route path={HomeTab.saveAll} element={<span>Hello tab3</span>} />
               <Route
                 path={HomeTab.selectRole}
                 element={<span>Hello tab4</span>}
-              />
-              <Route
-                path={HomeTab.savedReports}
-                element={<span>Hello tab5</span>}
               />
 
               <Route index element={<Onboarding />} />
