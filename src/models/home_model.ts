@@ -15,10 +15,11 @@ export type Teacher = {
 
 export enum HomeTab {
   selectRole = "/",
-  saveOneDegree = "save",
-  saveAllDegrees = "saveall",
+  save = "save",
+  saveAll = "saveall",
+  savedegree = "savedegree",
   editSkill = "editSkill",
-  notSaved = "notsaved",
+  didntGet = "didntget",
   studentsNotAccepted = "notaccepted",
   savedReports = "reports",
   saveReport = "newreport",

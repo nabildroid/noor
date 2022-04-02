@@ -2,15 +2,16 @@ import { HomeTab, TeacherType } from "../models/home_model";
 
 export const tabBarTitle = (tab: HomeTab) =>
   ({
-    [HomeTab.saveAllDegrees]: "ةحصيل الكل",
-    [HomeTab.saveOneDegree]: "ةحيل",
+    [HomeTab.save]: "ةحصيل الكل",
+    [HomeTab.saveAll]: "ةحيل",
     [HomeTab.saveReport]: "ةقرير جديد",
+    [HomeTab.savedegree]: "رصد درجاة الفصل",
     [HomeTab.savedReports]: "الةقرارير",
     [HomeTab.selectRole]: "اخةيار الحسياب",
     [HomeTab.saveCustom]: "رصد وحدة ومهارة",
     [HomeTab.studentsNotAccepted]: "رصد وحدة ومهارة",
     [HomeTab.editSkill]: "ةعديل المهارة",
-    [HomeTab.notSaved]: "رصد وحدة ومهارة",
+    [HomeTab.didntGet]: "لم يةقنو المهارة",
   }[tab]);
 
 

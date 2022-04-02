@@ -17,10 +17,6 @@ export default ({ label, excludedIds, actionName }: Props) => {
     (e) => !withinIncludes(e.id, excludedIds)
   );
 
-  const actionButton = form?.actionButtons.find((e) =>
-    e.name?.includes(actionName)
-  );
-
   const updateInputs = async (id: string, value: string) => {
     let requireUpdate = false;
     const newInputs = inputs.map((inp, i) => {
@@ -61,6 +57,18 @@ export default ({ label, excludedIds, actionName }: Props) => {
     }
   }
 
+  async function submit() {
+    const actionButton = form?.actionButtons.find((e) =>
+      e.name?.includes(actionName)
+    );
+
+    const action = await Repository.instance.submitForm({
+      action: form!.action,
+      actionButton: actionButton!,
+      inputs: inputs,
+    });
+  }
+
   useEffect(() => {
     if (form) {
       setInputs(formatInputs(form.inputs));
@@ -73,7 +81,7 @@ export default ({ label, excludedIds, actionName }: Props) => {
     setForm,
     formAction: form?.action,
     loadingIndex,
-    actionButton,
+    submit,
   };
 };
 

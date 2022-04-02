@@ -4,3 +4,8 @@ export enum RatingKinder {
   somewhat,
   unknown,
 }
+
+export enum Presense {
+  present,
+  absent,
+}

@@ -36,7 +36,7 @@ const Home: React.FC = ({ children }) => {
   }, [pathname, tabs]);
 
   return (
-    <div className="w-screen min-h-screen flex  bg-slate-100">
+    <div className="min-h-screen flex  bg-slate-100">
       <div className="flex-1 flex flex-col">
         <div className="px-4 flex-col-reverse p-2 bg-white md:bg-transparent md:flex-row font-arabic md:h-16 w-full  flex items-center justify-between">
           <div className="w-full pr-2 md:w-auto justify-end flex">

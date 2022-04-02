@@ -13,18 +13,17 @@ export const firebaseApp = initializeApp({
   storageBucket: "noor-a4a7d.appspot.com",
   messagingSenderId: "133224766800",
   appId: "1:133224766800:web:6bfbf76b956112ad832055",
+  databaseURL: "192.168.43.198",
 });
 
 const App = React.lazy(() => import("./app"));
 const AppProvider = React.lazy(() => import("./context/appContext"));
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Suspense fallback={<span></span>}>
-      <AppProvider>
-        <App />
-      </AppProvider>
-    </Suspense>
-  </React.StrictMode>,
+  <Suspense fallback={<span></span>}>
+    <AppProvider>
+      <App />
+    </AppProvider>
+  </Suspense>,
   document.getElementById("root")
 );

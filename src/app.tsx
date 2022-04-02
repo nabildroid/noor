@@ -4,10 +4,13 @@ import Loading from "./components/loading";
 
 import { AppContext } from "./context/appContext";
 import { HomeTab } from "./models/home_model";
+import DidntGet from "./views/home/didntGet";
 import EditSkill from "./views/home/editSkill";
 import Onboarding from "./views/home/onboarding";
 import SaveAll from "./views/home/saveAll";
 import SaveCustom from "./views/home/saveCustom";
+import SaveDegree from "./views/home/saveDegree";
+import SaveReport from "./views/home/saveReport";
 import Login from "./views/login";
 
 const Home = React.lazy(() => import("./views/home"));
@@ -43,18 +46,15 @@ function App() {
                 </Suspense>
               }
             >
-              <Route path={HomeTab.saveAllDegrees} element={<SaveAll />} />
+              <Route path={HomeTab.save} element={<SaveAll />} />
               <Route path={HomeTab.editSkill} element={<EditSkill />} />
               <Route path={HomeTab.saveCustom} element={<SaveCustom />} />
-              
-              <Route
-                path={HomeTab.saveReport}
-                element={<span>Hello tab2</span>}
-              />
-              <Route
-                path={HomeTab.saveOneDegree}
-                element={<span>Hello tab3</span>}
-              />
+              <Route path={HomeTab.saveCustom} element={<SaveCustom />} />
+
+              <Route path={HomeTab.saveReport} element={<SaveReport />} />
+              <Route path={HomeTab.savedegree} element={<SaveDegree />} />
+              <Route path={HomeTab.didntGet} element={<DidntGet/>} />
+              <Route path={HomeTab.saveAll} element={<span>Hello tab3</span>} />
               <Route
                 path={HomeTab.selectRole}
                 element={<span>Hello tab4</span>}

@@ -12,6 +12,7 @@ interface RadioList {
   onSelect(id: string | number): void;
   title: string;
   disabled: boolean;
+  current?:RadioListItem;
 }
 
 function classNames(...classes: string[]) {
@@ -23,8 +24,9 @@ const RadioList: React.FC<RadioList> = ({
   disabled,
   onSelect,
   title,
+  current,
 }) => {
-  const [selected, setSelected] = useState(items[0]);
+  const [selected, setSelected] = useState(current??items[0]);
 
   useEffect(() => {
     onSelect(selected.id);

@@ -35,22 +35,20 @@ const HomeProvider: React.FC = ({ children }) => {
 
   const getTeacherTabs = (type: TeacherType) => {
     return [
-      HomeTab.saveAllDegrees,
-      HomeTab.saveOneDegree,
+      HomeTab.save,
+      HomeTab.saveAll,
       HomeTab.savedReports,
+      HomeTab.savedegree,
       HomeTab.saveCustom,
       HomeTab.editSkill,
+      HomeTab.saveReport,
+      HomeTab.didntGet,
     ];
     if (type == TeacherType.elementery)
-      return [HomeTab.saveAllDegrees, HomeTab.saveReport, HomeTab.saveCustom];
+      return [HomeTab.saveReport, HomeTab.saveCustom];
     else if (type == TeacherType.kindergarten)
-      return [HomeTab.saveAllDegrees, HomeTab.saveCustom, HomeTab.selectRole];
-    return [
-      HomeTab.saveAllDegrees,
-      HomeTab.saveOneDegree,
-      HomeTab.savedReports,
-      HomeTab.saveCustom,
-    ];
+      return [HomeTab.saveCustom, HomeTab.selectRole];
+    return [HomeTab.savedReports, HomeTab.saveCustom];
   };
 
   const getTeacherType = (currentRole?: string) => {
