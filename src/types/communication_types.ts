@@ -16,6 +16,7 @@ export interface FormOptions {
   action: string;
   inputs: FormInput[];
   actionButtons: FormInput[];
+  id: string;
 }
 
 export interface FormSubmit {
@@ -48,6 +49,7 @@ export type NavigationResponse = {
   cookies: string[];
   from: string;
   weirdData: { [key: string]: string };
+  payload: any;
 };
 
 export interface FormNavigateResponse extends NavigationResponse {

@@ -10,6 +10,7 @@ import useFormOptions from "../../hooks/useFormOptions";
 import rates, { KinderRating } from "../../models/rating";
 import Repository from "../../repository";
 import { teacherTypeArabic } from "../../utils";
+import { EditSkillNavigateResponse } from "../../types/communication_types";
 
 interface EditSkillProps {}
 
@@ -101,8 +102,9 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   }, [stage]);
 
   async function fetchSkills() {
-    const skills = await submit();
-    console.log(submit);
+    const response = await submit<EditSkillNavigateResponse>("skillSubmit");
+
+    setSkills(response.skills);
   }
 
   const checkSave = async () => {};

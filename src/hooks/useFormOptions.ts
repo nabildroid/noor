@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Repository from "../repository";
-import { Form, FormInput } from "../types/communication_types";
+import {
+  Form,
+  FormInput,
+  NavigationResponse,
+} from "../types/communication_types";
 
 interface Props {
   label: string;
@@ -57,16 +61,23 @@ export default ({ label, excludedIds, actionName }: Props) => {
     }
   }
 
-  async function submit() {
+  async function submit<T extends NavigationResponse>(
+    type: Parameters<Repository["submitForm"]>["1"]
+  ) {
     const actionButton = form?.actionButtons.find((e) =>
       e.name?.includes(actionName)
     );
 
-    const action = await Repository.instance.submitForm({
-      action: form!.action,
-      actionButton: actionButton!,
-      inputs: inputs,
-    });
+    const action = await Repository.instance.submitForm<T>(
+      {
+        action: form!.action,
+        actionButton: actionButton!,
+        inputs: inputs,
+      },
+      type
+    );
+
+    return action as T["payload"];
   }
 
   useEffect(() => {

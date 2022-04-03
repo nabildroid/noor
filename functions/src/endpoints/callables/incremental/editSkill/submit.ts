@@ -35,5 +35,7 @@ export default functions.https.onCall(async (data: NavigationData) => {
   form.updateFromSreachSubmission(search);
 
   // todo include the cookies and redirected;
-  return { form: form.toJson() };
+  return homePage.sendForm(form, {
+    ...form.toJson(),
+  });
 });

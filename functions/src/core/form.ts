@@ -309,14 +309,14 @@ export default class Form {
       if (param[1] == "updatePanel") {
         const id = param[2].replace(/_/g, "$"); //CHECK if the first time this is the case!
         const value = param[3];
-        config?.updatePanel(id, value);
+        if (config.updatePanel) config.updatePanel(id, value);
       } else if (param[1] == "hiddenField") {
         const name = param[2];
         const value = param[3];
-        config?.hiddenFeild(name, value);
+        if (config.hiddenFeild) config.hiddenFeild(name, value);
       } else if (param[1] == "formAction") {
         const action = param[3];
-        config?.formAction(action);
+        if (config.formAction) config.formAction(action);
       }
     });
   }
