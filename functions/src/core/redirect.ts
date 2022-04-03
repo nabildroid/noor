@@ -168,10 +168,6 @@ export default class Redirect {
         "X-Requested-With": "XMLHttpRequest",
         ADRUM: "isAjax:true",
       },
-      proxy: {
-        host: "127.0.0.1",
-        port: 8082,
-      },
     });
 
     this.prevCookies = mergeCookies(
@@ -180,6 +176,7 @@ export default class Redirect {
       headers["set-cookie"]
     );
 
+    console.log(data.split("__EVENTARGUMENT")[0]);
     return data;
   }
 

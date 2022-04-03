@@ -4,22 +4,22 @@ import Redirect from "./redirect";
 import { mergeNodeTexts } from "../utils";
 
 export type FormInput = {
-  title: string;
-  value?: string;
-  id: string;
+  title: string; // label
+  value?: string; // in case the input doesn't have an options "serve as a supliment information"
+  id: string; // the parent id
   options: {
     selected: boolean;
     text: string;
     value: string;
   }[];
-  name?: string;
+  name?: string; // the input name
 };
 
 export default class Form {
-  private root: cheerio.Root;
-  private form: cheerio.Cheerio;
+  protected root: cheerio.Root;
+  protected form: cheerio.Cheerio;
 
-  private $(selector: string, context?: cheerio.Cheerio) {
+  protected $(selector: string, context?: cheerio.Cheerio) {
     return this.root(selector, context || this.form);
   }
 
@@ -30,6 +30,10 @@ export default class Form {
 
     this.root = loadHtml(html);
     this.form = this.root("body > form").first();
+  }
+
+  get html() {
+    return this.root.html();
   }
 
   private getActionButtons = () => {
@@ -191,25 +195,21 @@ export default class Form {
     this.updateForm(data);
   }
 
-  private updateForm(data: string) {
-    const params = parseNewOptionsResponse(data);
-    params.forEach((param) => {
-      if (param[1] == "updatePanel") {
-        const id = param[2].replace(/_/g, "$"); //CHECK if the first time this is the case!
-        const value = param[3];
-        console.log("-----------");
-        console.log(id);
-        console.log(value);
+  /**
+   * handle the select and form aciton and basic hidden inputs
+   */
+  protected updateForm(data: string) {
+    Form.parseResponse(data, {
+      updatePanel: (id, value) => {
         this.$(`*[id='${id}'] > select`).first().replaceWith(value);
-      } else if (param[1] == "hiddenField") {
-        const name = param[2];
-        const value = param[3];
+      },
+      hiddenFeild: (name, value) => {
         this.$(`input[name='${name}']`).attr("value", value);
         this.$(`div[name='${name}']`).html(value);
-      } else if (param[1] == "formAction") {
-        const action = param[3];
+      },
+      formAction: (action) => {
         this.form.attr("action", action);
-      }
+      },
     });
   }
 
@@ -235,7 +235,7 @@ export default class Form {
     <input type="submit" name="${inp.name}" value="${inp.title}" />
     </div></div>`)
     );
-    return new Form(root.html());
+    return new this(root.html());
   }
 
   toJson() {
@@ -283,19 +283,41 @@ export default class Form {
 </div>
 `;
   }
-}
 
-function parseNewOptionsResponse(data: string) {
-  return data.split("|").reduce(
-    (acc, v) => {
-      const last = acc[acc.length - 1];
-      if (last.length > 3) {
-        acc.push([v]);
-      } else {
-        last.push(v);
+  static parseResponse(
+    data: string,
+    config: {
+      updatePanel?: (id: string, value: string) => void;
+      hiddenFeild?: (name: string, value: string) => void;
+      formAction?: (action: string) => void;
+    }
+  ) {
+    const params = data.split("|").reduce(
+      (acc, v) => {
+        const last = acc[acc.length - 1];
+        if (last.length > 3) {
+          acc.push([v]);
+        } else {
+          last.push(v);
+        }
+        return acc;
+      },
+      [[]]
+    ) as string[][];
+
+    params.forEach((param) => {
+      if (param[1] == "updatePanel") {
+        const id = param[2].replace(/_/g, "$"); //CHECK if the first time this is the case!
+        const value = param[3];
+        config?.updatePanel(id, value);
+      } else if (param[1] == "hiddenField") {
+        const name = param[2];
+        const value = param[3];
+        config?.hiddenFeild(name, value);
+      } else if (param[1] == "formAction") {
+        const action = param[3];
+        config?.formAction(action);
       }
-      return acc;
-    },
-    [[]]
-  ) as string[][];
+    });
+  }
 }

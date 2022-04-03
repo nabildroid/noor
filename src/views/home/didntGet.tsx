@@ -13,7 +13,6 @@ import { teacherTypeArabic } from "../../utils";
 import CheckBoxs from "../../components/home/checkboxs";
 import { FormInput } from "../../types/communication_types";
 import Noti from "../../components/home/noti";
-import WhiteTable from "../../components/home/whiteTable";
 
 interface DidntGetProps {}
 

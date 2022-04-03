@@ -1,26 +1,31 @@
 import { load } from "cheerio";
-import { FormInput } from "./form";
 
-abstract class Table<T extends { [key: string]: any }> {
+export default abstract class Table<T extends { [key: string]: any }> {
   private root: cheerio.Root;
   private table: cheerio.Cheerio;
 
-  private $(selector: string, context?: cheerio.Cheerio) {
+  protected $(selector: string, context?: cheerio.Cheerio) {
     return this.root(selector, context || this.table);
   }
 
-  constructor(html: string, id: string) {
+  constructor(html: string, id?: string) {
     this.root = load(html);
-    this.table = this.root(`div[id='${id}']`);
+    if (id) {
+      this.table = this.root(`div[id='${id}']`);
+    } else {
+      this.table = this.root("table");
+    }
   }
 
   lines() {
     const lines: (T & { id: string })[] = [];
 
-    this.$("tr").map((i, e) => {
-      if (!i) return;
-
+    this.$("tbody > tr").each((i, e) => {
       const elm = this.root(e);
+
+      if (i == 0) return;
+      if (!this.filter(elm)) return;
+
       const id = elm.attr("id");
       lines.push({
         id,
@@ -31,18 +36,6 @@ abstract class Table<T extends { [key: string]: any }> {
     return lines;
   }
 
-  protected abstract processLine(th: cheerio.Cheerio): T;
-}
-
-type skill = {
-  num: number;
-  type: string;
-  name: string;
-  input: FormInput;
-};
-
-class SkillEditTable extends Table<skill> {
-  protected processLine(th: cheerio.Cheerio): skill {
-    
-  }
+  protected abstract processLine(tr: cheerio.Cheerio): T;
+  protected abstract filter(tr: cheerio.Cheerio): boolean;
 }

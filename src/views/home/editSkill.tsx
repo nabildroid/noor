@@ -30,18 +30,18 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     });
 
   useEffect(() => {
-    // Repository.instance
-    //   .navigateTo({
-    //     account: currentRole!,
-    //     nav1: "المهارات",
-    //     nav2: "إدخال نتائج المهارة على مستوى طفل ووحدة",
-    //   })
-    //   .then((r) => setForm(r.form))
-    //   .catch(logout);
+    Repository.instance
+      .navigateTo({
+        account: currentRole!,
+        nav1: "المهارات",
+        nav2: "إدخال نتائج المهارة على مستوى طفل ووحدة",
+      })
+      .then((r) => setForm(r.form))
+      .catch(logout);
   }, []);
 
   const [loading, setLoading] = useState(false);
-  const [stage, setStage] = useState(2);
+  const [stage, setStage] = useState(0);
 
   const [student, setStudent] = useState("نبيل العقريب");
 
@@ -97,7 +97,8 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   }, [stage]);
 
   async function fetchSkills() {
-    // const skills = await submit();
+    const skills = await submit();
+    console.log(submit);
   }
 
   const checkSave = async () => {};
