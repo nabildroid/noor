@@ -13,10 +13,11 @@ import { teacherTypeArabic } from "../../utils";
 
 interface EditSkillProps {}
 
-type Skill = {
-  title: string;
+export type Skill = {
   id: string;
-  value: RadioListItem;
+  value: string;
+  skillId: number;
+  title: string;
 };
 
 const EditSkill: React.FC<EditSkillProps> = () => {
@@ -49,17 +50,20 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     {
       id: "sddsd",
       title: "hello world",
-      value: KinderRating[0],
+      value: KinderRating[0].name,
+      skillId: 577657,
     },
     {
       id: "sdddzdsd",
       title: "infographya",
-      value: KinderRating[2],
+      skillId: 15151,
+      value: KinderRating[2].name,
     },
     {
       id: "sdddsdsdzdsd",
       title: "ikram dellici",
-      value: KinderRating[3],
+      skillId: 1515,
+      value: KinderRating[3].name,
     },
   ]);
 
@@ -69,7 +73,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
         if (e.id == skillId) {
           return {
             ...e,
-            value: KinderRating.find((i) => i.id == ratingId)!,
+            value: KinderRating.find((i) => i.id == ratingId)!.name,
           };
         } else return e;
       })
@@ -169,7 +173,11 @@ const EditSkill: React.FC<EditSkillProps> = () => {
               </h3>
               <div className="mt-2">
                 <RadioList
-                  current={s.value}
+                  current={{
+                    description: "",
+                    id: s.id,
+                    name: s.title,
+                  }}
                   disabled={loading}
                   title={s.title}
                   onSelect={(e) => setSkillsById(s.id, e as any)}

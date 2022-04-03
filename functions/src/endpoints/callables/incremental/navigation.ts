@@ -79,14 +79,10 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
     };
   });
 
-  const { prevCookies, redirected, html } = secondNav.stop();
+  const { html } = secondNav.stop();
   const form = new Form(html);
 
-  return {
-    redirected,
-    cookies: prevCookies,
-    form: form.toJson(),
-  };
+  return secondNav.sendForm(form);
 });
 
 async function innerNavigation(data: string) {

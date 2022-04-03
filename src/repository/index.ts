@@ -7,6 +7,7 @@ import {
 import { emulator, firebaseApp } from "../main";
 import {
   BouncingNavigation,
+  EditSkillNavigateResponse,
   FormNavigateResponse,
   FormOptions,
   FormSubmit,
@@ -67,11 +68,11 @@ export default class Repository {
 
     this.updateBouncingData({
       cookies: response.data.cookies,
-      from: response.data.redirected,
-      weirdData: response.data.form.weirdData,
+      from: response.data.redirected ||response.data.from,
+      weirdData: response.data.weirdData
     });
-
-    return response.data;
+    console.log("navigate to:::::");
+    return response.data.payload;
   }
 
   async formFetchOption(config: FormOptions) {
@@ -82,29 +83,31 @@ export default class Repository {
 
     this.updateBouncingData({
       cookies: response.data.cookies,
-      from: response.data.redirected,
-      weirdData: response.data.form.weirdData,
+      from: response.data.redirected ||response.data.from,
+      weirdData: response.data.weirdData,
     });
 
-    return response.data;
+    return response.data.payload;
   }
 
-  async submitForm(config:FormSubmit){
-    const response = await this.call<FormNavigateResponse>("formSubmit", {
+  async submitForm(config:FormSubmit,type:"formSubmit"|"skillSubmit"){
+    const response = await this.call<EditSkillNavigateResponse>(type, {
       ...config,
       ...(this.bouncingData ?? {}),
     });
 
     this.updateBouncingData({
       cookies: response.data.cookies,
-      from: response.data.redirected,
-      weirdData: response.data.form.weirdData,
+      from: response.data.redirected ||response.data.from,
+      weirdData: response.data.weirdData,
     });
 
-    return response.data;
+    return response.data.payload;
   }
 
   private updateBouncingData(config: Partial<BouncingNavigation>) {
+    console.log(config);
+
     if (!this.bouncingData) {
       this.bouncingData = {
         cookies: [],
@@ -122,7 +125,10 @@ export default class Repository {
         weirdData: config.weirdData ?? this.bouncingData.weirdData,
       };
     }
+    console.log(this.bouncingData);
   }
+
+
 
 
 }

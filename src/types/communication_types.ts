@@ -1,3 +1,5 @@
+import { Skill } from "../views/home/editSkill";
+
 export type BouncingNavigation = {
   cookies: string[];
   from?: string;
@@ -14,8 +16,6 @@ export interface FormOptions {
   action: string;
   inputs: FormInput[];
   actionButtons: FormInput[];
-
-  id: string;
 }
 
 export interface FormSubmit {
@@ -39,9 +39,6 @@ export type FormInput = {
 
 export type Form = {
   action: string;
-  weirdData: {
-    [key: string]: any;
-  };
   inputs: FormInput[];
   actionButtons: FormInput[];
 };
@@ -49,8 +46,20 @@ export type Form = {
 export type NavigationResponse = {
   redirected: string;
   cookies: string[];
+  from: string;
+  weirdData: { [key: string]: string };
 };
 
 export interface FormNavigateResponse extends NavigationResponse {
-  form: Form;
+  payload: {
+    form: Form;
+  };
+}
+
+export interface EditSkillNavigateResponse extends NavigationResponse {
+  payload: {
+    form: Form;
+    skillId: string;
+    skills: Skill[];
+  };
 }

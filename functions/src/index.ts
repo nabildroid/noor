@@ -5,6 +5,11 @@ import navigation from "./endpoints/callables/incremental/navigation";
 import formOption from "./endpoints/callables/incremental/formOptions";
 import formSubmit from "./endpoints/callables/incremental/formSubmit";
 
+import skillSubmit from "./endpoints/callables/incremental/editSkill/submit";
+// import skillSave from "./endpoints/callables/incremental/editSkill/save";
+
+
+
 export {
   signForm,
   postSignForm,
@@ -12,4 +17,6 @@ export {
   navigation,
   formOption,
   formSubmit,
+  // skillSave,
+  skillSubmit
 };

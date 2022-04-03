@@ -19,7 +19,8 @@
 
 # problems
 - [X] Redirection logic
-- [ ] dealing with tables
+- [X] dealing with tables
 - [X] form submission 
+- [ ] multi steps form submission 
 - [X] stream of options 
 - [ ] empty messages 

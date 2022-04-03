@@ -10,6 +10,7 @@ import {
   mergeCookies,
   pageNameBase64,
 } from "../utils";
+import Form from "./form";
 
 type RedirectionType =
   | "MenuItemRedirect"
@@ -169,6 +170,8 @@ export default class Redirect {
         ADRUM: "isAjax:true",
       },
     });
+    console.log(data);
+    this.weirdData = hiddenInputs(loadHtml(data));
 
     this.prevCookies = mergeCookies(
       this.cookies,
@@ -176,7 +179,6 @@ export default class Redirect {
       headers["set-cookie"]
     );
 
-    console.log(data.split("__EVENTARGUMENT")[0]);
     return data;
   }
 
@@ -215,5 +217,28 @@ export default class Redirect {
       redirected: request.res.responseUrl as string,
       prevCookies: headers["set-cookie"] ?? [],
     });
+  }
+
+  send(ob: { [key: string]: any }) {
+    return {
+      redirected: this.redirected,
+      cookies: mergeCookies(this.prevCookies, this.cookies),
+      from: this.from,
+      weirdData: this.weirdData,
+      payload: ob,
+    };
+  }
+
+  sendForm(form: Form, ob?: { [key: string]: any }) {
+    return {
+      redirected: this.redirected,
+      cookies: mergeCookies(this.prevCookies, this.cookies),
+      from: this.from,
+      weirdData: form.getWeirdData(),
+      payload: {
+        form: form.toJson(),
+        ...(ob ?? {}),
+      },
+    };
   }
 }

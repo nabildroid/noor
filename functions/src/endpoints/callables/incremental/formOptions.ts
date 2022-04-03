@@ -38,5 +38,5 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
   );
 
   // todo include the cookies and redirected;
-  return { form: form.toJson() };
+  return homePage.sendForm(form);
 });

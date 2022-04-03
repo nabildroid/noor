@@ -110,7 +110,7 @@ export default class Form {
     );
   }
 
-  private getWeirdData() {
+  getWeirdData() {
     const hiddens = this.$("input[type='hidden']");
     const hiddensSpecial = this.$("div[type='special']");
 

@@ -63,7 +63,6 @@ export function mergeCookies(...cookies: string[][]) {
     {}
   );
 
-  console.log(ob);
 
   return Object.entries(ob).reduce((acc, v) => {
     if (!v[1]) return acc;

@@ -30,6 +30,5 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
 
   const search = await form.submit(data.actionButton.name!, homePage);
 
-  // todo include the cookies and redirected;
-  return { form: form.toJson() };
+  return homePage.sendForm(form);
 });
