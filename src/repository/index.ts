@@ -68,8 +68,8 @@ export default class Repository {
 
     this.updateBouncingData({
       cookies: response.data.cookies,
-      from: response.data.redirected ||response.data.from,
-      weirdData: response.data.weirdData
+      from: response.data.redirected || response.data.from,
+      weirdData: response.data.weirdData,
     });
     console.log("navigate to:::::");
     return response.data.payload;
@@ -83,22 +83,25 @@ export default class Repository {
 
     this.updateBouncingData({
       cookies: response.data.cookies,
-      from: response.data.redirected ||response.data.from,
+      from: response.data.redirected || response.data.from,
       weirdData: response.data.weirdData,
     });
 
     return response.data.payload;
   }
 
-  async submitForm(config:FormSubmit,type:"formSubmit"|"skillSubmit"){
-    const response = await this.call<EditSkillNavigateResponse>(type, {
+  async submitForm<T extends NavigationResponse>(
+    config: FormSubmit,
+    type: "formSubmit" | "skillSubmit"
+  ) {
+    const response = await this.call<T>(type, {
       ...config,
       ...(this.bouncingData ?? {}),
     });
 
     this.updateBouncingData({
       cookies: response.data.cookies,
-      from: response.data.redirected ||response.data.from,
+      from: response.data.redirected || response.data.from,
       weirdData: response.data.weirdData,
     });
 
@@ -127,8 +130,4 @@ export default class Repository {
     }
     console.log(this.bouncingData);
   }
-
-
-
-
 }
