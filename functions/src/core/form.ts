@@ -202,14 +202,19 @@ export default class Form {
   protected updateForm(data: string) {
     Form.parseResponse(data, {
       updatePanel: (id, value) => {
+
+        console.log("-----------");
+        console.log("-----------");
+        
+        console.log(value);
+        console.log("-----------");
+        
         console.log("-----------");
 
         // check if the value is the whole data "sometimes its not ust a select!"
         const $ = loadHtml(value);
-        if ($(".form-controls").length) {
-          console.log("########################");
-          console.log("########################");
-          console.log("########################");
+        if ($(".form-controls").length || $("select").length >1) {
+          console.log(value);
           this.$(".wrapper").empty()
           this.$(".wrapper").append(value);
           return;
@@ -254,6 +259,7 @@ export default class Form {
     );
 
     form.append(inputWrapper.parent().html());
+    console.log(form.html());
     return new this(root.html());
   }
 

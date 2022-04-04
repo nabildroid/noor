@@ -16,41 +16,7 @@ import Noti from "../../components/home/noti";
 
 interface DidntGetProps {}
 
-const inputs: FormInput[] = [
-  {
-    id: "dsd",
-    title: "الصف",
-    options: [
-      {
-        selected: true,
-        text: "الكل",
-        value: "dsdsd",
-      },
-    ],
-  },
-  {
-    id: "dsd11",
-    title: "الصف",
-    options: [
-      {
-        selected: true,
-        text: "الكل",
-        value: "dsdsd",
-      },
-    ],
-  },
-  {
-    id: "ds22d",
-    title: "الصف",
-    options: [
-      {
-        selected: true,
-        text: "الكل",
-        value: "dsdsd",
-      },
-    ],
-  },
-];
+
 
 const modules = [
   {
@@ -79,10 +45,11 @@ enum NotyType {
 }
 
 const DidntGet: React.FC<DidntGetProps> = () => {
-  const { teacherType } = useContext(HomeContext);
+  const { teacherType, currentRole } = useContext(HomeContext);
+  const { logout } = useContext(AppContext);
 
   const {
-    inputs: inputss,
+    inputs,
     setForm,
     submit,
     updateInputs,
@@ -92,19 +59,30 @@ const DidntGet: React.FC<DidntGetProps> = () => {
     actionName: "ibtnSearch",
   });
 
-  const [notyType, setNotyType] = useState<NotyType>(NotyType.exists);
+  const [notyType, setNotyType] = useState<NotyType>();
 
-  const [period, setPeriod] = useState("الفةرة الرابعة");
+  const [period, setPeriod] = useState("");
 
-  const [stage, setStage] = useState(1);
+  const [stage, setStage] = useState(0);
 
   useEffect(() => {
     const isSecondStage = loadingIndex == inputs.length - 1;
-    if (isSecondStage) {
+    if (false && isSecondStage) {
       fetchSkills();
       setTimeout(() => setStage(1), 700);
     }
   }, [loadingIndex]);
+
+  useEffect(() => {
+    Repository.instance
+      .navigateTo({
+        account: currentRole!,
+        nav1: "المهارات",
+        nav2: "قائمة المعارف والمهارات التي لم يتقنها الطالب",
+      })
+      .then((r) => setForm(r.form))
+      .catch(logout);
+  }, []);
 
   async function fetchSkills() {
     // const skills = await submit();
@@ -240,7 +218,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
               <div className="mt-3 py-2 scroll-smooth overflow-hidden border border-zinc-300 overflow-y-auto shadow rounded   max-h-40 h-full ">
                 {Array(10)
                   .fill("")
-                  .map((_,i) => (
+                  .map((_, i) => (
                     <button
                       key={i}
                       className={`text-right pr-6
@@ -254,16 +232,14 @@ const DidntGet: React.FC<DidntGetProps> = () => {
                   ))}
               </div>
               <div className="my-3">
-              <SelectBox
-                label="الطالب"
-                options={[{ id: "dsd", name: "dsd", selected: false }]}
-                select={() => {}}
-              />
+                <SelectBox
+                  label="الطالب"
+                  options={[{ id: "dsd", name: "dsd", selected: false }]}
+                  select={() => {}}
+                />
               </div>
               <div className="text-center">
-              <CustomButton onClick={()=>{}}>
-رصد
-              </CustomButton>
+                <CustomButton onClick={() => {}}>رصد</CustomButton>
               </div>
             </div>
           </Transition>
