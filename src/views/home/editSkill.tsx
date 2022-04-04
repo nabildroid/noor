@@ -129,7 +129,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
               <div key={input.id}>
                 <SelectBox
                   loading={i > loadingIndex}
-                  select={(e) => updateInputs(input.id, e)}
+                  select={(e) => updateInputs(input.name!, e)}
                   label={input.title}
                   options={input.options.map((e) => ({
                     id: e.value,

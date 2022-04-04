@@ -9,11 +9,7 @@
   },
   "hosting": {
     "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
         "source": "**",
@@ -23,24 +19,16 @@
   },
   "emulators": {
     "auth": {
-      "port": 9099,
-      "host": "0.0.0.0"
-      
+      "port": 9099
     },
     "functions": {
-      "port": 5001,
-      "host": "0.0.0.0"
-
+      "port": 5001
     },
     "firestore": {
-      "port": 8080,
-      "host": "0.0.0.0"
-
+      "port": 8080
     },
     "hosting": {
-      "port": 5000,
-      "host": "0.0.0.0"
-
+      "port": 5000
     },
     "ui": {
       "enabled": true

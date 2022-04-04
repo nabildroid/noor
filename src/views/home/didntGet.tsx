@@ -96,7 +96,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
 
   const [period, setPeriod] = useState("الفةرة الرابعة");
 
-  const [stage, setStage] = useState(2);
+  const [stage, setStage] = useState(1);
 
   useEffect(() => {
     const isSecondStage = loadingIndex == inputs.length - 1;
@@ -130,7 +130,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
               <div key={input.id}>
                 <SelectBox
                   loading={i > loadingIndex}
-                  select={(e) => updateInputs(input.id, e)}
+                  select={(e) => updateInputs(input.name!, e)}
                   label={input.title}
                   options={input.options.map((e) => ({
                     id: e.value,

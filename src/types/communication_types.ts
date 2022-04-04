@@ -16,7 +16,7 @@ export interface FormOptions {
   action: string;
   inputs: FormInput[];
   actionButtons: FormInput[];
-  id: string;
+  name: string;
 }
 
 export interface FormSubmit {

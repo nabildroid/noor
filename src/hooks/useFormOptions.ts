@@ -21,10 +21,10 @@ export default ({ label, excludedIds, actionName }: Props) => {
     (e) => !withinIncludes(e.id, excludedIds)
   );
 
-  const updateInputs = async (id: string, value: string) => {
+  const updateInputs = async (name: string, value: string) => {
     let requireUpdate = false;
     const newInputs = inputs.map((inp, i) => {
-      if (inp.id != id) return inp;
+      if (inp.name != name) return inp;
       else {
         if (!inp.options.find((e) => e.selected && e.value == value)) {
           requireUpdate = true;
@@ -41,17 +41,17 @@ export default ({ label, excludedIds, actionName }: Props) => {
 
     if (requireUpdate) {
       setInputs(newInputs);
-      await fetchOptions(newInputs, id, value);
+      await fetchOptions(newInputs, name, value);
     }
   };
 
-  async function fetchOptions(inputs: FormInput[], id: string, value: string) {
-    const index = inputs.findIndex((e) => e.id == id);
+  async function fetchOptions(inputs: FormInput[], name: string, value: string) {
+    const index = inputs.findIndex((e) => e.name == name);
     setLoadinIndex(index);
     if (index + 1 < visibleInputs.length) {
       const { form: newForm } = await Repository.instance.formFetchOption({
         action: form!.action,
-        id: id,
+        name,
         inputs,
         actionButtons: form!.actionButtons,
       });
@@ -105,7 +105,7 @@ function withinIncludes(id: string, ids?: string[]) {
 
 function formatInputs(inputs: FormInput[]) {
   return inputs
-    .map((input) => ({
+    .map((input, i) => ({
       ...input,
       title: input.title.replaceAll("*", ""),
       options: input.options.map((e) => ({
@@ -113,5 +113,6 @@ function formatInputs(inputs: FormInput[]) {
         text: e.text.replaceAll("--", "").trim(),
       })),
     }))
-    .filter((e) => e.value != undefined);
+    // CHECK e.options for inputs that provide only informations!
+    .filter((e) => e.value != undefined && e.title != "" && e.options.length);
 }

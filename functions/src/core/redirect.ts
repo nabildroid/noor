@@ -174,7 +174,6 @@ export default class Redirect {
         port: 8082,
       },
     });
-    console.log(data);
     this.weirdData = hiddenInputs(loadHtml(data));
 
     this.prevCookies = mergeCookies(

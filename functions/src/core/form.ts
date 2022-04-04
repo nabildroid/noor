@@ -1,4 +1,4 @@
-import { load as loadHtml } from "cheerio";
+import { load, load as loadHtml } from "cheerio";
 import { checkValidity } from "../helpers";
 import Redirect from "./redirect";
 import { mergeNodeTexts } from "../utils";
@@ -24,7 +24,8 @@ export default class Form {
   }
 
   constructor(html: string) {
-    if (!checkValidity(html)) {
+    // todo set the previlege checks
+    if (false && !checkValidity(html)) {
       throw Error("you don't have the previlege to access this");
     }
 
@@ -66,7 +67,7 @@ export default class Form {
 
       const select = this.$("select", parent);
 
-      const id = select.parent().attr("id").replace(/_/g, "$");
+      const id = select.parent().attr("id")?.replace(/_/g, "$") ?? "";
 
       const options: {
         selected: boolean;
@@ -201,6 +202,19 @@ export default class Form {
   protected updateForm(data: string) {
     Form.parseResponse(data, {
       updatePanel: (id, value) => {
+        console.log("-----------");
+
+        // check if the value is the whole data "sometimes its not ust a select!"
+        const $ = loadHtml(value);
+        if ($(".form-controls").length) {
+          console.log("########################");
+          console.log("########################");
+          console.log("########################");
+          this.$(".wrapper").empty()
+          this.$(".wrapper").append(value);
+          return;
+        }
+
         this.$(`*[id='${id}'] > select`).first().replaceWith(value);
       },
       hiddenFeild: (name, value) => {
@@ -229,12 +243,17 @@ export default class Form {
       .map(([k, v]) => `<div type='special' name='${k}'>${v}</div>`)
       .forEach((e) => form.append(e));
 
-    inputs.forEach((inp) => form.append(this.createField(inp)));
+    const inputWrapper = load('<div class="wrapper"></div>')(".wrapper");
+
+    inputs.forEach((inp) => inputWrapper.append(this.createField(inp)));
+
     actionButtons.forEach((inp) =>
-      form.append(`<div id="${inp.id}"><div>
+      inputWrapper.append(`<div id="${inp.id}"><div>
     <input type="submit" name="${inp.name}" value="${inp.title}" />
     </div></div>`)
     );
+
+    form.append(inputWrapper.parent().html());
     return new this(root.html());
   }
 

@@ -24,7 +24,8 @@ type Module = {
 };
 
 const SaveDegree: React.FC<SaveDegreeProps> = () => {
-  const { teacherType } = useContext(HomeContext);
+  const { teacherType, currentRole } = useContext(HomeContext);
+  const { logout } = useContext(AppContext);
 
   const { inputs, setForm, submit, updateInputs, loadingIndex } =
     useFormOptions({
@@ -32,10 +33,10 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
       actionName: "ibtnSearch",
     });
 
-  const [stage, setStage] = useState(1);
+  const [stage, setStage] = useState(0);
 
-  const [student, setStudent] = useState("نبيل العقريب");
-  const [module, setModule] = useState("القران الكريم");
+  const [student, setStudent] = useState("");
+  const [module, setModule] = useState("");
 
   const [modules, setModules] = useState<Module[]>([
     {
@@ -63,6 +64,19 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
     }
   }, [loadingIndex]);
 
+
+  useEffect(() => {
+    Repository.instance
+      .navigateTo({
+        account: currentRole!,
+        nav1: "الإختبارات",
+        nav2: "ادخال الدرجات",
+      })
+      .then((r) => setForm(r.form))
+      .catch(logout);
+  }, []);
+
+
   async function fetchSkills() {
     // const skills = await submit();
   }
@@ -81,10 +95,10 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
             show={stage == 0}
           >
             {inputs.map((input, i) => (
-              <div key={input.id}>
+              <div key={input.id + i}>
                 <SelectBox
                   loading={i > loadingIndex}
-                  select={(e) => updateInputs(input.id, e)}
+                  select={(e) => updateInputs(input.name!, e)}
                   label={input.title}
                   options={input.options.map((e) => ({
                     id: e.value,

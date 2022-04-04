@@ -22,7 +22,7 @@ interface Params {
 
 const SelectBox: React.FC<Params> = ({ options, label, loading, select }) => {
   const selected = options.find((e) => e.selected) ?? options[0];
-
+  console.log(label,options);
   return (
     <Listbox
       disabled={loading}

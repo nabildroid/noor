@@ -8,7 +8,7 @@ interface NavigationData extends IncrementalData {
   action: string;
   inputs: FormInput[];
   actionButtons: FormInput[];
-  id: string;
+  name: string;
 }
 
 export default functions.https.onCall(async (data: NavigationData, context) => {
@@ -28,7 +28,7 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
     actionButtons: data.actionButtons,
   });
 
-  const selected = data.inputs.find((e) => e.id == data.id)!;
+  const selected = data.inputs.find((e) => e.name == data.name)!;
   const selectedValue = selected.options.find((e) => e.selected)!;
 
   await form.fetchFromOption(
