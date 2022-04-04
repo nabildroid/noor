@@ -8,6 +8,7 @@ import { emulator, firebaseApp } from "../main";
 import {
   BouncingNavigation,
   EditSkillNavigateResponse,
+  EditSkillSubmit,
   FormNavigateResponse,
   FormOptions,
   FormSubmit,
@@ -108,6 +109,20 @@ export default class Repository {
     return response.data.payload;
   }
 
+  async editSkillSave(config:EditSkillSubmit){
+    const response = await this.call<FormNavigateResponse>("skillSave", {
+      ...config,
+      ...(this.bouncingData ?? {}),
+    });
+
+    this.updateBouncingData({
+      cookies: response.data.cookies,
+      from: response.data.redirected || response.data.from,
+      weirdData: response.data.weirdData,
+    });
+
+    return response.data.payload;
+  }
   private updateBouncingData(config: Partial<BouncingNavigation>) {
     console.log(config);
 

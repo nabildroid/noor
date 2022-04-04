@@ -36,7 +36,7 @@ export default class Form {
     return this.root.html();
   }
 
-  private getActionButtons = () => {
+  protected getActionButtons = () => {
     const buttons = this.$("input[type='submit']");
     const inputs: FormInput[] = [];
 
@@ -100,7 +100,7 @@ export default class Form {
     return inputs;
   }
 
-  private getFormAction() {
+  protected getFormAction() {
     let action = this.form.attr("action");
     action = action.replace("https://noor.moe.gov.sa/Noor/EduWaveSMS/", "");
 
@@ -128,11 +128,12 @@ export default class Form {
     return params as { [key: string]: any };
   }
 
-  private fetchOptionRequestPayload(
-    config: { id: string; name: string; value: string },
+  protected fetchOptionRequestPayload(
+    config: { id?: string; name: string; value: string },
     settings: { name: string; value: string }[]
   ) {
     const params = this.getInputs();
+
     let payload = params.reduce(
       (acc, v) => ({
         ...acc,
@@ -140,13 +141,6 @@ export default class Form {
       }),
       {}
     );
-
-    payload = {
-      ...payload,
-      [config.name]: config.value,
-
-      ctl00oScriptManager: `${config.id}|${config.name}`,
-    };
 
     const weirdData = this.getWeirdData();
 
@@ -159,6 +153,12 @@ export default class Form {
     };
 
     settings.forEach((s) => (payload[s.name] = s.value));
+
+    payload[config.name] = config.value;
+
+    if (config.id) {
+      payload["ctl00oScriptManager"] = `${config.id}|${config.name}`;
+    }
 
     return payload;
   }

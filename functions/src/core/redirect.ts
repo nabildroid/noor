@@ -169,6 +169,10 @@ export default class Redirect {
         "X-Requested-With": "XMLHttpRequest",
         ADRUM: "isAjax:true",
       },
+      proxy: {
+        host: "localhost",
+        port: 8082,
+      },
     });
     console.log(data);
     this.weirdData = hiddenInputs(loadHtml(data));

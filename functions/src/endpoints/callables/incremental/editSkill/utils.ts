@@ -1,10 +1,47 @@
 import { load as loadHtml } from "cheerio";
 import Form from "../../../../core/form";
+import Redirect from "../../../../core/redirect";
 import Table from "../../../../core/table";
 
 export class EditSkillForm extends Form {
   constructor(html: string) {
     super(html);
+  }
+
+  async save(
+    skills: {
+      id: number;
+      value: number;
+    }[],
+    redirect: Redirect
+  ) {
+    const skillValues =
+      skills
+        .reduce(
+          (acc, v, i) => [...acc, `${i == 0 ? "" : i - 1 + "#"}${3},${v.id}`],
+          []
+        )
+        .join(",") + `${skills.length}#`;
+
+    const payload = this.fetchOptionRequestPayload(
+      {
+        name: "ctl00$PlaceHolderMain$hdnSkillResultIDs",
+        value: skillValues,
+      },
+      []
+    );
+
+    const action = this.getFormAction();
+
+    const data = await redirect.fork(action, {
+      ...payload,
+      __EVENTTARGET: "",
+      ctl00$ibtnYes: "نعم",
+      ctl00$hdnData_Data: "",
+      ctl00$hdnData_Operation: "Save",
+    });
+
+    return data;
   }
 
   updateFromSreachSubmission(data: string) {

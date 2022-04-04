@@ -7,7 +7,7 @@ import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
-import rates, { KinderRating } from "../../models/rating";
+import rates, { RateByName, KinderRating, RateById } from "../../models/rating";
 import Repository from "../../repository";
 import { teacherTypeArabic } from "../../utils";
 import { EditSkillNavigateResponse } from "../../types/communication_types";
@@ -25,7 +25,8 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
-  const { inputs, setForm, submit, updateInputs, loadingIndex } =
+  const ratingSystem = KinderRating;
+  const { inputs, setForm, formAction, submit, updateInputs, loadingIndex } =
     useFormOptions({
       label: "editSkill" + teacherType,
       actionName: "ibtnSearch",
@@ -45,42 +46,27 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   const [loading, setLoading] = useState(false);
   const [stage, setStage] = useState(0);
 
-  const [student, setStudent] = useState("نبيل العقريب");
+  const [student, setStudent] = useState("");
 
-  const [skills, setSkills] = useState<Skill[]>([
-    {
-      id: "sddsd",
-      title: "hello world",
-      value: KinderRating[0].name,
-      skillId: 577657,
-    },
-    {
-      id: "sdddzdsd",
-      title: "infographya",
-      skillId: 15151,
-      value: KinderRating[2].name,
-    },
-    {
-      id: "sdddsdsdzdsd",
-      title: "ikram dellici",
-      skillId: 1515,
-      value: KinderRating[3].name,
-    },
-  ]);
+  const [skills, setSkills] = useState<Skill[]>([]);
 
-  function setSkillsById(skillId: string, ratingId: number) {
+  const [allOneSkill, setAllOneSkill] = useState(ratingSystem[0]);
+
+  function setSkillsById(skillId: number, ratingId: number) {
     setSkills((skills) =>
       skills.map((e) => {
-        if (e.id == skillId) {
+        if (e.skillId == skillId) {
           return {
             ...e,
-            value: KinderRating.find((i) => i.id == ratingId)!.name,
+            value: ratingSystem.find((i) => i.id == ratingId)!.name,
           };
         } else return e;
       })
     );
   }
-  const skill = stage > 1 ? skills[stage - 2].title : "";
+
+  const skill = stage > 1 && skills.length ? skills[stage - 2].title : "";
+
   const isLastSkill = stage == skills.length + 1;
 
   useEffect(() => {
@@ -109,7 +95,23 @@ const EditSkill: React.FC<EditSkillProps> = () => {
 
   const checkSave = async () => {};
   const back = () => setStage(Math.max(stage - 1, 0));
-  const next = () => setStage(Math.min(stage + 1, skills.length + 1));
+  const next = () => {
+    setStage(Math.min(stage + 1, skills.length + 1));
+  };
+
+  const save = async () => {
+    const data = await Repository.instance.editSkillSave({
+      action: formAction!,
+      inputs,
+      skills: skills.map((s) => ({
+        id: s.skillId,
+        value: allOneSkill.id as any,
+      })),
+    });
+
+    setForm(data.form);
+    setStage(0);
+  };
 
   const pageTitle = `ةعديل ${teacherTypeArabic(teacherType)}`;
 
@@ -147,7 +149,9 @@ const EditSkill: React.FC<EditSkillProps> = () => {
               <RadioList
                 disabled={loading}
                 title={pageTitle}
-                onSelect={(e) => {}}
+                onSelect={(e) =>
+                  setAllOneSkill(RateById(ratingSystem, e as any))
+                }
                 items={rates(teacherType)}
               />
             </div>
@@ -161,7 +165,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
               >
                 مهارة على حدة
               </button>
-              <CustomButton onClick={() => {}}>رصد</CustomButton>
+              <CustomButton onClick={() => save()}>رصد</CustomButton>
             </div>
           </Transition>
 
@@ -175,14 +179,10 @@ const EditSkill: React.FC<EditSkillProps> = () => {
               </h3>
               <div className="mt-2">
                 <RadioList
-                  current={{
-                    description: "",
-                    id: s.id,
-                    name: s.title,
-                  }}
+                  current={RateByName(ratingSystem, s.value)}
                   disabled={loading}
                   title={s.title}
-                  onSelect={(e) => setSkillsById(s.id, e as any)}
+                  onSelect={(e) => setSkillsById(s.skillId, e as any)}
                   items={rates(teacherType)}
                 />
               </div>

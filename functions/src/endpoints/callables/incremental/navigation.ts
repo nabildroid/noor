@@ -82,7 +82,7 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
   const { html } = secondNav.stop();
   const form = new Form(html);
 
-  return secondNav.sendForm(form);
+  return secondNav.sendForm(form);  
 });
 
 async function innerNavigation(data: string) {

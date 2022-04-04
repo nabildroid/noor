@@ -26,6 +26,15 @@ export interface FormSubmit {
   // type: // todo submit type!
 }
 
+export interface EditSkillSubmit {
+  action: string;
+  inputs: FormInput[];
+  skills: {
+    id: number;
+    value: number;
+  }[];
+}
+
 export type FormInput = {
   title: string;
   value?: string;

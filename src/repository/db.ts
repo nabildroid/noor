@@ -3,9 +3,7 @@ import {
   Firestore,
   getFirestore,
   doc,
-  collection,
-  QuerySnapshot,
-  getDoc,
+  
   onSnapshot,
 } from "firebase/firestore";
 import { emulator, firebaseApp } from "../main";

@@ -9,6 +9,7 @@ export default abstract class Table<T extends { [key: string]: any }> {
   }
 
   constructor(html: string, id?: string) {
+    console.log(html);
     this.root = load(html);
     if (id) {
       this.table = this.root(`div[id='${id}']`);
