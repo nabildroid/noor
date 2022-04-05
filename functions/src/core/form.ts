@@ -202,24 +202,37 @@ export default class Form {
   protected updateForm(data: string) {
     Form.parseResponse(data, {
       updatePanel: (id, value) => {
-
-        console.log("-----------");
-        console.log("-----------");
-        
-        console.log(value);
-        console.log("-----------");
-        
-        console.log("-----------");
-
+        const wrapper = this.$(".wrapper");
         // check if the value is the whole data "sometimes its not ust a select!"
         const $ = loadHtml(value);
-        if ($(".form-controls").length || $("select").length >1) {
+        if ($(".form-controls").length) {
           console.log(value);
-          this.$(".wrapper").empty()
-          this.$(".wrapper").append(value);
+          wrapper.empty();
+          wrapper.append(value);
           return;
         }
 
+        // multi parts selection
+        if ($("select").length > 1) {
+          $("select").each((_, e) => {
+            const name = $(e).attr("name");
+            console.log(name);
+            const replaceBy = $(e).parent();
+
+            const shouldBeReplaced = this.$(`*[name='${name}']`).first();
+            if (shouldBeReplaced.length) {
+              shouldBeReplaced.replaceWith(replaceBy);
+            } else {
+              // todo append before the last element [name]
+              wrapper.append(`<div>${replaceBy.parent().html()}</div>`);
+              console.log("####should be created");
+              console.log(replaceBy.parent().html());
+              console.log("####should be created");
+            }
+          });
+        }
+
+        // default behavior
         this.$(`*[id='${id}'] > select`).first().replaceWith(value);
       },
       hiddenFeild: (name, value) => {
