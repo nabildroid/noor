@@ -5,6 +5,7 @@ import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
+import { NoorSection, NoorSkill } from "../../models/home_model";
 import Repository from "../../repository";
 
 interface SaveReportProps {}
@@ -23,8 +24,8 @@ const SaveReport: React.FC<SaveReportProps> = () => {
     Repository.instance
       .navigateTo({
         account: currentRole!,
-        nav1: "المهارات", // todo use enum
-        nav2: "إدخال نتائج الطلاب على مستوى المادة والمهارة",
+        nav1: NoorSection.skill,
+        nav2: NoorSkill.moduleSkill,
       })
       .then((r) => setForm(r.form))
       .catch(logout);

@@ -11,6 +11,7 @@ import rates, { RateByName, KinderRating, RateById } from "../../models/rating";
 import Repository from "../../repository";
 import { teacherTypeArabic } from "../../utils";
 import { EditSkillNavigateResponse } from "../../types/communication_types";
+import { NoorSection, NoorSkill } from "../../models/home_model";
 
 interface EditSkillProps {}
 
@@ -36,8 +37,8 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     Repository.instance
       .navigateTo({
         account: currentRole!,
-        nav1: "المهارات",
-        nav2: "إدخال نتائج المهارة على مستوى طفل ووحدة",
+        nav1: NoorSection.skill,
+        nav2: NoorSkill.skillModuleChild,
       })
       .then((r) => setForm(r.form))
       .catch(logout);

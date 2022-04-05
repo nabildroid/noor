@@ -12,6 +12,7 @@ import Repository from "../../repository";
 import { teacherTypeArabic } from "../../utils";
 import { Presense } from "../../types/home_types";
 import CheckBoxs from "../../components/home/checkboxs";
+import { NoorExam, NoorSection } from "../../models/home_model";
 
 interface SaveDegreeProps {}
 
@@ -64,18 +65,16 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
     }
   }, [loadingIndex]);
 
-
   useEffect(() => {
     Repository.instance
       .navigateTo({
         account: currentRole!,
-        nav1: "الإختبارات",
-        nav2: "ادخال الدرجات",
+        nav1: NoorSection.exams,
+        nav2: NoorExam.enter,
       })
       .then((r) => setForm(r.form))
       .catch(logout);
   }, []);
-
 
   async function fetchSkills() {
     // const skills = await submit();

@@ -4,6 +4,24 @@ export enum TeacherType {
   primary,
 }
 
+export enum NoorSection {
+  skill = "المهارات",
+  exams = "الإختبارات",
+}
+
+export enum NoorSkill {
+  moduleStudent = "إدخال نتائج المهارة على مستوى طالب ومادة",
+  skillModuleChild = "إدخال نتائج المهارة على مستوى طفل ووحدة",
+  moduleSkill = "إدخال نتائج الطلاب على مستوى المادة والمهارة",
+  skillModuleSkill = "إدخال نتائج المهارة على مستوى وحدة ومهارة",
+  notSaved = "الفصول الغير مرصدة مهاراتها",
+  studentDidntGet = "قائمة المعارف والمهارات التي لم يتقنها الطالب",
+}
+
+export enum NoorExam {
+  enter = "ادخال الدرجات",
+}
+
 export type Teacher = {
   name: string;
   id: string;
@@ -76,4 +94,3 @@ export interface IHomeProvider extends HomeState {
   selectTab(tab: HomeTab): void;
   selectRole(role: string): void;
 }
-

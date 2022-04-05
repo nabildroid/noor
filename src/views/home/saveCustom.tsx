@@ -11,6 +11,7 @@ import rates from "../../models/rating";
 import Repository from "../../repository";
 import { RatingKinder } from "../../types/home_types";
 import { teacherTypeArabic } from "../../utils";
+import { NoorSection, NoorSkill } from "../../models/home_model";
 
 interface SaveCustomProps {}
 
@@ -21,15 +22,15 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
   const { inputs, setForm, updateInputs, loadingIndex } = useFormOptions({
     label: "saveCustom" + teacherType,
     excludedIds: ["PanelSkill"],
-    actionName:""
+    actionName: "",
   });
 
   useEffect(() => {
     Repository.instance
       .navigateTo({
         account: currentRole!,
-        nav1: "المهارات",
-        nav2: "إدخال نتائج المهارة على مستوى وحدة ومهارة",
+        nav1: NoorSection.skill,
+        nav2: NoorSkill.skillModuleSkill,
       })
       .then((r) => setForm(r.form))
       .catch(logout);

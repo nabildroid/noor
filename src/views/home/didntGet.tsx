@@ -13,10 +13,9 @@ import { teacherTypeArabic } from "../../utils";
 import CheckBoxs from "../../components/home/checkboxs";
 import { FormInput } from "../../types/communication_types";
 import Noti from "../../components/home/noti";
+import { NoorSection, NoorSkill } from "../../models/home_model";
 
 interface DidntGetProps {}
-
-
 
 const modules = [
   {
@@ -48,16 +47,11 @@ const DidntGet: React.FC<DidntGetProps> = () => {
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
-  const {
-    inputs,
-    setForm,
-    submit,
-    updateInputs,
-    loadingIndex,
-  } = useFormOptions({
-    label: "DidntGet" + teacherType,
-    actionName: "ibtnSearch",
-  });
+  const { inputs, setForm, submit, updateInputs, loadingIndex } =
+    useFormOptions({
+      label: "DidntGet" + teacherType,
+      actionName: "ibtnSearch",
+    });
 
   const [notyType, setNotyType] = useState<NotyType>();
 
@@ -77,8 +71,8 @@ const DidntGet: React.FC<DidntGetProps> = () => {
     Repository.instance
       .navigateTo({
         account: currentRole!,
-        nav1: "المهارات",
-        nav2: "قائمة المعارف والمهارات التي لم يتقنها الطالب",
+        nav1: NoorSection.skill,
+        nav2: NoorSkill.studentDidntGet,
       })
       .then((r) => setForm(r.form))
       .catch(logout);
