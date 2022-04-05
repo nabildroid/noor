@@ -40,7 +40,6 @@ const AppProvider: React.FC = ({ children }) => {
       credential
     );
 
-
     if (operation == "success") {
       signInWithEmailAndPassword(
         auth,
@@ -71,6 +70,8 @@ const AppProvider: React.FC = ({ children }) => {
 
   async function logout() {
     dispatch({ type: "logout" });
+    localStorage.removeItem("bouncing");
+
     auth.signOut();
   }
 

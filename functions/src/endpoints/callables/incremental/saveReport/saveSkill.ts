@@ -3,15 +3,11 @@ import * as functions from "firebase-functions";
 import { IncrementalData } from "../../../../types";
 import Redirect from "../../../../core/redirect";
 import Form, { FormInput } from "../../../../core/form";
-import { EditSkillForm } from "./utils";
 
 interface NavigationData extends IncrementalData {
   action: string;
   inputs: FormInput[];
-  skills: {
-    id: number;
-    value: number;
-  }[];
+  isEmpty: boolean;
 }
 
 export default functions.https.onCall(async (data: NavigationData) => {
@@ -21,23 +17,5 @@ export default functions.https.onCall(async (data: NavigationData) => {
     from:
       data.from ??
       "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
-  });
-
-  const form = new EditSkillForm(
-    Form.fromJson({
-      action: data.action,
-      weird: data.weirdData,
-      inputs: data.inputs,
-      actionButtons: [
-        
-      ],
-    }).html
-  );
-
-  const response = await form.save(data.skills, homePage);
-  form.updateFromSreachSubmission(response);
-
-  return homePage.sendForm(form, {
-    ...form.toJson(),
   });
 });

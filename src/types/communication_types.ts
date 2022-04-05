@@ -1,4 +1,23 @@
 import { Skill } from "../views/home/editSkill";
+import { Degrees } from "../views/home/saveDegree";
+
+export type FormInput = {
+  title: string;
+  value?: string;
+  id: string;
+  options: {
+    selected: boolean;
+    text: string;
+    value: string;
+  }[];
+  name?: string;
+};
+
+export type Form = {
+  action: string;
+  inputs: FormInput[];
+  actionButtons: FormInput[];
+};
 
 export type BouncingNavigation = {
   cookies: string[];
@@ -35,23 +54,34 @@ export interface EditSkillSubmit {
   }[];
 }
 
-export type FormInput = {
-  title: string;
-  value?: string;
-  id: string;
-  options: {
-    selected: boolean;
-    text: string;
-    value: string;
-  }[];
-  name?: string;
-};
-
-export type Form = {
+export interface ReportSubmit {
   action: string;
   inputs: FormInput[];
-  actionButtons: FormInput[];
-};
+  isEmpty: boolean;
+}
+
+// ensuring the communication between the backend and frontend using typescript!
+export type FormSubmitLookup =
+  | {
+      type: "formSubmit";
+      payload: FormSubmit;
+      response: NavigationResponse;
+    }
+  | {
+      type: "skillSubmit";
+      payload: FormSubmit;
+      response: EditSkillNavigateResponse;
+    }
+  | {
+      type: "saveDegreeSubmit";
+      payload: FormSubmit;
+      response: SaveDegreeNavigateResponse;
+    }
+  | {
+      type: "skillReportSubmit";
+      payload: ReportSubmit;
+      response: NavigationResponse;
+    };
 
 export type NavigationResponse = {
   redirected: string;
@@ -72,5 +102,11 @@ export interface EditSkillNavigateResponse extends NavigationResponse {
     form: Form;
     skillId: string;
     skills: Skill[];
+  };
+}
+export interface SaveDegreeNavigateResponse extends NavigationResponse {
+  payload: {
+    form: Form;
+    degress: Degrees[];
   };
 }

@@ -8,4 +8,6 @@ export enum RatingKinder {
 export enum Presense {
   present,
   absent,
+  cheat,
+  zero,
 }

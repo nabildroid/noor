@@ -21,6 +21,13 @@ export default functions.https.onCall(async (data: NavigationData) => {
       "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
   });
 
+  data.actionButton = {
+    name: "ctl00$PlaceHolderMain$ibtnSearch",
+    value: "ابحث", // CHECK hard coded
+    id: "",
+    options: [],
+    title: "ssx",
+  };
   const form = new EditSkillForm(
     Form.fromJson({
       action: data.action,

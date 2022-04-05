@@ -16,12 +16,19 @@ import { NoorExam, NoorSection } from "../../models/home_model";
 
 interface SaveDegreeProps {}
 
-type Module = {
+export type Module = {
   presence: Presense;
   id: string;
   title: string;
   max: number;
   value: number;
+};
+
+export type Degrees = {
+  studentID: number;
+  studentName: string;
+  semester: number;
+  modules: Module[];
 };
 
 const SaveDegree: React.FC<SaveDegreeProps> = () => {
@@ -36,31 +43,14 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
 
   const [stage, setStage] = useState(0);
 
-  const [student, setStudent] = useState("");
-  const [module, setModule] = useState("");
+  const [degrees, setDegrees] = useState<Degrees[]>([]);
 
-  const [modules, setModules] = useState<Module[]>([
-    {
-      id: "sddsd",
-      title: "hello world",
-      max: 10,
-      presence: Presense.absent,
-      value: 2,
-    },
-
-    {
-      id: "sddsdefdze",
-      title: "hellzfeorld",
-      max: 5,
-      presence: Presense.absent,
-      value: 3,
-    },
-  ]);
+  const currentDegree = stage > 1 && degrees.length ? degrees[stage - 2] : null;
 
   useEffect(() => {
     const isSecondStage = loadingIndex == inputs.length - 1;
     if (isSecondStage) {
-      fetchSkills();
+      fetchDegress();
       setTimeout(() => setStage(1), 700);
     }
   }, [loadingIndex]);
@@ -76,13 +66,16 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
       .catch(logout);
   }, []);
 
-  async function fetchSkills() {
-    // const skills = await submit();
+  async function fetchDegress() {
+    const { degress } = await submit("saveDegreeSubmit", {});
+
+    setDegrees(degress);
   }
 
   const checkSave = async () => {};
   const back = () => setStage(Math.max(stage - 1, 0));
-
+  const next = () => setStage((s) => s + 1);
+  
   return (
     <div className="flex flex-1 h-full flex-col">
       <PageTitle title="رصد درجاة الفصل" />
@@ -109,61 +102,68 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
             ))}
           </Transition>
 
-          <Transition className={"flex-1"} show={stage == 1}>
-            <h3 className="text-indigo-500 font-arabic text-center text-sm">
-              {student}
-            </h3>
-            <h3 className="text-indigo-600 bg-indigo-50 py-1 font-arabic text-center text-md">
-              {module}
-            </h3>
-            <div className="mt-2">
-              {modules.map((m) => (
-                <div className="border-b items-end border-b-indigo-500/20 py-2 px-2 space-x-2 flex flex-row-reverse">
-                  <div className="">
-                    <p className="text-sm text-right text-indigo-700">
-                      {m.title}
-                    </p>
-                    <div className="flex items-center shadow-sm focus-within:border-indigo-500 border rounded-md border-gray-300 pr-2">
-                      <input
-                        type="number"
-                        className=" bg-white -mr-1  text-right outline-none rounded-md w-20 text-lg text-indigo-900"
-                      />
-                      <p className="font-mono -mb-1 text-md text-slate-500">
-                        / {m.max}
+          {degrees.map((s, i) => (
+            <Transition
+              key={s.studentID}
+              className={"flex-1"}
+              show={stage == i + 2}
+            >
+              <h3 className="text-indigo-500 font-arabic text-center text-sm">
+                {s.studentName}
+              </h3>
+
+              <div className="mt-2">
+                {currentDegree?.modules.map((m) => (
+                  <div className="border-b items-end border-b-indigo-500/20 py-2 px-2 space-x-2 flex flex-row-reverse">
+                    <div className="">
+                      <p className="text-sm text-right text-indigo-700">
+                        {m.title}
                       </p>
+                      <div className="flex items-center shadow-sm focus-within:border-indigo-500 border rounded-md border-gray-300 pr-2">
+                        <input
+                          type="number"
+                          className=" bg-white -mr-1  text-right outline-none rounded-md w-20 text-lg text-indigo-900"
+                        />
+                        <p className="font-mono -mb-1 text-md text-slate-500">
+                          / {m.max}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex-1 h-8 justify-center">
+                      <CheckBoxs
+                        className="flex space-x-2"
+                        onSelect={() => {}}
+                        options={[
+                          {
+                            id: "dsd",
+                            value: "حاضر",
+                          },
+                          {
+                            id: "dsdsdd",
+                            value: "غائب",
+                          },
+                        ]}
+                      />
                     </div>
                   </div>
-                  <div className="flex-1 h-8 justify-center">
-                    <CheckBoxs
-                      className="flex space-x-2"
-                      onSelect={() => {}}
-                      options={[
-                        {
-                          id: "dsd",
-                          value: "حاضر",
-                        },
-                        {
-                          id: "dsdsdd",
-                          value: "غائب",
-                        },
-                      ]}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            <div className="flex mt-4 flex-row-reverse  items-center justify-between">
-              {/* todo bullet navigation */}
+              <div className="flex mt-4 flex-row-reverse  items-center justify-between">
+                {/* todo bullet navigation */}
 
-              <CustomButton loading={false} onClick={checkSave}>
-                رصد
-              </CustomButton>
-              <CustomButton icon={false} secondary onClick={back}>
-                رجوع
-              </CustomButton>
-            </div>
-          </Transition>
+                <CustomButton icon={false} onClick={next}>
+                  الطاب الةالي
+                </CustomButton>
+                <CustomButton loading={false} onClick={checkSave}>
+                  رصد
+                </CustomButton>
+                <CustomButton icon={false} secondary onClick={back}>
+                  رجوع
+                </CustomButton>
+              </div>
+            </Transition>
+          ))}
         </div>
       </div>
     </div>

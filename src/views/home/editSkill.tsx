@@ -11,7 +11,7 @@ import rates, { RateByName, KinderRating, RateById } from "../../models/rating";
 import Repository from "../../repository";
 import { teacherTypeArabic } from "../../utils";
 import { EditSkillNavigateResponse } from "../../types/communication_types";
-import { NoorSection, NoorSkill } from "../../models/home_model";
+import { NoorSection, NoorSkill, TeacherType } from "../../models/home_model";
 
 interface EditSkillProps {}
 
@@ -34,11 +34,16 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     });
 
   useEffect(() => {
+    const type =
+      teacherType == TeacherType.kindergarten
+        ? NoorSkill.skillModuleChild
+        : NoorSkill.moduleStudent;
+
     Repository.instance
       .navigateTo({
         account: currentRole!,
         nav1: NoorSection.skill,
-        nav2: NoorSkill.skillModuleChild,
+        nav2: type,
       })
       .then((r) => setForm(r.form))
       .catch(logout);
@@ -89,12 +94,15 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   }, [stage]);
 
   async function fetchSkills() {
-    const response = await submit<EditSkillNavigateResponse>("skillSubmit");
+    const response = await submit("skillSubmit", {});
 
     setSkills(response.skills);
   }
 
-  const checkSave = async () => {};
+  const checkSave = async () => {
+    
+    save();
+  };
   const back = () => setStage(Math.max(stage - 1, 0));
   const next = () => {
     setStage(Math.min(stage + 1, skills.length + 1));

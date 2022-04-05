@@ -5,12 +5,15 @@ import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
-import { NoorSection, NoorSkill } from "../../models/home_model";
+import { NoorExam, NoorSection, NoorSkill } from "../../models/home_model";
 import Repository from "../../repository";
+import { ReportSubmit } from "../../types/communication_types";
 
-interface SaveReportProps {}
+interface SaveReportProps {
+  type: NoorSection;
+}
 
-const SaveReport: React.FC<SaveReportProps> = () => {
+const SaveReport: React.FC<SaveReportProps> = ({ type }) => {
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
@@ -18,9 +21,10 @@ const SaveReport: React.FC<SaveReportProps> = () => {
     useFormOptions({
       label: "report" + teacherType,
       actionName: "",
+      excludedNames: ["ddlStudySystem", "ddlSkillTypeDesc", "ddlSkills"],
     });
 
-  useEffect(() => {
+  function fetchSkill() {
     Repository.instance
       .navigateTo({
         account: currentRole!,
@@ -29,7 +33,34 @@ const SaveReport: React.FC<SaveReportProps> = () => {
       })
       .then((r) => setForm(r.form))
       .catch(logout);
+  }
+
+  function fetchExam() {
+    Repository.instance
+      .navigateTo({
+        account: currentRole!,
+        nav1: NoorSection.exams,
+        nav2: NoorExam.enter,
+      })
+      .then((r) => setForm(r.form))
+      .catch(logout);
+  }
+
+  useEffect(() => {
+    if (type == NoorSection.exams) {
+      fetchExam();
+    } else fetchSkill();
   }, []);
+
+  async function save(isEmpty: boolean = false) {
+    if (type == NoorSection.skill) {
+      const a = await submit("skillSubmit", {
+        skills:[]
+      });
+      
+      
+    }
+  }
 
   return (
     <div className="flex flex-1 h-full flex-col">

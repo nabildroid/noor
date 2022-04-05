@@ -12,6 +12,7 @@ import {
   FormNavigateResponse,
   FormOptions,
   FormSubmit,
+  FormSubmitLookup,
   NavigateTo,
   NavigationResponse,
 } from "../types/communication_types";
@@ -33,6 +34,11 @@ export default class Repository {
     this.functions = getFunctions(firebaseApp);
     if (emulator) {
       connectFunctionsEmulator(this.functions, "localhost", 5001);
+    }
+
+    const cache = localStorage.getItem("bouncing");
+    if (cache) {
+      // this.bouncingData = JSON.parse(cache);
     }
   }
 
@@ -91,12 +97,12 @@ export default class Repository {
     return response.data.payload;
   }
 
-  async submitForm<T extends NavigationResponse>(
-    config: FormSubmit,
-    type: "formSubmit" | "skillSubmit"
-  ) {
-    const response = await this.call<T>(type, {
-      ...config,
+  async submitForm<
+    T extends FormSubmitLookup["type"],
+    B extends Omit<FormSubmitLookup & { type: T }, "type">
+  >(type: T, config: {}) {
+    const response = await this.call<B["response"]>(type, {
+      ...(config as {}),
       ...(this.bouncingData ?? {}),
     });
 
@@ -109,7 +115,7 @@ export default class Repository {
     return response.data.payload;
   }
 
-  async editSkillSave(config:EditSkillSubmit){
+  async editSkillSave(config: EditSkillSubmit) {
     const response = await this.call<FormNavigateResponse>("skillSave", {
       ...config,
       ...(this.bouncingData ?? {}),
@@ -123,9 +129,11 @@ export default class Repository {
 
     return response.data.payload;
   }
-  private updateBouncingData(config: Partial<BouncingNavigation>) {
-    console.log(config);
 
+  private updateBouncingData(config: Partial<BouncingNavigation>) {
+
+    localStorage.setItem("bouncing", JSON.stringify(config));
+    
     if (!this.bouncingData) {
       this.bouncingData = {
         cookies: [],
@@ -143,6 +151,6 @@ export default class Repository {
         weirdData: config.weirdData ?? this.bouncingData.weirdData,
       };
     }
-    console.log(this.bouncingData);
+
   }
 }

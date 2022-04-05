@@ -119,7 +119,7 @@ export type skill = {
   title: string;
 };
 
-export class SkillEditTable extends Table<skill> {
+export class SkillEditTable extends Table<skill,undefined> {
   protected filter(tr: cheerio.Cheerio): boolean {
     return this.$("img", tr).length != 0;
   }

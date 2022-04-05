@@ -8,7 +8,7 @@ import formSubmit from "./endpoints/callables/incremental/formSubmit";
 import skillSubmit from "./endpoints/callables/incremental/editSkill/submit";
 import skillSave from "./endpoints/callables/incremental/editSkill/save";
 
-
+import skillReportSubmit from "./endpoints/callables/incremental/saveReport/saveSkill";
 
 export {
   signForm,
@@ -18,5 +18,6 @@ export {
   formOption,
   formSubmit,
   skillSave,
-  skillSubmit
+  skillSubmit,
+  skillReportSubmit,
 };
