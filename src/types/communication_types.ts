@@ -54,6 +54,12 @@ export interface EditSkillSubmit {
   }[];
 }
 
+export interface SaveAllSubmit {
+  action: string;
+  inputs: FormInput[];
+  rate: number;
+}
+
 export interface ReportSubmit {
   action: string;
   inputs: FormInput[];
@@ -81,6 +87,11 @@ export type FormSubmitLookup =
       type: "skillReportSubmit";
       payload: ReportSubmit;
       response: NavigationResponse;
+    }
+  | {
+      type: "saveAll";
+      payload: SaveAllSubmit;
+      response: NavigationResponse;
     };
 
 export type NavigationResponse = {
@@ -107,6 +118,6 @@ export interface EditSkillNavigateResponse extends NavigationResponse {
 export interface SaveDegreeNavigateResponse extends NavigationResponse {
   payload: {
     form: Form;
-    degress: Degrees[];
+    degrees: Degrees[];
   };
 }

@@ -149,7 +149,7 @@ export default class Form {
       ...payload,
       ...weirdData,
       __EVENTTARGET: config.name,
-      __ASYNCPOST: true,
+      // __ASYNCPOST: true,
       ctl00$tbNameBookMarks: "",
     };
 
@@ -164,7 +164,7 @@ export default class Form {
     return payload;
   }
 
-  async submit(name: string, redirect: Redirect) {
+  async submit(name: string, redirect: Redirect, config = {}) {
     const actionButtons = this.getActionButtons();
     const target = actionButtons.find((e) => e.name == name)!;
 
@@ -175,11 +175,15 @@ export default class Form {
 
     const action = this.getFormAction();
 
-    const data = await redirect.fork(action, {
-      ...payload,
-      [target.name!]: target.title,
-      __EVENTTARGET: "",
-    });
+    const data = await redirect.fork(
+      action,
+      {
+        ...payload,
+        [target.name!]: target.title,
+        __EVENTTARGET: "",
+      },
+      config
+    );
 
     return data;
   }

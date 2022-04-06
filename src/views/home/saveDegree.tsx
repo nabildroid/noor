@@ -13,19 +13,24 @@ import { teacherTypeArabic } from "../../utils";
 import { Presense } from "../../types/home_types";
 import CheckBoxs from "../../components/home/checkboxs";
 import { NoorExam, NoorSection } from "../../models/home_model";
+import { FormInput } from "../../types/communication_types";
 
 interface SaveDegreeProps {}
 
 export type Module = {
-  presence: Presense;
-  id: string;
+  presence: FormInput;
   title: string;
-  max: number;
-  value: number;
+  input: {
+    max: number;
+    value: number;
+    name: string;
+    id: string;
+  };
 };
 
 export type Degrees = {
   studentID: number;
+  // todo add userProfileID
   studentName: string;
   semester: number;
   modules: Module[];
@@ -51,7 +56,7 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
     const isSecondStage = loadingIndex == inputs.length - 1;
     if (isSecondStage) {
       fetchDegress();
-      setTimeout(() => setStage(1), 700);
+      // setTimeout(() => setStage(1), 700);
     }
   }, [loadingIndex]);
 
@@ -67,15 +72,15 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
   }, []);
 
   async function fetchDegress() {
-    const { degress } = await submit("saveDegreeSubmit", {});
+    const { degrees } = await submit("saveDegreeSubmit", {});
 
-    setDegrees(degress);
+    setDegrees(degrees);
   }
 
   const checkSave = async () => {};
   const back = () => setStage(Math.max(stage - 1, 0));
   const next = () => setStage((s) => s + 1);
-  
+
   return (
     <div className="flex flex-1 h-full flex-col">
       <PageTitle title="رصد درجاة الفصل" />
@@ -125,7 +130,7 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
                           className=" bg-white -mr-1  text-right outline-none rounded-md w-20 text-lg text-indigo-900"
                         />
                         <p className="font-mono -mb-1 text-md text-slate-500">
-                          / {m.max}
+                          / {m.input.max}
                         </p>
                       </div>
                     </div>
@@ -133,16 +138,10 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
                       <CheckBoxs
                         className="flex space-x-2"
                         onSelect={() => {}}
-                        options={[
-                          {
-                            id: "dsd",
-                            value: "حاضر",
-                          },
-                          {
-                            id: "dsdsdd",
-                            value: "غائب",
-                          },
-                        ]}
+                        options={m.presence.options.map((e) => ({
+                          id: e.value,
+                          value: e.text,
+                        }))}
                       />
                     </div>
                   </div>

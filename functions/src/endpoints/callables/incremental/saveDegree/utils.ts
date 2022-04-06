@@ -1,4 +1,5 @@
 import { load as loadHtml } from "cheerio";
+import * as FormData from "form-data";
 import Form, { FormInput } from "../../../../core/form";
 import Redirect from "../../../../core/redirect";
 import Table from "../../../../core/table";
@@ -8,34 +9,59 @@ export class SaveDegreeForm extends Form {
     super(html);
   }
 
-  async save() {}
+  async submit(name: string, redirect: Redirect) {
+    const formData = new FormData();
+    const actionButtons = this.getActionButtons();
+    const target = actionButtons.find((e) => e.name == name)!;
 
-  updateFromSreachSubmission(data: string) {
-    this.updateForm(data);
+    const payload = this.fetchOptionRequestPayload(
+      { id: target.id, name: target.name!, value: target.title },
+      []
+    );
 
-    Form.parseResponse(data, {
-      updatePanel: (id, value) => {
-        const panel = loadHtml(value);
-        // CHECK hardcoded
-        if (id == "ctl00$PlaceHolderMain$UpdatePanel7") {
-          const name = panel("table[id]").attr("id").replace(/_/g, "$");
+    const action = this.getFormAction();
 
-          const target = panel(".GridClass").parent().html();
-          const table = new SaveDegreeTable(target);
+    const data = {
+      ...payload,
+      [target.name!]: target.title,
+      __EVENTTARGET: "",
+    };
+    
+    Object.entries(data).forEach((v) => formData.append(v[0], v[1]));
 
-          const skills = table.lines();
+    formData.append(
+      "ctl00$PlaceHolderMain$oFileUploadAttachment",
+      Buffer.alloc(1),
+      {
+        filename: "",
+        contentType: "application/octet-stream",
+      }
+    );
 
-          //   this.appendSkills(name, skills);
-        }
-      },
-    });
+    const response = await redirect.fork(
+      action,
+      formData,
+
+      formData.getHeaders()
+    );
+
+    return response;
   }
 
-  toJson() {
-    const data = super.toJson();
+  save(data: Degrees[], redirect: Redirect) {
+    return "";
+  }
+
+  static updateFromSreachSubmission(data: string) {
+    const panel = loadHtml(data);
+    const target = panel(".GridClass").parent().html();
+
+    const form = new Form(data);
+    const table = new SaveDegreeTable(target);
 
     return {
-      ...data,
+      form,
+      degrees: table.lines(),
     };
   }
 }
@@ -111,7 +137,6 @@ export class SaveDegreeTable extends Table<Degrees, Module[]> {
               title: "",
             },
           });
-
         } else if (input.length) {
           const id = input.attr("id");
           const name = input.attr("name");

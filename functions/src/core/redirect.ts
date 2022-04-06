@@ -1,3 +1,5 @@
+import * as FormData from "form-data";
+
 import http from "axios";
 import { stringify as QueryEncode } from "querystring";
 import { load as loadHtml } from "cheerio";
@@ -155,19 +157,28 @@ export default class Redirect {
     };
   }
 
-  async fork(to: string, payload: any) {
+  async fork(
+    to: string,
+    payload: any,
+    config = {
+      "X-MicrosoftAjax": "Delta=true",
+      "X-Requested-With": "XMLHttpRequest",
+      ADRUM: "isAjax:true",
+    } as {}
+  ) {
     const cookies = mergeCookies(this.prevCookies, this.cookies);
+    if (!(payload instanceof FormData)) {
+      payload = replaceNullValues(payload, "");
+      payload = QueryEncode(payload);
+    }
 
-    payload = replaceNullValues(payload, "");
-
-    const { data, headers } = await http.post(to, QueryEncode(payload), {
+    const { data, headers } = await http.post(to, payload, {
       headers: {
         ...defaultHeader(cookies),
         Referer: this.from,
         "Content-Type": "application/x-www-form-urlencoded",
-        "X-MicrosoftAjax": "Delta=true",
-        "X-Requested-With": "XMLHttpRequest",
-        ADRUM: "isAjax:true",
+
+        ...config,
       },
       proxy: {
         host: "localhost",

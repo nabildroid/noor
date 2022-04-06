@@ -21,6 +21,14 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
       "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
   });
 
+  const form = await fetchOptions(data, homePage);
+
+  // todo include the cookies and redirected;
+  return homePage.sendForm(form);
+});
+
+
+export async function fetchOptions(data: NavigationData, homePage: Redirect) {
   const form = Form.fromJson({
     action: data.action,
     weird: data.weirdData,
@@ -36,7 +44,6 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
     [],
     homePage
   );
+  return form;
+}
 
-  // todo include the cookies and redirected;
-  return homePage.sendForm(form);
-});

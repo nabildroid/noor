@@ -15,6 +15,7 @@ import {
   FormSubmitLookup,
   NavigateTo,
   NavigationResponse,
+  SaveAllSubmit,
 } from "../types/communication_types";
 import { LoginFormParams, LoginSubmissionResponse } from "../types/login_types";
 
@@ -117,6 +118,21 @@ export default class Repository {
 
   async editSkillSave(config: EditSkillSubmit) {
     const response = await this.call<FormNavigateResponse>("skillSave", {
+      ...config,
+      ...(this.bouncingData ?? {}),
+    });
+
+    this.updateBouncingData({
+      cookies: response.data.cookies,
+      from: response.data.redirected || response.data.from,
+      weirdData: response.data.weirdData,
+    });
+
+    return response.data.payload;
+  }
+
+  async saveAll(config: SaveAllSubmit) {
+    const response = await this.call<FormNavigateResponse>("saveAll", {
       ...config,
       ...(this.bouncingData ?? {}),
     });
