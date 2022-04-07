@@ -1,6 +1,23 @@
 import { clone } from "../utils";
 import { FormInput } from "./form";
 
+function createdPath(inputs: FormInput[]) {
+  let path = "";
+
+  for (const inp of inputs) {
+    const options = removeEmpty(inp.options);
+    if (!options.length) return null;
+    else {
+      const selected = options[0].text;
+      path += selected;
+    }
+  }
+  return path;
+}
+
+// FIXME antypattern
+const walked = new Set<string>();
+let isDone = false;
 //BUG racing with WeiredData !
 export async function executeVariant(
   inputsOrg: FormInput[],
@@ -13,7 +30,16 @@ export async function executeVariant(
 ): Promise<any> {
   const inputs = clone(inputsOrg);
 
+  if (isDone) return;
+  
   if (i + 1 > inputs.length) {
+    const currentPath = createdPath(inputs);
+    // FIXME checking here means one wasted network iteration!
+    if (currentPath && walked.has(currentPath)) {
+      isDone =  true;
+      return;
+    } else walked.add(currentPath);
+
     const last = inputs[inputs.length - 1];
     for (const o of removeEmpty(last.options)) {
       // await config.execute([
@@ -47,18 +73,16 @@ export async function executeVariant(
   if (containOpt(options, "الكل")) {
     current.options = selectOpt(options, "الكل");
     return await executeVariant(inputs, config, i + 1);
-  
-  // in case of the current options is empty fetch from the parent
+
+    // in case of the current options is empty fetch from the parent
   } else if (!options.length) {
     const filled = await config.fetchOptions(inputs, inputs[i - 1].name);
     return await executeVariant(filled, config, i - 1);
-  
-  }else if(getSelected(options)){
+  } else if (getSelected(options)) {
     const filled = await config.fetchOptions(inputs, current.name);
-    return await executeVariant(filled, config, i+1);
-
+    return await executeVariant(filled, config, i + 2);
   } else {
-    // for each option select one 
+    // for each option select one
     for (const e of removeEmpty(options)) {
       await executeVariant(
         [
@@ -91,6 +115,6 @@ function removeEmpty(ops: FormInput["options"]) {
   );
 }
 
-function getSelected(ops: FormInput["options"]){
-  return ops.find(d=>d.selected);
+function getSelected(ops: FormInput["options"]) {
+  return ops.find((d) => d.selected);
 }
