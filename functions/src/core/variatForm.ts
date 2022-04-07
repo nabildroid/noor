@@ -42,14 +42,13 @@ export async function executeVariant(
 
     const last = inputs[inputs.length - 1];
     for (const o of removeEmpty(last.options)) {
-      // await config.execute([
-      //   ...inputs.slice(0, inputs.length - 1),
-      //   {
-      //     ...last,
-      //     options: selectOpt(last.options, o.text),
-      //   },
-      // ]);
-      return;
+      await config.execute([
+        ...inputs.slice(0, inputs.length - 1),
+        {
+          ...last,
+          options: selectOpt(last.options, o.text),
+        },
+      ]);
     }
 
     return;
