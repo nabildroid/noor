@@ -9,15 +9,28 @@ import {
   TeacherType,
 } from "../models/home_model";
 import Repository from "../repository";
+import DB from "../repository/db";
 import { AppContext } from "./appContext";
 
 export const HomeContext = createContext<IHomeProvider>(null!);
 
 const HomeProvider: React.FC = ({ children }) => {
+  console.log("creating the context!");
   const [state, dispatch] = useReducer(homeAction, HomeStateInit);
   const { user, logout } = useContext(AppContext);
 
   const teacher = useFetchTeacher({ user });
+
+  useEffect(() => {
+    console.log("subscribing to the task list");
+    return DB.instance.subscribeToTasks(user!.uid, (task, isDeleted) => {
+      console.log(task.id,isDeleted?"deleted":"added");
+      if (isDeleted) dispatch({ type: "deleteTask", payload: task.id! });
+      else {
+        dispatch({ type: "addTask", payload: task });
+      }
+    });
+  },[]);
 
   useEffect(() => {
     if (teacher) {

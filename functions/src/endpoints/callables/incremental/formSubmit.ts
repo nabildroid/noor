@@ -28,7 +28,7 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
     actionButtons: [data.actionButton],
   });
 
-  const search = await form.submit(data.actionButton.name!, homePage);
+  // const search = await form.submit(data.actionButton.name!, homePage);
 
   return homePage.sendForm(form);
 });

@@ -18,6 +18,7 @@ import {
   SaveAllSubmit,
 } from "../types/communication_types";
 import { LoginFormParams, LoginSubmissionResponse } from "../types/login_types";
+import { mergeCookies } from "../utils";
 
 export default class Repository {
   private functions: Functions;
@@ -31,6 +32,10 @@ export default class Repository {
     return Repository._instance!;
   }
 
+  trustMe() {
+    return this.bouncingData;
+  }
+
   constructor() {
     this.functions = getFunctions(firebaseApp);
     if (emulator) {
@@ -39,7 +44,7 @@ export default class Repository {
 
     const cache = localStorage.getItem("bouncing");
     if (cache) {
-      // this.bouncingData = JSON.parse(cache);
+      this.bouncingData = JSON.parse(cache);
     }
   }
 
@@ -147,9 +152,6 @@ export default class Repository {
   }
 
   private updateBouncingData(config: Partial<BouncingNavigation>) {
-
-    localStorage.setItem("bouncing", JSON.stringify(config));
-    
     if (!this.bouncingData) {
       this.bouncingData = {
         cookies: [],
@@ -157,16 +159,19 @@ export default class Repository {
       };
     } else {
       this.bouncingData = {
-        cookies: [
-          ...new Set([
-            ...(config.cookies ?? []),
-            ...(this.bouncingData?.cookies ?? []),
-          ]),
-        ],
+        cookies: config.cookies ?? this.bouncingData.cookies,
         from: config.from ?? this.bouncingData.from,
         weirdData: config.weirdData ?? this.bouncingData.weirdData,
       };
     }
 
+    localStorage.setItem(
+      "bouncing",
+      JSON.stringify({
+        weirdData: this.bouncingData.weirdData,
+        cookies: mergeCookies(this.bouncingData.cookies),
+        from: this.bouncingData.from,
+      })
+    );
   }
 }

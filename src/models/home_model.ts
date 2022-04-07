@@ -1,3 +1,5 @@
+import { BouncingNavigation, SaveAllSubmit } from "../types/communication_types";
+
 export enum TeacherType {
   kindergarten,
   elementery,
@@ -31,6 +33,22 @@ export type Teacher = {
   currentRole: string;
 };
 
+export enum BackgroundTaskType {
+  saveAll = "saveAll",
+}
+
+export type BackgroundTask<T> = {
+  id?: string;
+  type: BackgroundTaskType;
+  user: string;
+  completed: boolean;
+  payload: T & BouncingNavigation;
+};
+
+export interface SaveAllTask extends BackgroundTask<SaveAllSubmit> {
+  type: BackgroundTaskType.saveAll;
+}
+
 export enum HomeTab {
   selectRole = "/",
   save = "save",
@@ -47,6 +65,14 @@ export enum HomeTab {
 export type HomeActions =
   | {
       type: "setRole";
+      payload: string;
+    }
+  | {
+      type: "addTask";
+      payload: BackgroundTask<any>;
+    }
+  | {
+      type: "deleteTask";
       payload: string;
     }
   | {
@@ -79,6 +105,7 @@ export type HomeState = {
   loading: boolean;
   tab: HomeTab;
   tabs: HomeTab[];
+  tasks: BackgroundTask<any>[];
 };
 
 export const HomeStateInit: HomeState = {
@@ -88,6 +115,7 @@ export const HomeStateInit: HomeState = {
 
   teacherType: TeacherType.elementery,
   tabs: [],
+  tasks: [],
 };
 
 export interface IHomeProvider extends HomeState {

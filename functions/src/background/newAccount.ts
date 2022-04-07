@@ -1,6 +1,10 @@
 import * as functions from "firebase-functions";
+import * as fs from "fs"
 
-import { auth, db } from "../common";
+
+const path = require("path");
+const os = require("os");
+import { auth, db, storage } from "../common";
 import { extractHomeData } from "../helpers";
 import Redirect from "../core/redirect";
 
@@ -10,18 +14,26 @@ export default functions.auth.user().onCreate(async (user) => {
     return;
   }
 
-
   const name = user.email.split("@")[0];
 
   try {
     const cookieDoc = await db.collection("cookies").doc(name).get();
     const cookies = (cookieDoc.data() as any).cookies as string[];
-    const homePage =await Redirect.start({
-      from:"https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
-      cookies
-    })
+    const homePage = await Redirect.start({
+      from: "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
+      cookies,
+    });
+
     const homedata = (await extractHomeData(homePage.stop().html))!;
+
+
     
+
+    const tempFilePath = path.join(os.tmpdir(), user.uid + ".html");
+
+    fs.writeFileSync(tempFilePath,homePage.stop().html)
+    await storage.upload(tempFilePath);
+
     const { userName, allAccounts, currentAccount } = homedata;
     const { weirdData } = homedata;
 

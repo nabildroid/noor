@@ -9,7 +9,7 @@ import {
 } from "../types/communication_types";
 
 interface Props {
-  label: string;
+  label: {};
   excludedIds?: string[];
   excludedNames?: string[];
   actionName: string;
@@ -26,6 +26,7 @@ type SubmitType = <
 ) => Promise<D["response"]["payload"]>;
 
 
+const createPath = (x:{})=>Object.values(x).join("-");
 
 // todo use label to cach data
 export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
@@ -98,6 +99,19 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
     return action as any;
   };
 
+  const letMeHandleIt = () => {
+    const actionButton = form?.actionButtons.find((e) =>
+      e.name?.includes(actionName)
+    );
+
+    return {
+      ...Repository.instance.trustMe(),
+      action: form!.action,
+      actionButton: actionButton!,
+      inputs: inputs,
+    };
+  };
+
   useEffect(() => {
     if (form) {
       setInputs(formatInputs(form.inputs));
@@ -111,6 +125,7 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
     formAction: form?.action,
     loadingIndex,
     submit,
+    letMeHandleIt
   };
 };
 

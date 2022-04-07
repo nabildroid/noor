@@ -3,11 +3,14 @@ import {
   Firestore,
   getFirestore,
   doc,
-  
   onSnapshot,
+  collection,
+  addDoc,
+  query,
+  where,
 } from "firebase/firestore";
 import { emulator, firebaseApp } from "../main";
-import { Teacher } from "../models/home_model";
+import { BackgroundTask, Teacher } from "../models/home_model";
 
 export default class DB {
   private firestore: Firestore;
@@ -28,16 +31,45 @@ export default class DB {
   }
 
   subscribeToTeacher(id: string, listener: (teacher: Teacher) => void) {
-      console.log("fetching ",id);
+    console.log("fetching ", id);
     const teacherDoc = doc(this.firestore, `users/${id}`);
 
     return onSnapshot(teacherDoc, {}, (snapshot) => {
       if (snapshot.exists()) {
-          console.log(snapshot.id);
+        console.log(snapshot.id);
         listener(snapshot.data() as Teacher);
       }
     });
   }
 
-  
+  subscribeToTasks(
+    userId: string,
+    listener: (task: BackgroundTask<any>, deleted: boolean) => void
+  ) {
+    const ref = collection(this.firestore, "tasks");
+    const tasksquery = query(
+      ref,
+      where("user", "==", userId),
+      where("completed", "!=", true)
+    );
+
+    return onSnapshot(tasksquery, {}, (snapshot) => {
+      snapshot.docChanges().forEach((doc) => {
+        listener(
+          {
+            ...doc.doc.data(),
+            id: doc.doc.id,
+          } as any,
+          doc.type == "removed"
+        );
+      });
+    });
+  }
+
+  async createTask(task: BackgroundTask<any>) {
+    const tasks = collection(this.firestore, "tasks");
+    await addDoc(tasks, {
+      ...task,
+    });
+  }
 }

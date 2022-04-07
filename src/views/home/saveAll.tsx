@@ -7,19 +7,26 @@ import rates from "../../models/rating";
 import { RatingKinder } from "../../types/home_types";
 import { teacherTypeArabic } from "../../utils";
 import Repository from "../../repository";
-import { NoorSection, NoorSkill, TeacherType } from "../../models/home_model";
+import {
+  BackgroundTaskType,
+  NoorSection,
+  NoorSkill,
+  SaveAllTask,
+  TeacherType,
+} from "../../models/home_model";
 import useFormOptions from "../../hooks/useFormOptions";
 import { AppContext } from "../../context/appContext";
+import DB from "../../repository/db";
 
 interface SaveAllProps {}
 
 const SaveAll: React.FC<SaveAllProps> = () => {
   const { teacherType, currentRole } = useContext(HomeContext);
-  const { logout } = useContext(AppContext);
+  const { logout, user } = useContext(AppContext);
   const [selected, select] = useState<RatingKinder>();
   const [loading, setLoading] = useState(false);
 
-  const { inputs, setForm, formAction, submit } = useFormOptions({
+  const { setForm, letMeHandleIt } = useFormOptions({
     label: "saveAll" + teacherType,
     actionName: "ibtnSearch",
   });
@@ -42,11 +49,19 @@ const SaveAll: React.FC<SaveAllProps> = () => {
   const checkSave = async () => {
     console.log("saving", selected);
     if (selected == undefined) return;
-    
+
     setLoading(true);
-    await submit("saveAll", {
-      rate: selected,
-    });
+    const task: SaveAllTask = {
+      payload: {
+        ...letMeHandleIt(),
+        rate: selected,
+      } as any,
+      completed: false,
+      type: BackgroundTaskType.saveAll,
+      user: user!.uid,
+    };
+    await DB.instance.createTask(task);
+
     setLoading(false);
   };
 

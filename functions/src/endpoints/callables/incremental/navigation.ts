@@ -66,10 +66,28 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
     };
   });
 
-  const secondNav = await firstNav.next(async (config) => {
+  const ensureFirstNav = await firstNav.nextIf(
+    async (config) => {
+      const nav2Ids = await innerNavigation(config.html);
+      return nav2Ids.length == 0;
+    },
+    async (config) => {
+      const home = await extractHomeData(config.html);
+      const nav1Id = home.navigation.find((e) => e.text == data.nav1)!.id;
+
+      console.log("##### YAYYYY [FORCED] first step!");
+      return {
+        target: "MenuItemRedirect",
+        to: nav1Id,
+        weirdData: home.weirdData,
+      };
+    }
+  );
+
+  const secondNav = await ensureFirstNav.next(async (config) => {
     const nav2Ids = await innerNavigation(config.html);
     console.log(nav2Ids);
-    const nav2Id = nav2Ids.find((e) => e.text == data.nav2)!.id;
+    const nav2Id = nav2Ids.find((e) => e.text == data.nav2)?.id ?? [];
 
     console.log("##### YAYYYY second step!");
 
@@ -82,7 +100,7 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
   const { html } = secondNav.stop();
   const form = new Form(html);
 
-  return secondNav.sendForm(form);  
+  return secondNav.sendForm(form);
 });
 
 async function innerNavigation(data: string) {

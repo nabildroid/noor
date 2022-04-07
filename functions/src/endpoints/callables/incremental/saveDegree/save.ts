@@ -29,8 +29,8 @@ export default functions.https.onCall(async (data: NavigationData) => {
     }).html
   );
 
-  const search = await form.save(data.degrees, homePage);
-  const response = SaveDegreeForm.updateFromSreachSubmission(search);
+  // const search = await form.save(data.degrees, homePage);
+  // const response = SaveDegreeForm.updateFromSreachSubmission(search);
 
   return homePage.sendForm(form, {
     ...form.toJson(),

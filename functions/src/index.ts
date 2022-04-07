@@ -11,7 +11,7 @@ import skillSave from "./endpoints/callables/incremental/editSkill/save";
 import skillReportSubmit from "./endpoints/callables/incremental/saveReport/saveSkill";
 
 import saveDegreeSubmit from "./endpoints/callables/incremental/saveDegree/submit";
-import saveAll from "./endpoints/callables/incremental/saveAll/save";
+import saveAll from "./background/saveAll/save";
 
 export {
   signForm,

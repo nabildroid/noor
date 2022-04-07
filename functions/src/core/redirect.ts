@@ -234,6 +234,9 @@ export default class Redirect {
     });
   }
 
+
+  
+
   setWeiredData(weird:{ [key: string]: any }){
     this.weirdData = weird as weird;
   }

@@ -11,6 +11,16 @@ export default (state: HomeState, action: HomeActions): HomeState => {
       ...state,
       loading: true,
     };
+  else if (action.type == "addTask")
+    return {
+      ...state,
+      tasks: [...state.tasks, action.payload],
+    };
+  else if (action.type == "deleteTask")
+    return {
+      ...state,
+      tasks: state.tasks.filter((e) => e.id != action.payload),
+    };
   else if (action.type == "setTeacher")
     return {
       ...state,

@@ -63,7 +63,6 @@ export function mergeCookies(...cookies: string[][]) {
     {}
   );
 
-
   return Object.entries(ob).reduce((acc, v) => {
     if (!v[1]) return acc;
     return [...acc, `${v[0]}=${v[1]}`];
@@ -81,11 +80,7 @@ export function escapeQuotes(str?: string) {
   return (str ?? "").replace(/"/g, '\\"').replace(/'/g, "\\'");
 }
 
-
-
-
-export function clone<T>(ob:T){
-  return JSON.parse(JSON.stringify(ob)) as T
+export function clone<T>(ob: T) {
+  if (ob) return JSON.parse(JSON.stringify(ob)) as T;
+  return undefined;
 }
-
-

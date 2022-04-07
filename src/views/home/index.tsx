@@ -10,17 +10,26 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import SelectRole from "../../components/home/navigation/selectRole";
 import PhoneMenu from "../../components/home/navigation/phoneMenu";
 import Menu from "../../components/home/navigation/menu";
+import Noti from "../../components/home/noti";
 
 const Home: React.FC = ({ children }) => {
-  const { teacher, loading, selectTab, tab, tabs, selectRole, currentRole } =
-    useContext(HomeContext);
+  const {
+    teacher,
+    tasks,
+    loading,
+    selectTab,
+    tab,
+    tabs,
+    selectRole,
+    currentRole,
+  } = useContext(HomeContext);
 
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
   const correctNavigation = useCallback(
     (route: string) => {
-      console.log(route,tabs);
+      console.log(route, tabs);
       if (tabs.some((e) => e == route) && route != tab) {
         selectTab(route as any);
       } else if (route != undefined) {
@@ -55,6 +64,7 @@ const Home: React.FC = ({ children }) => {
           </div>
         </div>
         <div className="w-full overflow-hidden  flex-1 p-4">
+          {!!tasks.length && <Noti text="جاري ةنفيذ العملية" />}
           <Outlet />
         </div>
         <div></div>
