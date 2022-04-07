@@ -59,7 +59,7 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
 
   return (
     <div className="flex flex-1 h-full flex-col">
-      <PageTitle title="الةقارير المحفوظة" />
+      <PageTitle title="التقارير المحفوظة" />
 
       <div
         className={`mt-4 b flex-1 flex flex-col max-w-sm md:max-w-xl mx-auto w-full`}

@@ -63,10 +63,12 @@ const Home: React.FC = ({ children }) => {
             <NameLabel name={teacher?.name} />
           </div>
         </div>
+
         <div className="w-full overflow-hidden  flex-1 p-4">
-          {!!tasks.length && <Noti text="جاري ةنفيذ العملية" />}
-          <Outlet />
+          {!!tasks.length && <Noti text="جاري تنفيذ العملية" />}
+          {teacher && <Outlet />}
         </div>
+
         <div></div>
       </div>
       <nav className="max-w-xs hidden md:block w-full bg-slate-50 shadow-md">

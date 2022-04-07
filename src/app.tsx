@@ -47,7 +47,7 @@ function App() {
                 </Suspense>
               }
             >
-              <Route path={HomeTab.save} element={<SaveAll />} />
+              <Route path={HomeTab.saveAll} element={<SaveAll />} />
               <Route path={HomeTab.editSkill} element={<EditSkill />} />
               <Route path={HomeTab.saveCustom} element={<SaveCustom />} />
 
@@ -58,7 +58,6 @@ function App() {
               <Route path={HomeTab.savedegree} element={<SaveDegree />} />
               <Route path={HomeTab.didntGet} element={<DidntGet />} />
               <Route path={HomeTab.savedReports} element={<SavedReports />} />
-              <Route path={HomeTab.saveAll} element={<span>Hello tab3</span>} />
               <Route
                 path={HomeTab.selectRole}
                 element={<span>Hello tab4</span>}

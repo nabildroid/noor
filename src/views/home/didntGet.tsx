@@ -19,19 +19,19 @@ interface DidntGetProps {}
 
 const modules = [
   {
-    class: "الثالثة ابةدائي",
+    class: "الثالثة ابتدائي",
     module: "علوم",
     num: 4,
     id: "dsds",
   },
   {
-    class: "الثالثة ابةدائي",
+    class: "الثالثة ابتدائي",
     module: "علوم",
     num: 4,
     id: "dssqd",
   },
   {
-    class: "الثالثة ابةدائي",
+    class: "الثالثة ابتدائي",
     module: "علوم",
     num: 4,
     id: "dssds",
@@ -118,7 +118,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
                 <Noti text="يوجد" />
                 <div className="mt-4 text-center">
                   <CustomButton onClick={() => setStage(1)} icon={false}>
-                    اسةعراض
+                    استعراض
                   </CustomButton>
                 </div>
               </>
@@ -127,7 +127,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
 
           <Transition className={" flex-1"} show={stage == 1}>
             <h3 className="text-indigo-600 bg-indigo-50 py-1 font-arabic text-center text-md">
-              طلاب لم يةقنو المهاراة في {period}
+              طلاب لم يتقنو المهاراة في {period}
             </h3>
 
             <div className="mt-8 w-full flex flex-col overflow-hidden">
@@ -178,7 +178,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
                               onClick={() => setStage(2)}
                               className="text-indigo-600  p-1 hover:text-indigo-900"
                             >
-                              ةعديل
+                              تعديل
                             </button>
                           </td>
                         </tr>
@@ -192,7 +192,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
 
           <Transition className="flex-1" show={stage == 2}>
             <h3 className="text-indigo-600 mt-1 bg-indigo-50 py-1 font-arabic text-center text-md">
-              طلاب لم يةقنو المهاراة في {period}
+              طلاب لم يتقنو المهاراة في {period}
             </h3>
 
             <div className="flex justify-center space-x-6 mt-2 items-center">

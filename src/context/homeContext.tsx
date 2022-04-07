@@ -24,18 +24,21 @@ const HomeProvider: React.FC = ({ children }) => {
   useEffect(() => {
     console.log("subscribing to the task list");
     return DB.instance.subscribeToTasks(user!.uid, (task, isDeleted) => {
-      console.log(task.id,isDeleted?"deleted":"added");
+      console.log(task.id, isDeleted ? "deleted" : "added");
       if (isDeleted) dispatch({ type: "deleteTask", payload: task.id! });
       else {
         dispatch({ type: "addTask", payload: task });
       }
     });
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (teacher) {
       dispatch({ type: "setTeacher", payload: teacher });
       dispatch({ type: "setRole", payload: teacher.currentRole });
+      const type = getTeacherType(teacher.currentRole);
+      dispatch({ type: "setTeacherType", payload: type });
+      dispatch({ type: "setTab", payload: HomeTab.selectRole });
     }
   }, [teacher]);
 
@@ -47,20 +50,15 @@ const HomeProvider: React.FC = ({ children }) => {
   }, [state.currentRole]);
 
   const getTeacherTabs = (type: TeacherType) => {
-    return [
-      HomeTab.save,
-      HomeTab.saveAll,
-      HomeTab.savedReports,
-      HomeTab.savedegree,
-      HomeTab.saveCustom,
-      HomeTab.editSkill,
-      HomeTab.saveReport,
-      HomeTab.didntGet,
-    ];
     if (type == TeacherType.elementery)
-      return [HomeTab.saveReport, HomeTab.saveCustom];
+      return [HomeTab.saveReport, HomeTab.saveCustom, HomeTab.editSkill];
     else if (type == TeacherType.kindergarten)
-      return [HomeTab.saveCustom, HomeTab.selectRole];
+      return [
+        HomeTab.saveAll,
+        HomeTab.editSkill,
+        HomeTab.savedReports,
+        HomeTab.saveReport,
+      ];
     return [HomeTab.savedReports, HomeTab.saveCustom];
   };
 

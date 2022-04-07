@@ -34,6 +34,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     });
 
   useEffect(() => {
+    console.log("teacher type:",teacherType);
     const type =
       teacherType == TeacherType.kindergarten
         ? NoorSkill.skillModuleChild
@@ -100,8 +101,17 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   }
 
   const checkSave = async () => {
-    
-    save();
+    const data = await Repository.instance.editSkillSave({
+      action: formAction!,
+      inputs,
+      skills: skills.map((s) => ({
+        id: s.skillId,
+        value: parseInt(s.value)
+      })),
+    });
+
+    setForm(data.form);
+    setStage(0);
   };
   const back = () => setStage(Math.max(stage - 1, 0));
   const next = () => {
@@ -122,7 +132,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     setStage(0);
   };
 
-  const pageTitle = `ةعديل ${teacherTypeArabic(teacherType)}`;
+  const pageTitle = `تعديل ${teacherTypeArabic(teacherType!)}`;
 
   return (
     <div className="flex flex-1 h-full flex-col">
@@ -132,6 +142,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
         <div className="flex-1  w-full px-4 bg-white  rounded-md shadow  py-4">
           <Transition
             className="flex-1 w-full grid md:grid-cols-2  gap-3"
+            style={{direction:"rtl"}}
             show={stage == 0}
           >
             {inputs.map((input, i) => (
@@ -151,9 +162,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
           </Transition>
 
           <Transition className={"flex-1"} show={stage == 1}>
-            <h3 className="text-indigo-500 font-arabic text-center text-sm">
-              {student}
-            </h3>
+            
             <div className="mt-2">
               <RadioList
                 disabled={loading}
@@ -161,7 +170,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
                 onSelect={(e) =>
                   setAllOneSkill(RateById(ratingSystem, e as any))
                 }
-                items={rates(teacherType)}
+                items={rates(teacherType!)}
               />
             </div>
             <div className="mt-4 flex  justify-center items-stretch space-x-6">
@@ -192,7 +201,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
                   disabled={loading}
                   title={s.title}
                   onSelect={(e) => setSkillsById(s.skillId, e as any)}
-                  items={rates(teacherType)}
+                  items={rates(teacherType!)}
                 />
               </div>
 
@@ -202,7 +211,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
                   {/* todo bullet navigation */}
                   {!isLastSkill && (
                     <CustomButton icon={false} onClick={next}>
-                      الةالي
+                      التالي
                     </CustomButton>
                   )}
                   {isLastSkill && (

@@ -5,6 +5,7 @@ import * as functions from "firebase-functions";
 
 import { auth, db, LOGIN_ENDPOINT } from "../../common";
 import { firestore } from "firebase-admin";
+import { mergeCookies } from "../../utils";
 
 const iv = cry.enc.Utf8.parse("1052099214050902");
 const key = cry.enc.Utf8.parse("p10zpop213tpDW41");
@@ -28,7 +29,7 @@ export default functions.https.onCall(async (data, context) => {
     __VIEWSTATEENCRYPTED,
     __EVENTVALIDATION,
     __VIEWSTATE,
-    cookies,
+    cookies: OldCookies,
   } = data;
   const { name, password, captcha } = data;
 
@@ -55,18 +56,19 @@ export default functions.https.onCall(async (data, context) => {
           Referer: LOGIN_ENDPOINT,
           "User-Agent":
             "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36",
-          Cookie: cookies.join("; "),
+          Cookie: OldCookies.join("; "),
         },
         maxRedirects: 0,
       });
     } catch (e: any) {
       if (e.response && e.response.status == 302) {
-        const cookies = e.response.headers["set-cookie"];
+        const cookies = mergeCookies(
+          OldCookies,
+          e.response.headers["set-cookie"]
+        );
+        
         if (!(cookies instanceof Array) || !cookies.length) {
-          console.error(
-            "success login without returning cookies",
-            e.response
-          );
+          console.error("success login without returning cookies", e.response);
           return { operation: "failed" };
         }
 

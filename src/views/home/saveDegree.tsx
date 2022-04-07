@@ -83,7 +83,7 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
 
   return (
     <div className="flex flex-1 h-full flex-col">
-      <PageTitle title="رصد درجاة الفصل" />
+      <PageTitle title="رصد درجات الفصل" />
 
       <div className="mt-4 b flex-1 flex flex-col max-w-sm mx-auto w-full">
         <div className="flex-1  w-full px-4 bg-white  rounded-md shadow  py-4">

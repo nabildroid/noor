@@ -2,22 +2,21 @@ import { HomeTab, TeacherType } from "../models/home_model";
 
 export const tabBarTitle = (tab: HomeTab) =>
   ({
-    [HomeTab.save]: "ةحصيل الكل",
-    [HomeTab.saveAll]: "ةحيل",
-    [HomeTab.saveReport]: "ةقرير جديد",
-    [HomeTab.savedegree]: "رصد درجاة الفصل",
-    [HomeTab.savedReports]: "الةقرارير",
-    [HomeTab.selectRole]: "اخةيار الحسياب",
+    [HomeTab.saveAll]: "تحصيل الكل",
+    [HomeTab.saveReport]: "تقرير جديد",
+    [HomeTab.savedegree]: "رصد درجات الفصل",
+    [HomeTab.savedReports]: "التقرارير",
+    [HomeTab.selectRole]: "اختيار الحسياب",
     [HomeTab.saveCustom]: "رصد وحدة ومهارة",
     [HomeTab.studentsNotAccepted]: "رصد وحدة ومهارة",
-    [HomeTab.editSkill]: "ةعديل المهارة",
-    [HomeTab.didntGet]: "لم يةقنو المهارة",
+    [HomeTab.editSkill]: "تعديل المهارت",
+    [HomeTab.didntGet]: "لم يتقنو المهارت",
   }[tab]);
 
 export const teacherTypeArabic = (type: TeacherType) => {
   if (type == TeacherType.kindergarten) return "الروضة";
-  else if (type == TeacherType.primary) return "الابةدائية";
-  else return "المةوسطة";
+  else if (type == TeacherType.primary) return "الابتدائية";
+  else return "المتوسطة";
 };
 
 export function mergeCookies(...cookies: string[][]) {

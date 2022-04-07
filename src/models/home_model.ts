@@ -51,7 +51,6 @@ export interface SaveAllTask extends BackgroundTask<SaveAllSubmit> {
 
 export enum HomeTab {
   selectRole = "/",
-  save = "save",
   saveAll = "saveall",
   savedegree = "savedegree",
   editSkill = "editSkill",
@@ -101,7 +100,7 @@ export type HomeActions =
 export type HomeState = {
   currentRole?: string;
   teacher?: Teacher;
-  teacherType: TeacherType;
+  teacherType?: TeacherType;
   loading: boolean;
   tab: HomeTab;
   tabs: HomeTab[];
@@ -111,9 +110,6 @@ export type HomeState = {
 export const HomeStateInit: HomeState = {
   tab: HomeTab.selectRole,
   loading: false,
-  currentRole: "المدرس الاول",
-
-  teacherType: TeacherType.elementery,
   tabs: [],
   tasks: [],
 };
