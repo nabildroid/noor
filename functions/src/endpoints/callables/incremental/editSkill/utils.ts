@@ -18,7 +18,10 @@ export class EditSkillForm extends Form {
     const skillValues =
       skills
         .reduce(
-          (acc, v, i) => [...acc, `${i == 0 ? "" : i - 1 + "#"}${3},${v.id}`],
+          (acc, v, i) => [
+            ...acc,
+            `${i == 0 ? "" : i - 1 + "#"}${v.value},${v.id}`,
+          ],
           []
         )
         .join(",") + `${skills.length}#`;
@@ -55,13 +58,19 @@ export class EditSkillForm extends Form {
           const name = panel("table[id]").attr("id").replace(/_/g, "$");
 
           const target = panel(".GridClass").parent().html();
-          const table = new SkillEditTable(target);
+          if (target) {
+            const table = new SkillEditTable(target);
 
-          const skills = table.lines();
-          this.appendSkills(name, skills);
+            const skills = table.lines();
+            this.appendSkills(name, skills);
+          } else {
+            this.appendSkills(name, []);
+            console.warn("no skills to be appended");
+          }
         }
       },
     });
+    return this.getWeirdData();
   }
 
   toJson() {
@@ -119,13 +128,13 @@ export type skill = {
   title: string;
 };
 
-export class SkillEditTable extends Table<skill,undefined> {
+export class SkillEditTable extends Table<skill, undefined> {
   protected filter(tr: cheerio.Cheerio): boolean {
     return this.$("img", tr).length != 0;
   }
   protected processLine(tr: cheerio.Cheerio): skill {
     const img = this.$("img", tr);
-    const skillId = img.attr("skillid");
+    const skillId = img.attr("skillid") || img.attr("studentprofileid");
     const value = img.attr("title");
 
     const id = tr.attr("id").replace(/_/g, "$");

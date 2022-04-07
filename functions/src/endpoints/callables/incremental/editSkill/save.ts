@@ -23,21 +23,24 @@ export default functions.https.onCall(async (data: NavigationData) => {
       "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
   });
 
-  const form = new EditSkillForm(
-    Form.fromJson({
-      action: data.action,
-      weird: data.weirdData,
-      inputs: data.inputs,
-      actionButtons: [
-        
-      ],
-    }).html
-  );
-
-  const response = await form.save(data.skills, homePage);
-  form.updateFromSreachSubmission(response);
+  const form = await saveEditedSkills(data, homePage);
 
   return homePage.sendForm(form, {
     ...form.toJson(),
   });
 });
+
+export async function saveEditedSkills(data: NavigationData, homePage: Redirect) {
+  const form = new EditSkillForm(
+    Form.fromJson({
+      action: data.action,
+      weird: data.weirdData,
+      inputs: data.inputs,
+      actionButtons: [],
+    }).html
+  );
+
+  const response = await form.save(data.skills, homePage);
+  form.updateFromSreachSubmission(response);
+  return form;
+}

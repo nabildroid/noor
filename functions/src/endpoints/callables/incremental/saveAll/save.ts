@@ -25,14 +25,19 @@ export default functions.https.onCall(async (data: NavigationData) => {
       "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
   });
 
+  // CHECK get the skillsIDS and the form variante, you don't have to fetch all skills everytime, but the skills my vary depending on the form paramters!
+
+  
+
   let from: "execute" | "fetch" = "execute";
 
   let { action } = data;
+  
   executeVariant(data.inputs, {
     execute: async (inputs) => {
       from = "execute";
       // go to the seach button
-      action = await executeSkillEdits(
+      const response = await executeSkillEdits(
         {
           ...data,
           inputs,
@@ -41,6 +46,9 @@ export default functions.https.onCall(async (data: NavigationData) => {
         },
         homePage
       );
+
+      action = response.action;
+      homePage.setWeiredData(response.weirdData);
     },
     fetchOptions: async (inputs, name) => {
       from = "fetch";
@@ -64,6 +72,10 @@ export default functions.https.onCall(async (data: NavigationData) => {
         name: "ctl00$PlaceHolderMain$ddlUnitTypesDDL",
         value: "الكل",
       },
+      {
+        name:"ctl00$PlaceHolderMain$ddlStudySystem",
+        value:"منتظم"
+      }
     ],
   });
 });
@@ -95,6 +107,5 @@ async function executeSkillEdits(data: NavigationData, homePage: Redirect) {
     homePage
   );
 
-  action = savedResponse.toJson().action;
-  return action;
+  return savedResponse.toJson();
 }

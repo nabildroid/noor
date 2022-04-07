@@ -185,6 +185,7 @@ export default class Redirect {
         port: 8082,
       },
     });
+
     this.weirdData = hiddenInputs(loadHtml(data));
 
     this.prevCookies = mergeCookies(
@@ -233,6 +234,10 @@ export default class Redirect {
     });
   }
 
+  setWeiredData(weird:{ [key: string]: any }){
+    this.weirdData = weird as weird;
+  }
+  
   send(ob: { [key: string]: any }) {
     return {
       redirected: this.redirected,

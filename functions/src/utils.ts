@@ -80,3 +80,12 @@ export function replaceNullValues(ob: { [key: string]: any }, repalce: any) {
 export function escapeQuotes(str?: string) {
   return (str ?? "").replace(/"/g, '\\"').replace(/'/g, "\\'");
 }
+
+
+
+
+export function clone<T>(ob:T){
+  return JSON.parse(JSON.stringify(ob)) as T
+}
+
+

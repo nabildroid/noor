@@ -50,7 +50,8 @@ export async function editSkillSubmit(data: NavigationData, homePage: Redirect) 
 
   const search = await form.submit(data.actionButton.name!, homePage);
 
-  form.updateFromSreachSubmission(search);
+  const weirdData = form.updateFromSreachSubmission(search);
+  homePage.setWeiredData(weirdData);
   return form;
 }
 

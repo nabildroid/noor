@@ -40,7 +40,7 @@ export async function fetchOptions(data: NavigationData, homePage: Redirect) {
   const selectedValue = selected.options.find((e) => e.selected)!;
 
   await form.fetchFromOption(
-    { id: selected.id, name: selected.name!, value: selectedValue.value },
+    { id: "", name: selected.name!, value: selectedValue.value },
     [],
     homePage
   );

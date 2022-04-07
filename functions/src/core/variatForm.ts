@@ -1,8 +1,9 @@
+import { clone } from "../utils";
 import { FormInput } from "./form";
 
 //BUG racing with WeiredData !
 export async function executeVariant(
-  inputs: FormInput[],
+  inputsOrg: FormInput[],
   config: {
     execute(inputs: FormInput[]): Promise<any>;
     fetchOptions(inputs: FormInput[], name: string): Promise<FormInput[]>;
@@ -10,30 +11,55 @@ export async function executeVariant(
   },
   i: number = 0
 ): Promise<any> {
+  const inputs = clone(inputsOrg);
+
   if (i + 1 > inputs.length) {
-    return await config.execute(inputs);
+    const last = inputs[inputs.length - 1];
+    for (const o of removeEmpty(last.options)) {
+      // await config.execute([
+      //   ...inputs.slice(0, inputs.length - 1),
+      //   {
+      //     ...last,
+      //     options: selectOpt(last.options, o.text),
+      //   },
+      // ]);
+      return;
+    }
+
+    return;
   }
 
   const current = inputs[i];
+
   const left = inputs.slice(0, i);
   const right = inputs.slice(i + 1);
 
   const options = removeEmpty(current.options);
 
+  // custom values
   const isTarget = config.customSelect.find((e) => e.name == current.name);
   if (isTarget) {
     current.options = selectOpt(options, isTarget.value);
     return await executeVariant(inputs, config, i + 1);
   }
 
+  // select all if this option exists
   if (containOpt(options, "الكل")) {
     current.options = selectOpt(options, "الكل");
     return await executeVariant(inputs, config, i + 1);
-  } else if (!removeEmpty(options).length) {
+  
+  // in case of the current options is empty fetch from the parent
+  } else if (!options.length) {
+    const filled = await config.fetchOptions(inputs, inputs[i - 1].name);
+    return await executeVariant(filled, config, i - 1);
+  
+  }else if(getSelected(options)){
     const filled = await config.fetchOptions(inputs, current.name);
-    return await executeVariant(filled, config, i);
+    return await executeVariant(filled, config, i+1);
+
   } else {
-    for (const e of options) {
+    // for each option select one 
+    for (const e of removeEmpty(options)) {
       await executeVariant(
         [
           ...left,
@@ -63,4 +89,8 @@ function removeEmpty(ops: FormInput["options"]) {
   return ops.filter(
     (e) => !e.text.includes("لا يوجد") && !e.text.includes("اختر")
   );
+}
+
+function getSelected(ops: FormInput["options"]){
+  return ops.find(d=>d.selected);
 }

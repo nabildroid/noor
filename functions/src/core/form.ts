@@ -164,7 +164,7 @@ export default class Form {
     return payload;
   }
 
-  async submit(name: string, redirect: Redirect, config = {}) {
+  async submit(name: string, redirect: Redirect, config?:{}) {
     const actionButtons = this.getActionButtons();
     const target = actionButtons.find((e) => e.name == name)!;
 
@@ -198,6 +198,9 @@ export default class Form {
     const data = await redirect.fork(action, payload);
 
     this.updateForm(data);
+    redirect.setWeiredData(this.getWeirdData());
+
+    
   }
 
   /**
