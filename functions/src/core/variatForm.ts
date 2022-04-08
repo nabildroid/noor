@@ -60,7 +60,7 @@ export async function executeVariant(
   const right = inputs.slice(i + 1);
 
   const options = removeEmpty(current.options);
-
+  const nextInputOptions = removeEmpty(inputs[i + 1]?.options ?? [])
   // custom values
   const isTarget = config.customSelect.find((e) => e.name == current.name);
   if (isTarget) {
@@ -77,7 +77,7 @@ export async function executeVariant(
   } else if (!options.length) {
     const filled = await config.fetchOptions(inputs, inputs[i - 1].name);
     return await executeVariant(filled, config, i - 1);
-  } else if (getSelected(options)) {
+  } else if (getSelected(options) && !nextInputOptions.length) {
     const filled = await config.fetchOptions(inputs, current.name);
     return await executeVariant(filled, config, i + 2);
   } else {

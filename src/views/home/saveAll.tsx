@@ -65,7 +65,7 @@ const SaveAll: React.FC<SaveAllProps> = () => {
     setLoading(false);
   };
 
-  const pageTitle = `رصد الكل ب${teacherTypeArabic(teacherType)}`;
+  const pageTitle = `رصد الكل ب${teacherTypeArabic(teacherType!)}`;
   // todo use form automatic submission
 
   return (
@@ -77,7 +77,7 @@ const SaveAll: React.FC<SaveAllProps> = () => {
           disabled={loading}
           title={pageTitle}
           onSelect={(e) => select(e as any)}
-          items={rates(teacherType)}
+          items={rates(teacherType!)}
         />
 
         <div className="mt-4 text-center">

@@ -1,12 +1,12 @@
 import * as functions from "firebase-functions";
 
-import { IncrementalData } from "../../types";
-import Redirect from "../../core/redirect";
-import { FormInput } from "../../core/form";
-import { executeVariant } from "../../core/variatForm";
-import { editSkillSubmit } from "../../endpoints/callables/incremental/editSkill/submit";
-import { saveEditedSkills } from "../../endpoints/callables/incremental/editSkill/save";
-import { fetchOptions } from "../../endpoints/callables/incremental/formOptions";
+import { IncrementalData } from "../../../types";
+import Redirect from "../../../core/redirect";
+import { FormInput } from "../../../core/form";
+import { executeVariant } from "../../../core/variatForm";
+import { editSkillSubmit } from "../../callables/incremental/editSkill/submit";
+import { saveEditedSkills } from "../../callables/incremental/editSkill/save";
+import { fetchOptions } from "../../callables/incremental/formOptions";
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -15,10 +15,13 @@ interface NavigationData extends IncrementalData {
   rate: number;
 }
 
-export default functions.firestore
-  .document("tasks/{taskId}")
+export default functions
+  .runWith({
+    timeoutSeconds: 60 * 9,
+  })
+  .firestore.document("tasks/{taskId}")
   .onCreate(async (snapshot) => {
-    const data = snapshot.data() as NavigationData;
+    const data = snapshot.data().payload as NavigationData;
 
     const homePage = Redirect.load({
       cookies: data.cookies,

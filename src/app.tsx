@@ -18,11 +18,13 @@ const Home = React.lazy(() => import("./views/home"));
 const HomeProvider = React.lazy(() => import("./context/homeContext"));
 
 function App() {
-  const { user, loading } = useContext(AppContext);
+  const app = useContext(AppContext);
 
-  if (loading) {
+  if (app?.loading) {
     return <Loading />;
   }
+
+  const { user } = app;
 
   return (
     <BrowserRouter>
@@ -51,10 +53,7 @@ function App() {
               <Route path={HomeTab.editSkill} element={<EditSkill />} />
               <Route path={HomeTab.saveCustom} element={<SaveCustom />} />
 
-              <Route
-                path={HomeTab.saveReport}
-                element={<SaveReport type={NoorSection.skill} />}
-              />
+              <Route path={HomeTab.saveReport} element={<SaveReport />} />
               <Route path={HomeTab.savedegree} element={<SaveDegree />} />
               <Route path={HomeTab.didntGet} element={<DidntGet />} />
               <Route path={HomeTab.savedReports} element={<SavedReports />} />

@@ -5,15 +5,17 @@ import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
-import { NoorExam, NoorSection, NoorSkill } from "../../models/home_model";
+import {
+  NoorExam,
+  NoorSection,
+  NoorSkill,
+  TeacherType,
+} from "../../models/home_model";
 import Repository from "../../repository";
-import { ReportSubmit } from "../../types/communication_types";
 
-interface SaveReportProps {
-  type: NoorSection;
-}
+interface SaveReportProps {}
 
-const SaveReport: React.FC<SaveReportProps> = ({ type }) => {
+const SaveReport: React.FC<SaveReportProps> = ({}) => {
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
@@ -21,6 +23,7 @@ const SaveReport: React.FC<SaveReportProps> = ({ type }) => {
     useFormOptions({
       label: "report" + teacherType,
       actionName: "",
+      excludedIds:["PanelSkill"],
       excludedNames: ["ddlStudySystem", "ddlSkillTypeDesc", "ddlSkills"],
     });
 
@@ -29,7 +32,7 @@ const SaveReport: React.FC<SaveReportProps> = ({ type }) => {
       .navigateTo({
         account: currentRole!,
         nav1: NoorSection.skill,
-        nav2: NoorSkill.moduleSkill,
+        nav2: NoorSkill.skillModuleSkill,
       })
       .then((r) => setForm(r.form))
       .catch(logout);
@@ -47,19 +50,15 @@ const SaveReport: React.FC<SaveReportProps> = ({ type }) => {
   }
 
   useEffect(() => {
-    if (type == NoorSection.exams) {
-      fetchExam();
-    } else fetchSkill();
+    if (teacherType == TeacherType.kindergarten) {
+      fetchSkill();
+    } else fetchExam();
   }, []);
 
   async function save(isEmpty: boolean = false) {
-    if (type == NoorSection.skill) {
-      const a = await submit("skillSubmit", {
-        skills:[]
-      });
-      
-      
-    }
+    const a = await submit("skillSubmit", {
+      skills: [],
+    });
   }
 
   return (

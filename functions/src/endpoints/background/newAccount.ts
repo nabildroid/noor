@@ -4,9 +4,9 @@ import * as fs from "fs"
 
 const path = require("path");
 const os = require("os");
-import { auth, db, storage } from "../common";
-import { extractHomeData } from "../helpers";
-import Redirect from "../core/redirect";
+import { auth, db, storage } from "../../common";
+import { extractHomeData } from "../../helpers";
+import Redirect from "../../core/redirect";
 
 export default functions.auth.user().onCreate(async (user) => {
   if (!user.email) {

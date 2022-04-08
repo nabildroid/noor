@@ -11,15 +11,16 @@ import rates from "../../models/rating";
 import Repository from "../../repository";
 import { RatingKinder } from "../../types/home_types";
 import { teacherTypeArabic } from "../../utils";
-import { NoorSection, NoorSkill } from "../../models/home_model";
+import { BackgroundTaskType, NoorSection, NoorSkill, SaveCustomTask } from "../../models/home_model";
+import DB from "../../repository/db";
 
 interface SaveCustomProps {}
 
 const SaveCustom: React.FC<SaveCustomProps> = () => {
   const { teacherType, currentRole } = useContext(HomeContext);
-  const { logout } = useContext(AppContext);
+  const { logout,user } = useContext(AppContext);
 
-  const { inputs, setForm, updateInputs, loadingIndex } = useFormOptions({
+  const { inputs, setForm, letMeHandleIt,updateInputs, loadingIndex } = useFormOptions({
     label: "saveCustom" + teacherType,
     excludedIds: ["PanelSkill"],
     actionName: "",
@@ -50,11 +51,25 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
   const checkSave = async () => {
     if (rating) {
       setLoading(true);
+
+      setLoading(true);
+    const task: SaveCustomTask = {
+      payload: {
+        ...letMeHandleIt(),
+        rate: rating,
+      } as any,
+      completed: false,
+      type: BackgroundTaskType.saveCustom,
+      user: user!.uid,
+    };
+    
+    await DB.instance.createTask(task);
+
       console.log("saving ...");
     }
   };
 
-  const pageTitle = `وحدة ومهارة${teacherTypeArabic(teacherType)}`;
+  const pageTitle = `وحدة ومهارة${teacherTypeArabic(teacherType!)}`;
 
   return (
     <div className="flex flex-1 h-full flex-col">
@@ -87,7 +102,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
               disabled={loading}
               title={pageTitle}
               onSelect={(e) => setRating(e as any)}
-              items={rates(teacherType)}
+              items={rates(teacherType!)}
             />
           </Transition>
 

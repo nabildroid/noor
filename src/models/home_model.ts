@@ -35,6 +35,7 @@ export type Teacher = {
 
 export enum BackgroundTaskType {
   saveAll = "saveAll",
+  saveCustom = "saveCustom",
 }
 
 export type BackgroundTask<T> = {
@@ -47,6 +48,9 @@ export type BackgroundTask<T> = {
 
 export interface SaveAllTask extends BackgroundTask<SaveAllSubmit> {
   type: BackgroundTaskType.saveAll;
+}
+export interface SaveCustomTask extends BackgroundTask<SaveAllSubmit> {
+  type: BackgroundTaskType.saveCustom;
 }
 
 export enum HomeTab {
