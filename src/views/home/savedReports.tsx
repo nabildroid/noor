@@ -99,24 +99,26 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
 
   useEffect(() => {
     const visible = reports.filter(({ params }) => {
-      return Object.entries(params).some(([k, v]) => {
-        return selection.some((s) => {
-          const active = s.options.find((a) => a.selected);
-
-          if (active?.value === "") return true;
-          return k.includes(s.id) && v.value == active?.value;
+      return selection.every((s) => {
+        const active = s.options.find((e) => e.selected)!;
+        return Object.entries(params).some(([k, v]) => {
+          return (
+            k.includes(s.id) && (active.value === "" || active.value == v.value)
+          );
         });
       });
     });
     console.log(visible);
     setVisibleReports(
-      visible.map(({ id, params }) => {
+      visible.map(({ id, params,isEmpty }) => {
         const childs = Object.entries(params)
           .filter(([k]) => {
             return selection.some((s) => k.includes(s.id));
           })
+          .filter(([_, v]) => v.text != "الكل")
           .map(([_, v]) => v.text);
-        return { id, childs };
+          
+        return { id, childs:[...childs,isEmpty?"فارغ":"مرصود"]};
       })
     );
   }, [selection]);
@@ -141,6 +143,13 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
   useEffect(() => {
     DB.instance.getReports(user!.uid).then(setReports);
   }, []);
+
+  function remove() {
+    selected.forEach((id) => {
+      DB.instance.deleteReport(id);
+      setReports((r) => r.filter((a) => a.id != id));
+    });
+  }
 
   return (
     <div className="flex flex-1 h-full flex-col">
@@ -177,7 +186,7 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
 
           <Transition show={!!selected.length}>
             <div className="flex space-x-2 justify-center mt-4">
-              <CustomButton icon={false} secondary onClick={() => {}}>
+              <CustomButton icon={false} secondary onClick={remove}>
                 حدف
               </CustomButton>
 

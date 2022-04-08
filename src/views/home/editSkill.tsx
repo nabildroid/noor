@@ -7,7 +7,7 @@ import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
-import rates, { RateByName, KinderRating, RateById } from "../../models/rating";
+import rates, { RateByName, KinderRating, RateById, RateToId } from "../../models/rating";
 import Repository from "../../repository";
 import { teacherTypeArabic } from "../../utils";
 import { EditSkillNavigateResponse } from "../../types/communication_types";
@@ -106,7 +106,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
       inputs,
       skills: skills.map((s) => ({
         id: s.skillId,
-        value: parseInt(s.value)
+        value: parseInt(RateToId(s.value).toString())
       })),
     });
 

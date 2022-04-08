@@ -85,3 +85,8 @@ export function RateByName(arr: Rating, name: string) {
 export function RateById(arr: Rating, id: string) {
   return arr.find((e) => e.id == id) || arr[0];
 }
+
+export const RateToId = (name: string) =>
+  [...ElementeryRating, ...KinderRating, ...PrimaryRating].find(
+    (e) => e.name == name
+  )!.id;
