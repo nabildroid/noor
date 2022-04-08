@@ -7,11 +7,17 @@ import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
-import rates, { RateByName, KinderRating, RateById, RateToId } from "../../models/rating";
+import rates, {
+  RateByName,
+  KinderRating,
+  RateById,
+  RateToId,
+} from "../../models/rating";
 import Repository from "../../repository";
 import { teacherTypeArabic } from "../../utils";
 import { EditSkillNavigateResponse } from "../../types/communication_types";
 import { NoorSection, NoorSkill, TeacherType } from "../../models/home_model";
+import Card from "../../components/home/card";
 
 interface EditSkillProps {}
 
@@ -34,7 +40,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     });
 
   useEffect(() => {
-    console.log("teacher type:",teacherType);
+    console.log("teacher type:", teacherType);
     const type =
       teacherType == TeacherType.kindergarten
         ? NoorSkill.skillModuleChild
@@ -101,17 +107,18 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   }
 
   const checkSave = async () => {
+    const editedSkills = skills.map((s) => ({
+      id: s.skillId,
+      value: RateToId(s.value).toString(),
+    }));
     const data = await Repository.instance.editSkillSave({
       action: formAction!,
       inputs,
-      skills: skills.map((s) => ({
-        id: s.skillId,
-        value: parseInt(RateToId(s.value).toString())
-      })),
+      skills: editedSkills,
     });
 
     setForm(data.form);
-    setStage(0);
+    // setStage(0);
   };
   const back = () => setStage(Math.max(stage - 1, 0));
   const next = () => {
@@ -138,11 +145,11 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     <div className="flex flex-1 h-full flex-col">
       <PageTitle title={pageTitle} />
 
-      <div className="mt-4 b flex-1 flex flex-col max-w-sm mx-auto w-full">
-        <div className="flex-1  w-full px-4 bg-white  rounded-md shadow  py-4">
+      <div className="mt-4 flex-1 flex flex-col max-w-sm mx-auto w-full">
+        <Card loading={!inputs.length}>
           <Transition
             className="flex-1 w-full grid md:grid-cols-2  gap-3"
-            style={{direction:"rtl"}}
+            style={{ direction: "rtl" }}
             show={stage == 0}
           >
             {inputs.map((input, i) => (
@@ -162,7 +169,6 @@ const EditSkill: React.FC<EditSkillProps> = () => {
           </Transition>
 
           <Transition className={"flex-1"} show={stage == 1}>
-            
             <div className="mt-2">
               <RadioList
                 disabled={loading}
@@ -228,7 +234,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
               </div>
             </Transition>
           ))}
-        </div>
+        </Card>
       </div>
     </div>
   );

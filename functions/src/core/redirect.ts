@@ -26,7 +26,6 @@ interface RedirectionNavigationParams {
   weirdData?: weird;
 }
 
-
 interface RedirectionLoadParams {
   from: string;
   cookies: string[];
@@ -181,6 +180,10 @@ export default class Redirect {
 
         ...config,
       },
+      proxy: {
+        host: "localhost",
+        port: 8082,
+      },
     });
 
     this.weirdData = hiddenInputs(loadHtml(data));
@@ -231,13 +234,10 @@ export default class Redirect {
     });
   }
 
-
-  
-
-  setWeiredData(weird:{ [key: string]: any }){
+  setWeiredData(weird: { [key: string]: any }) {
     this.weirdData = weird as weird;
   }
-  
+
   send(ob: { [key: string]: any }) {
     return {
       redirected: this.redirected,

@@ -11,20 +11,29 @@ import rates from "../../models/rating";
 import Repository from "../../repository";
 import { RatingKinder } from "../../types/home_types";
 import { teacherTypeArabic } from "../../utils";
-import { BackgroundTaskType, NoorSection, NoorSkill, SaveCustomTask } from "../../models/home_model";
+import {
+  BackgroundTaskType,
+  NoorSection,
+  NoorSkill,
+  SaveCustomTask,
+} from "../../models/home_model";
 import DB from "../../repository/db";
+import Loading from "../../components/loading";
+import { Loader } from "react-feather";
+import Card from "../../components/home/card";
 
 interface SaveCustomProps {}
 
 const SaveCustom: React.FC<SaveCustomProps> = () => {
   const { teacherType, currentRole } = useContext(HomeContext);
-  const { logout,user } = useContext(AppContext);
+  const { logout, user } = useContext(AppContext);
 
-  const { inputs, setForm, letMeHandleIt,updateInputs, loadingIndex } = useFormOptions({
-    label: "saveCustom" + teacherType,
-    excludedIds: ["PanelSkill"],
-    actionName: "",
-  });
+  const { inputs, setForm, letMeHandleIt, updateInputs, loadingIndex } =
+    useFormOptions({
+      label: "saveCustom" + teacherType,
+      excludedIds: ["PanelSkill"],
+      actionName: "",
+    });
 
   useEffect(() => {
     Repository.instance
@@ -53,17 +62,17 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
       setLoading(true);
 
       setLoading(true);
-    const task: SaveCustomTask = {
-      payload: {
-        ...letMeHandleIt(),
-        rate: rating,
-      } as any,
-      completed: false,
-      type: BackgroundTaskType.saveCustom,
-      user: user!.uid,
-    };
-    
-    await DB.instance.createTask(task);
+      const task: SaveCustomTask = {
+        payload: {
+          ...letMeHandleIt(),
+          rate: rating,
+        } as any,
+        completed: false,
+        type: BackgroundTaskType.saveCustom,
+        user: user!.uid,
+      };
+
+      await DB.instance.createTask(task);
 
       console.log("saving ...");
     }
@@ -76,7 +85,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
       <PageTitle title={pageTitle} />
 
       <div className="mt-4 b flex-1 flex flex-col max-w-sm mx-auto w-full">
-        <div className="flex-1 flex flex-col w-full h-full px-4 bg-white rounded-md shadow  py-4">
+        <Card loading={!inputs.length}>
           <Transition
             className="flex-1 w-full grid md:grid-cols-2  gap-3"
             show={!secondStage}
@@ -119,7 +128,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
               }`}
             ></span>
           </div>
-        </div>
+        </Card>
 
         {/* todo hide button instead of opacity */}
         <div

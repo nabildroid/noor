@@ -50,14 +50,14 @@ export interface EditSkillSubmit {
   inputs: FormInput[];
   skills: {
     id: number;
-    value: number;
+    value: number | string;
   }[];
 }
 
 export interface SaveAllSubmit {
   action: string;
   inputs: FormInput[];
-  rate: number;
+  rate: number | string;
 }
 
 export interface ReportSubmit {

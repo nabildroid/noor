@@ -60,7 +60,13 @@ const HomeProvider: React.FC = ({ children }) => {
         HomeTab.saveReport,
         HomeTab.savedReports,
       ];
-    return [HomeTab.savedReports, HomeTab.saveCustom];
+    return [
+      HomeTab.savedReports,
+      HomeTab.saveAll,
+      HomeTab.saveReport,
+      HomeTab.saveCustom,
+      HomeTab.editSkill,
+    ];
   };
 
   const getTeacherType = (currentRole?: string) => {

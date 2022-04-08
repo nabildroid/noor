@@ -24,7 +24,7 @@ export class EditSkillForm extends Form {
           ],
           []
         )
-        .join(",") + `${skills.length}#`;
+        .join(",") + `,${skills.length-1}#`;
 
     const payload = this.fetchOptionRequestPayload(
       {
@@ -33,6 +33,10 @@ export class EditSkillForm extends Form {
       },
       []
     );
+
+    skills.forEach((_,i)=>{
+      payload[`ctl00$PlaceHolderMain$gvInsertSkillByUnitAndSkill$ctl${i+2}$tbTeacherNotes`]=""
+    })
 
     const action = this.getFormAction();
 

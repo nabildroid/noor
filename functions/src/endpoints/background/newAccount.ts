@@ -48,7 +48,7 @@ export default functions.auth.user().onCreate(async (user) => {
     });
 
     await auth.setCustomUserClaims(user.uid, {
-      try: Date.now() + 5 * 24 * 3600 * 1000,
+      try: Date.now() + 30 * 24 * 3600 * 1000,
     });
 
     await db
@@ -57,7 +57,7 @@ export default functions.auth.user().onCreate(async (user) => {
       .set({
         name: userName,
         username: name,
-        try: Date.now() + 5 * 24 * 3600 * 1000,
+        try: Date.now() + 30 * 24 * 3600 * 1000,
         role: [...allAccounts.map((e) => e.text), currentAccount],
         currentRole: currentAccount,
         weirdData,

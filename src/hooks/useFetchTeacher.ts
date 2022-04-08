@@ -7,23 +7,29 @@ type params = {
   user?: User;
 };
 
+function dateDiffInDays(end: number, start: number) {
+  const diff = (end - start) / 1000;
+  const diffDay = diff / 60 / 60 / 24;
+
+  return Math.round(diffDay) + " day" + (diffDay > 1 ? "s" : "");
+}
+
 const useFetchTeacher = ({ user }: params) => {
   const [teacher, setTeacher] = useState<Teacher>();
   useEffect(() => {
     if (user) {
-      // const savedData = localStorage.getItem(user.uid);
-      // if (savedData) {
-      //   try {
-      //     const saved = JSON.parse(savedData) as Teacher;
-      //     setTeacher(saved);
-      //     return;
-      //   } catch (e) {}
-      // }
-
-      // todo remove the subscription 
+      // todo remove the subscription
       // CHECK should i get the teacher doc everytime!
-      DB.instance.subscribeToTeacher(user.uid, (data)=>{
-        setTeacher(data);
+      DB.instance.subscribeToTeacher(user.uid, (data) => {
+        setTeacher({
+          ...data,
+          isPro:
+            data.try - Date.now() > 100000000000
+              ? true
+              : data.try > Date.now()
+              ? dateDiffInDays(data.try, Date.now())
+              : false,
+        });
         console.log(data);
       });
     }

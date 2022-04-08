@@ -1,4 +1,5 @@
 import React, { useContext, useEffect } from "react";
+import Card from "../../components/home/card";
 import CustomButton from "../../components/home/customButton";
 import PageTitle from "../../components/home/pageTitle";
 import SelectBox from "../../components/home/selectBox";
@@ -65,7 +66,8 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
     <div className="flex flex-1 h-full flex-col">
       <PageTitle title="انشاء تقرير جديد" />
 
-      <div className="mt-4  b flex-1 flex flex-col max-w-sm mx-auto w-full h-full px-4 bg-white rounded-md shadow  py-4">
+      <div className="mt-4 h-full   flex flex-col max-w-sm mx-auto w-full  overflow-hidden  rounded-md ">
+        <Card loading={!inputs.length}>
         {inputs.map((input, i) => (
           <div key={input.id}>
             <SelectBox
@@ -89,6 +91,7 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
             انشاء مرصود
           </CustomButton>
         </div>
+        </Card>
       </div>
     </div>
   );

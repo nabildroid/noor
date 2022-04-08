@@ -11,6 +11,8 @@ import SelectRole from "../../components/home/navigation/selectRole";
 import PhoneMenu from "../../components/home/navigation/phoneMenu";
 import Menu from "../../components/home/navigation/menu";
 import Noti from "../../components/home/noti";
+import BuyMessage from "../../components/home/buyMessage";
+import { KinderRating, RateToId } from "../../models/rating";
 
 const Home: React.FC = ({ children }) => {
   const {
@@ -23,6 +25,14 @@ const Home: React.FC = ({ children }) => {
     selectRole,
     currentRole,
   } = useContext(HomeContext);
+
+
+  const isProMessage =
+    teacher?.isPro === true
+      ? "PRO"
+      : teacher?.isPro === false
+      ? "buy"
+      : teacher?.isPro;
 
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -57,8 +67,24 @@ const Home: React.FC = ({ children }) => {
             <PhoneMenu items={tabs} selected={tab} />
           </div>
           <div className="flex w-full md:w-auto md:space-x-2 justify-between md:justify-center">
-            <button className="rounded-full   text-indigo-600 bg-indigo-200 px-6 text-center flex items-center">
-              Pro
+            <button
+              className={`rounded-full
+                ${
+                  teacher?.isPro === false
+                    ? "text-yellow-600 bg-yellow-200 shadow-xl animate-bounce"
+                    : ""
+                }
+                ${
+                  typeof teacher?.isPro == "string"
+                    ? "text-green-600 bg-green-200"
+                    : ""
+                }
+                ${
+                  teacher?.isPro === true ? "text-indigo-600 bg-indigo-200" : ""
+                }
+             px-6 text-center flex items-center`}
+            >
+              <span className="-mb-1">{isProMessage}</span>
             </button>
             <NameLabel name={teacher?.name} />
           </div>
@@ -66,7 +92,9 @@ const Home: React.FC = ({ children }) => {
 
         <div className="w-full overflow-hidden  flex-1 p-4">
           {!!tasks.length && <Noti text="جاري تنفيذ العملية" />}
-          {teacher && <Outlet />}
+          {teacher && teacher.isPro !== false && <Outlet />}
+
+          {teacher?.isPro === false && <BuyMessage />}
         </div>
 
         <div></div>

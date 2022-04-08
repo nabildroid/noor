@@ -32,7 +32,7 @@ export type Teacher = {
   name: string;
   id: string;
   try: number;
-  isPremium: boolean;
+  isPro: boolean | string;
   role: string[];
   currentRole: string;
 };
