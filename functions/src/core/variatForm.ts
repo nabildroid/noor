@@ -16,8 +16,7 @@ function createdPath(inputs: FormInput[]) {
 }
 
 // FIXME antypattern
-const walked = new Set<string>();
-let isDone = false;
+
 //BUG racing with WeiredData !
 export async function executeVariant(
   inputsOrg: FormInput[],
@@ -25,20 +24,28 @@ export async function executeVariant(
     execute(inputs: FormInput[]): Promise<any>;
     fetchOptions(inputs: FormInput[], name: string): Promise<FormInput[]>;
     customSelect: { name: string; value: string }[];
+    walked?: Set<string>;
+    isDone?: boolean;
   },
   i: number = 0
 ): Promise<any> {
   const inputs = clone(inputsOrg);
 
-  if (isDone) return;
-  
+
+  if(!config.walked)  {
+    config.walked = new Set();
+    config.isDone = false;
+  }
+
+  if (config.isDone) return;
+
   if (i + 1 > inputs.length) {
     const currentPath = createdPath(inputs);
     // FIXME checking here means one wasted network iteration!
-    if (currentPath && walked.has(currentPath)) {
-      isDone =  true;
+    if (currentPath && config.walked.has(currentPath)) {
+      config.isDone = true;
       return;
-    } else walked.add(currentPath);
+    } else config.walked.add(currentPath);
 
     const last = inputs[inputs.length - 1];
     for (const o of removeEmpty(last.options)) {
@@ -60,7 +67,7 @@ export async function executeVariant(
   const right = inputs.slice(i + 1);
 
   const options = removeEmpty(current.options);
-  const nextInputOptions = removeEmpty(inputs[i + 1]?.options ?? [])
+  const nextInputOptions = removeEmpty(inputs[i + 1]?.options ?? []);
   // custom values
   const isTarget = config.customSelect.find((e) => e.name == current.name);
   if (isTarget) {

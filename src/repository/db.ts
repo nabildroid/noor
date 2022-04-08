@@ -8,9 +8,12 @@ import {
   addDoc,
   query,
   where,
+  deleteDoc,
+  getDoc,
+  getDocs,
 } from "firebase/firestore";
 import { emulator, firebaseApp } from "../main";
-import { BackgroundTask, Teacher } from "../models/home_model";
+import { BackgroundTask, Report, Teacher } from "../models/home_model";
 
 export default class DB {
   private firestore: Firestore;
@@ -71,5 +74,22 @@ export default class DB {
     await addDoc(tasks, {
       ...task,
     });
+  }
+
+  async getReports(userId: string) {
+    const ref = collection(this.firestore, "reports");
+    const reportsQuery = query(ref, where("user", "==", userId));
+    const docs = await getDocs(reportsQuery);
+    return docs.docs.map((doc) => {
+      return {
+        ...doc.data(),
+        id: doc.id,
+      };
+    }) as any as Report[];
+  }
+
+  async deleteReport(id: string) {
+    const report = doc(this.firestore, `reports/${id}`);
+    await deleteDoc(report);
   }
 }

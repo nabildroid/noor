@@ -24,7 +24,6 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
   //     "معلم -الروضة الثانية عشرة بمكة المكرمة - الإدارة العامة للتعليم بمنطقة مكة المكرمة  - (بنات)",
   // };
 
-  console.log(data);
   const homePage = await Redirect.start({
     from:
       data.from ??

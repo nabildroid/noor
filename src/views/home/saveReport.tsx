@@ -56,8 +56,8 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
   }, []);
 
   async function save(isEmpty: boolean = false) {
-    const a = await submit("skillSubmit", {
-      skills: [],
+    const a = await submit("newSkillReport", {
+      isEmpty
     });
   }
 
@@ -82,10 +82,10 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
         ))}
 
         <div className="flex mt-4 justify-between">
-          <CustomButton secondary icon={false} onClick={() => {}}>
+          <CustomButton secondary icon={false} onClick={() => {save(true)}}>
             انشاء فارغ
           </CustomButton>
-          <CustomButton icon={false} onClick={() => {}}>
+          <CustomButton icon={false} onClick={() => {save()}}>
             انشاء مرصود
           </CustomButton>
         </div>

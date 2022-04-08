@@ -12,7 +12,6 @@ interface NavigationData extends IncrementalData {
 }
 
 export default functions.https.onCall(async (data: NavigationData, context) => {
-  console.log(data);
   const homePage = await Redirect.load({
     cookies: data.cookies,
     weirdData: data.weirdData,

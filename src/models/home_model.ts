@@ -1,4 +1,8 @@
-import { BouncingNavigation, SaveAllSubmit } from "../types/communication_types";
+import {
+  BouncingNavigation,
+  FormInput,
+  SaveAllSubmit,
+} from "../types/communication_types";
 
 export enum TeacherType {
   kindergarten,
@@ -44,6 +48,17 @@ export type BackgroundTask<T> = {
   user: string;
   completed: boolean;
   payload: T & BouncingNavigation;
+};
+
+export type Report = {
+  user: string;
+  id: string;
+  files: {
+    csv: string;
+    pdf: string;
+  };
+  params: { [key: string]: FormInput["options"][0] };
+  isEmpty: boolean;
 };
 
 export interface SaveAllTask extends BackgroundTask<SaveAllSubmit> {

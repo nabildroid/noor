@@ -93,7 +93,6 @@ export default functions.https.onCall(async (data, context) => {
       }
     }
   } else {
-    console.warn("unvalide data", ...data);
   }
 
   return { operation: "failed" };

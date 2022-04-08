@@ -13,6 +13,7 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "@supercharge/strings": "^1.25.1",
     "@types/cheerio": "^0.22.31",
     "axios": "^0.26.1",
     "axios-debug-log": "^0.8.4",

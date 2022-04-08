@@ -1,4 +1,9 @@
 import { weird } from "./types";
+import * as Str from "@supercharge/strings";
+
+export const randomString = (size: number = 16) => {
+  return Str.random(size);
+};
 
 export function extractRoleId(str: string) {
   const right = str.split("','").pop() as string;

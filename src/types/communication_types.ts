@@ -84,7 +84,7 @@ export type FormSubmitLookup =
       response: SaveDegreeNavigateResponse;
     }
   | {
-      type: "skillReportSubmit";
+      type: "newSkillReport";
       payload: ReportSubmit;
       response: NavigationResponse;
     }

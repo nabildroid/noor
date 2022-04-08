@@ -26,6 +26,7 @@ interface RedirectionNavigationParams {
   weirdData?: weird;
 }
 
+
 interface RedirectionLoadParams {
   from: string;
   cookies: string[];

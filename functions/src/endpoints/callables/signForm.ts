@@ -16,7 +16,6 @@ export default functions.https.onCall(async (_, __) => {
   });
 
   const cookies = response.headers["set-cookie"] || [];
-  console.log(response.headers);
   const html = response.data;
 
   const $ = loadHtml(html);
