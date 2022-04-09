@@ -71,7 +71,7 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
   ) {
     const index = inputs.findIndex((e) => e.name == name);
     setLoadinIndex(index);
-    if (true && index + 1 < visibleInputs.length) {
+    if (true && index + 1 < inputs.length) {
       const { form: newForm } = await Repository.instance.formFetchOption({
         action: form!.action,
         name,

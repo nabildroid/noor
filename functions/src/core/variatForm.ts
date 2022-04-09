@@ -56,7 +56,7 @@ export async function executeVariant(
       config
     );
     return;
-  } else if (last.length) {
+  } else if (i + 1 > inputs.length && last.length) {
     i -= 1;
   }
 
@@ -75,7 +75,7 @@ export async function executeVariant(
   }
 
   // select all if this option exists
-  if (containExactOpt(options, "الكل")) {
+  if (!getSelected(options) && containExactOpt(options, "الكل")) {
     current.options = selectOpt(options, "الكل");
     return await executeVariant(inputs, config, i + 1);
 
@@ -86,6 +86,8 @@ export async function executeVariant(
   } else if (getSelected(options) && !nextInputOptions.length) {
     const filled = await config.fetchOptions(inputs, current.name);
     return await executeVariant(filled, config, i + 2);
+  } else if (getSelected(options)) {
+    return await executeVariant(inputs, config, i + 1);
   } else {
     // for each option select one
     for (const e of removeEmpty(options)) {
@@ -101,6 +103,7 @@ export async function executeVariant(
         config,
         i + 1
       );
+      return; // todo remove this!
     }
     return;
   }

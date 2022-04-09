@@ -101,15 +101,15 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
   const csv = createCSV(items, fileName);
   // const pdf = createPDF(items, fileName);
 
-  const config = (filePath:string)=>({
+  const config = (filePath: string) => ({
     metadata: {
       metadata: {
         userId: context.auth.uid,
         from: "saveReport/newSkillReport",
       },
     },
-    destination:`reports/${path.basename(filePath)}`
-  })
+    destination: `reports/${path.basename(filePath)}`,
+  });
 
   const [onlineCSV] = await storage.upload(csv, config(csv));
   // const [onlinePDF] = await storage.upload(`reports/${pdf}`, config);
@@ -130,7 +130,7 @@ function createParmsFromInputs(inputs: FormInput[]) {
   const result = {};
 
   inputs.forEach((i) => {
-    result[i.name!] = i.options.find((e) => e.selected)
+    result[i.name!] = i.options.find((e) => e.selected);
   });
 
   return result;
@@ -138,7 +138,7 @@ function createParmsFromInputs(inputs: FormInput[]) {
 
 function createCSV(items: Item[], fileName: string) {
   let csv = "";
-  const add = (x: string) => (csv = `${csv},${x}`);
+  const add = (x: string) => (csv = `${csv},${x.replace(/,/g, " ")}`);
 
   add("");
   items[0].students.forEach((s) => add(s.title));
@@ -157,4 +157,3 @@ function createCSV(items: Item[], fileName: string) {
   fs.writeFileSync(tempFilePath, csv);
   return tempFilePath;
 }
-
