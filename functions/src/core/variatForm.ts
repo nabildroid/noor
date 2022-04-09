@@ -8,7 +8,7 @@ function createdPath(inputs: FormInput[]) {
     const options = removeEmpty(inp.options);
     if (!options.length) return null;
     else {
-      const selected = options[0].text;
+      const selected = options.find((i) => i.selected).text;
       path += selected;
     }
   }
@@ -31,8 +31,7 @@ export async function executeVariant(
 ): Promise<any> {
   const inputs = clone(inputsOrg);
 
-
-  if(!config.walked)  {
+  if (!config.walked) {
     config.walked = new Set();
     config.isDone = false;
   }
@@ -45,17 +44,9 @@ export async function executeVariant(
     if (currentPath && config.walked.has(currentPath)) {
       config.isDone = true;
       return;
-    } else config.walked.add(currentPath);
-
-    const last = inputs[inputs.length - 1];
-    for (const o of removeEmpty(last.options)) {
-      await config.execute([
-        ...inputs.slice(0, inputs.length - 1),
-        {
-          ...last,
-          options: selectOpt(last.options, o.text),
-        },
-      ]);
+    } else {
+      config.walked.add(currentPath);
+      await config.execute(inputs);
     }
 
     return;
@@ -76,14 +67,14 @@ export async function executeVariant(
   }
 
   // select all if this option exists
-  if (containOpt(options, "الكل")) {
+  if (containExactOpt(options, "الكل")) {
     current.options = selectOpt(options, "الكل");
     return await executeVariant(inputs, config, i + 1);
 
     // in case of the current options is empty fetch from the parent
   } else if (!options.length) {
     const filled = await config.fetchOptions(inputs, inputs[i - 1].name);
-    return await executeVariant(filled, config, i - 1);
+    return await executeVariant(filled, config, i);
   } else if (getSelected(options) && !nextInputOptions.length) {
     const filled = await config.fetchOptions(inputs, current.name);
     return await executeVariant(filled, config, i + 2);
@@ -107,17 +98,30 @@ export async function executeVariant(
   }
 }
 
+// replace -- الكل -- to الكل
+function clean(x: string) {
+  return x.replace(/--/g, "").trim();
+}
+
 function selectOpt(ops: FormInput["options"], text: string) {
-  return ops.map((e) => ({ ...e, selected: e.text == text }));
+  return ops.map((e) => ({ ...e, selected: clean(e.text) == text }));
 }
 
 function containOpt(ops: FormInput["options"], text: string) {
   return ops.some((e) => e.text.includes(text));
 }
 
+function containExactOpt(ops: FormInput["options"], text: string) {
+  return ops.some((e) => clean(e.text) == text);
+}
+
 function removeEmpty(ops: FormInput["options"]) {
   return ops.filter(
-    (e) => !e.text.includes("لا يوجد") && !e.text.includes("اختر")
+    (e) =>
+      !e.text.includes("-- لا يوجد --") &&
+      !e.text.includes("-- اختر --") &&
+      e.text != "لا يوجد" &&
+      e.text != "اختر"
   );
 }
 
