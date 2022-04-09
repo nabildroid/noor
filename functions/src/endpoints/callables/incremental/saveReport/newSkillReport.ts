@@ -2,12 +2,11 @@ import * as functions from "firebase-functions";
 import * as fs from "fs";
 import { IncrementalData } from "../../../../types";
 import Redirect from "../../../../core/redirect";
-import Form, { FormInput } from "../../../../core/form";
+import { FormInput } from "../../../../core/form";
 import { executeVariant } from "../../../../core/variatForm";
 import { fetchOptions } from "../formOptions";
 import { editSkillSubmit } from "../editSkill/submit";
 import { skill } from "./utils";
-import { fstat } from "fs";
 import path = require("path");
 import os = require("os");
 import { randomString } from "../../../../utils";
@@ -100,7 +99,7 @@ export default functions.https.onCall(async (data: NavigationData, context) => {
   const fileName = randomString();
 
   const csv = createCSV(items, fileName);
-  const pdf = createPDF(items, fileName);
+  // const pdf = createPDF(items, fileName);
 
   const config = (filePath:string)=>({
     metadata: {
@@ -159,8 +158,3 @@ function createCSV(items: Item[], fileName: string) {
   return tempFilePath;
 }
 
-function createPDF(items: Item[], fileName: string) {
-  const tempFilePath = path.join(os.tmpdir(), fileName + ".pdf");
-
-  return tempFilePath;
-}

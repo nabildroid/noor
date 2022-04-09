@@ -17,6 +17,7 @@ import Noti from "../../components/home/noti";
 import WhiteTable from "../../components/home/checkTable";
 import { Report, TeacherType } from "../../models/home_model";
 import DB from "../../repository/db";
+import Storage from "../../repository/storage";
 
 interface SavedReportsProps {}
 
@@ -110,15 +111,15 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
     });
     console.log(visible);
     setVisibleReports(
-      visible.map(({ id, params,isEmpty }) => {
+      visible.map(({ id, params, isEmpty }) => {
         const childs = Object.entries(params)
           .filter(([k]) => {
             return selection.some((s) => k.includes(s.id));
           })
           .filter(([_, v]) => v.text != "الكل")
           .map(([_, v]) => v.text);
-          
-        return { id, childs:[...childs,isEmpty?"فارغ":"مرصود"]};
+
+        return { id, childs: [...childs, isEmpty ? "فارغ" : "مرصود"] };
       })
     );
   }, [selection]);
@@ -151,6 +152,15 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
     });
   }
 
+  function download(id?: string) {
+    const ids = id ? [id] : selected;
+    const paths = reports
+      .filter((i) => ids.includes(i.id))
+      .map((e) => e.files.csv);
+
+    Promise.all(paths.map(Storage.instance.getDownloadURL)).then(console.log);
+  }
+
   return (
     <div className="flex flex-1 h-full flex-col">
       <PageTitle title="التقارير المحفوظة" />
@@ -179,7 +189,7 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
           <CheckTable
             head={tableHead}
             action="ةحميل"
-            onAction={console.log}
+            onAction={download}
             onSelecte={onSelected}
             items={visibleReports}
           />
@@ -190,7 +200,7 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
                 حدف
               </CustomButton>
 
-              <CustomButton onClick={() => {}}>ةحميل</CustomButton>
+              <CustomButton onClick={download}>ةحميل</CustomButton>
               <CustomButton icon={false} onClick={() => {}}>
                 مشارك
               </CustomButton>

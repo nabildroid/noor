@@ -4,14 +4,16 @@ import Loading from "./components/loading";
 
 import { AppContext } from "./context/appContext";
 import { HomeTab, NoorSection } from "./models/home_model";
-import DidntGet from "./views/home/didntGet";
-import EditSkill from "./views/home/editSkill";
-import Onboarding from "./views/home/onboarding";
-import SaveAll from "./views/home/saveAll";
-import SaveCustom from "./views/home/saveCustom";
-import SaveDegree from "./views/home/saveDegree";
-import SavedReports from "./views/home/savedReports";
-import SaveReport from "./views/home/saveReport";
+
+const DidntGet = React.lazy(() => import("./views/home/didntGet"));
+const EditSkill = React.lazy(() => import("./views/home/editSkill"));
+const Onboarding = React.lazy(() => import("./views/home/onboarding"));
+const SaveAll = React.lazy(() => import("./views/home/saveAll"));
+const SaveCustom = React.lazy(() => import("./views/home/saveCustom"));
+const SaveDegree = React.lazy(() => import("./views/home/saveDegree"));
+const SavedReports = React.lazy(() => import("./views/home/savedReports"));
+const SaveReport = React.lazy(() => import("./views/home/saveReport"));
+
 import Login from "./views/login";
 
 const Home = React.lazy(() => import("./views/home"));
@@ -49,20 +51,76 @@ function App() {
                 </Suspense>
               }
             >
-              <Route path={HomeTab.saveAll} element={<SaveAll />} />
-              <Route path={HomeTab.editSkill} element={<EditSkill />} />
-              <Route path={HomeTab.saveCustom} element={<SaveCustom />} />
+              <Route
+                path={HomeTab.saveAll}
+                element={
+                  <Suspense fallback={<></>}>
+                    <SaveAll />
+                  </Suspense>
+                }
+              />
+              <Route
+                path={HomeTab.editSkill}
+                element={
+                  <Suspense fallback={<></>}>
+                    <EditSkill />
+                  </Suspense>
+                }
+              />
+              <Route
+                path={HomeTab.saveCustom}
+                element={
+                  <Suspense fallback={<></>}>
+                    <SaveCustom />
+                  </Suspense>
+                }
+              />
 
-              <Route path={HomeTab.saveReport} element={<SaveReport />} />
-              <Route path={HomeTab.savedegree} element={<SaveDegree />} />
-              <Route path={HomeTab.didntGet} element={<DidntGet />} />
-              <Route path={HomeTab.savedReports} element={<SavedReports />} />
+              <Route
+                path={HomeTab.saveReport}
+                element={
+                  <Suspense fallback={<></>}>
+                    <SaveReport />
+                  </Suspense>
+                }
+              />
+              <Route
+                path={HomeTab.savedegree}
+                element={
+                  <Suspense fallback={<></>}>
+                    <SaveDegree />
+                  </Suspense>
+                }
+              />
+              <Route
+                path={HomeTab.didntGet}
+                element={
+                  <Suspense fallback={<></>}>
+                    <DidntGet />
+                  </Suspense>
+                }
+              />
+              <Route
+                path={HomeTab.savedReports}
+                element={
+                  <Suspense fallback={<></>}>
+                    <SavedReports />
+                  </Suspense>
+                }
+              />
               <Route
                 path={HomeTab.selectRole}
                 element={<span>Hello tab4</span>}
               />
 
-              <Route index element={<Onboarding />} />
+              <Route
+                index
+                element={
+                  <Suspense fallback={<></>}>
+                    <Onboarding />
+                  </Suspense>
+                }
+              />
             </Route>
             <Route path="*" element={<Navigate to="/" />} />
           </>
