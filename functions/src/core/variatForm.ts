@@ -38,7 +38,8 @@ export async function executeVariant(
 
   if (config.isDone) return;
 
-  if (i + 1 > inputs.length) {
+  const last = removeEmpty(inputs[inputs.length - 1].options);
+  if (i + 1 > inputs.length && getSelected(last)) {
     const currentPath = createdPath(inputs);
     // FIXME checking here means one wasted network iteration!
     if (currentPath && config.walked.has(currentPath)) {
@@ -47,9 +48,16 @@ export async function executeVariant(
     } else {
       config.walked.add(currentPath);
       await config.execute(inputs);
+      return;
     }
-
+  } else if (i - inputs.length > 0) {
+    console.error(
+      "iterated through all without catching the last input!",
+      config
+    );
     return;
+  } else if (last.length) {
+    i -= 1;
   }
 
   const current = inputs[i];
