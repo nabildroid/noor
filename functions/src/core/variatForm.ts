@@ -1,5 +1,14 @@
+import { fetchOptions } from "../endpoints/callables/incremental/formOptions";
 import { clone } from "../utils";
 import { FormInput } from "./form";
+import Redirect from "./redirect";
+import {
+  AbstractVariation,
+  containExactOpt,
+  getSelected,
+  removeEmpty,
+  selectOpt
+} from "./variation";
 
 function createdPath(inputs: FormInput[]) {
   let path = "";
@@ -15,122 +24,160 @@ function createdPath(inputs: FormInput[]) {
   return path;
 }
 
-// FIXME antypattern
+const SPLIT = 2;
 
-//BUG racing with WeiredData !
-export async function executeVariant(
-  inputsOrg: FormInput[],
-  config: {
-    execute(inputs: FormInput[]): Promise<any>;
-    fetchOptions(inputs: FormInput[], name: string): Promise<FormInput[]>;
-    customSelect: { name: string; value: string }[];
-    walked?: Set<string>;
-    isDone?: boolean;
-  },
-  i: number = 0
-): Promise<any> {
-  const inputs = clone(inputsOrg);
-
-  if (!config.walked) {
-    config.walked = new Set();
-    config.isDone = false;
-  }
-
-  if (config.isDone) return;
-
-  const last = removeEmpty(inputs[inputs.length - 1].options);
-  if (i + 1 > inputs.length && getSelected(last)) {
-    const currentPath = createdPath(inputs);
-    // FIXME checking here means one wasted network iteration!
-    if (currentPath && config.walked.has(currentPath)) {
-      config.isDone = true;
-      return;
-    } else {
-      config.walked.add(currentPath);
-      await config.execute(inputs);
-      return;
-    }
-  } else if (i - inputs.length > 0) {
-    console.error(
-      "iterated through all without catching the last input!",
-      config
+abstract class Variation<T> extends AbstractVariation {
+  // manuel handling
+  protected step_if_Taget() {
+    const isTarget = this.customOptions.find(
+      (e) => e.name == this.current.name
     );
-    return;
-  } else if (i + 1 > inputs.length && last.length) {
-    i -= 1;
-  }
+    if (isTarget) {
+      this.current.options = selectOpt(this.options, isTarget.value);
 
-  const current = inputs[i];
-
-  const left = inputs.slice(0, i);
-  const right = inputs.slice(i + 1);
-
-  const options = removeEmpty(current.options);
-  const nextInputOptions = removeEmpty(inputs[i + 1]?.options ?? []);
-  // custom values
-  const isTarget = config.customSelect.find((e) => e.name == current.name);
-  if (isTarget) {
-    current.options = selectOpt(options, isTarget.value);
-    return await executeVariant(inputs, config, i + 1);
-  }
-
-  // select all if this option exists
-  if (!getSelected(options) && containExactOpt(options, "الكل")) {
-    current.options = selectOpt(options, "الكل");
-    return await executeVariant(inputs, config, i + 1);
-
-    // in case of the current options is empty fetch from the parent
-  } else if (!options.length) {
-    const filled = await config.fetchOptions(inputs, inputs[i - 1].name);
-    return await executeVariant(filled, config, i);
-  } else if (getSelected(options) && !nextInputOptions.length) {
-    const filled = await config.fetchOptions(inputs, current.name);
-    return await executeVariant(filled, config, i + 2);
-  } else if (getSelected(options)) {
-    return await executeVariant(inputs, config, i + 1);
-  } else {
-    // for each option select one
-    for (const e of removeEmpty(options)) {
-      await executeVariant(
-        [
-          ...left,
-          {
-            ...current,
-            options: selectOpt(options, e.text),
-          },
-          ...right,
-        ],
-        config,
-        i + 1
-      );
+      return this.next().execute();
     }
-    return;
+    throw Error("next step  2!");
+  }
+  // prefere all option // CHECK if this is the case for all usecases
+  protected step_if_all(): Promise<any> {
+    if (!getSelected(this.options) && containExactOpt(this.options, "الكل")) {
+      this.current.options = selectOpt(this.options, "الكل");
+      return this.next().execute();
+    }
+    throw Error("next step  3!");
+  }
+  // doesn't contain any options because the prev input didn't got submited
+  protected async step_if_empty(): Promise<any> {
+    if (!this.options.length) {
+      await this.prev().fetchOptions();
+      return this.next().execute();
+    }
+    throw Error("next step 4!");
+  }
+  // contain a selected option but the next one doesn't !
+  protected step_if_selected_and_next_emtpy(): Promise<any> {
+    if (getSelected(this.options) && !this.nextInputOption?.length) {
+      this.fetchOptions();
+      return this.next().next().execute();
+    }
+    throw Error("next step 5!");
+  }
+  protected step_if_selected(): Promise<any> {
+    if (getSelected(this.options)) {
+      return this.next().execute();
+    }
+    throw Error("next step 6!");
+  }
+
+  constructor(inputs: FormInput[], redirect: Redirect) {
+    super(inputs, redirect);
+  }
+
+  protected abstract get formAction(): string;
+
+  private async fetchOptions(): Promise<void> {
+    const response = await fetchOptions(
+      {
+        inputs: this.inputs,
+        ...this.redirect.send({}),
+        action: this.formAction,
+        actionButtons: [],
+        name: this.current.name,
+      },
+      this.redirect
+    );
+    // submit the form
+    this.inputs = response.toJson().inputs;
+  }
+
+  iterateOptions() {
+    return this.options.map(async (o) => {
+      this.stack();
+      this.current.options.map((e) => ({
+        ...e,
+        selected: e.text == o.text,
+      }));
+      const data = await this.next().execute();
+      this.unstack();
+      return data;
+    });
+  }
+
+  run() {
+    return this.execute();
+  }
+
+  protected abstract process(): T;
+
+  protected async fork() {
+    const notSelectedOptions = this.options.map((e) => ({
+      ...e,
+      selected: false,
+    }));
+    const parts: FormInput["options"][] = [];
+    const total = notSelectedOptions.length;
+    const slices = Math.round(total / SPLIT);
+    let i = 0;
+    for (i; i < total; i += slices) {
+      parts.push(notSelectedOptions.slice(i, i + slices));
+    }
+
+    const tempInputs = clone(this.inputs);
+
+    this.current.options = parts.shift();
+
+    const variations = parts.map((part) => {
+      const temp = clone(tempInputs);
+      temp[this.index].options = part;
+      return temp;
+    });
+
+    const instances = await Promise.all(
+      variations.map((inputs) => this.create(inputs))
+    );
+
+    await Promise.all(instances.map((v) => v.recreation()));
+
+    return [this, ...instances].map((c) => c.iterateOptions());
+  }
+
+  protected abstract create(inputs: FormInput[]): Promise<Variation<T>>;
+
+  protected abstract navigation(): [string, string];
+
+  async recreation() {
+
+    process.exit();
   }
 }
 
-// replace -- الكل -- to الكل
-function clean(x: string) {
-  return x.replace(/--/g, "").trim();
-}
+export class SkillVariant extends Variation<string> {
+  protected formAction: string;
 
-function selectOpt(ops: FormInput["options"], text: string) {
-  return ops.map((e) => ({ ...e, selected: clean(e.text) == text }));
-}
+  constructor(inputs: FormInput[], action: string, redirect: Redirect) {
+    super(inputs, redirect);
 
-function containExactOpt(ops: FormInput["options"], text: string) {
-  return ops.some((e) => clean(e.text) == text);
-}
+    this.formAction = action;
+  }
 
-function removeEmpty(ops: FormInput["options"]) {
-  return ops.filter(
-    (e) =>
-      !e.text.includes("-- لا يوجد --") &&
-      !e.text.includes("-- اختر --") &&
-      e.text != "لا يوجد" &&
-      e.text != "اختر"
-  );
-}
+  protected navigation(): [string, string] {
+    return ["nav1", "nav2"];
+  }
 
-function getSelected(ops: FormInput["options"]) {
-  return ops.find((d) => d.selected);
+  protected process(): string {
+    this.inputs;
+    console.log(this.inputs);
+    throw new Error("Method not implemented.");
+  }
+
+  protected async create(inputs: FormInput[]) {
+    const params = this.redirect.send({});
+
+    const redirect = await Redirect.start({
+      cookies: params.cookies,
+      from: params.from,
+    });
+    return new SkillVariant(inputs, this.formAction, redirect);
+  }
 }

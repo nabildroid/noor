@@ -1,12 +1,11 @@
 import * as functions from "firebase-functions";
-
-import { IncrementalData } from "../../../types";
-import Redirect from "../../../core/redirect";
 import { FormInput } from "../../../core/form";
-import { executeVariant } from "../../../core/variatForm";
-import { editSkillSubmit } from "../../callables/incremental/editSkill/submit";
+import Redirect from "../../../core/redirect";
+import { SkillVariant } from "../../../core/variatForm";
+import { IncrementalData } from "../../../types";
 import { saveEditedSkills } from "../../callables/incremental/editSkill/save";
-import { fetchOptions } from "../../callables/incremental/formOptions";
+import { editSkillSubmit } from "../../callables/incremental/editSkill/submit";
+
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -36,50 +35,11 @@ export default functions
 
     let { action } = data;
 
-    await executeVariant(data.inputs, {
-      execute: async (inputs) => {
-        // go to the seach button
-        const response = await executeSkillEdits(
-          {
-            ...data,
-            inputs,
-            ...homePage.send({}),
-            action,
-          },
-          homePage
-        );
 
-        action = response.action;
-        homePage.setWeiredData(response.weirdData);
-      },
-      fetchOptions: async (inputs, name) => {
-        const response = await fetchOptions(
-          {
-            ...data,
-            inputs,
-            ...homePage.send({}),
-            action,
-            actionButtons: [],
-            name,
-          },
-          homePage
-        );
-        // submit the form
-        return response.toJson().inputs;
-      },
-      customSelect: [
-        {
-          name: "ctl00$PlaceHolderMain$ddlUnitTypesDDL",
-          value: "الكل",
-        },
-        {
-          name: "ctl00$PlaceHolderMain$ddlStudySystem",
-          value: "منتظم",
-        },
-      ],
-    });
+    const variante = new SkillVariant(data.inputs,action,homePage);
+    variante.run();
 
-    snapshot.ref.update({ completed: true, payload: {} });
+
   });
 
 async function executeSkillEdits(data: NavigationData, homePage: Redirect) {
