@@ -1,16 +1,6 @@
 import {
-  connectFirestoreEmulator,
-  Firestore,
-  getFirestore,
-  doc,
-  onSnapshot,
-  collection,
-  addDoc,
-  query,
-  where,
-  deleteDoc,
-  getDoc,
-  getDocs,
+  addDoc, collection, connectFirestoreEmulator, deleteDoc, doc, Firestore, getDocs, getFirestore, onSnapshot, query,
+  where
 } from "firebase/firestore";
 import { emulator, firebaseApp } from "../main";
 import { BackgroundTask, Report, Teacher } from "../models/home_model";

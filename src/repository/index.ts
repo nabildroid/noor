@@ -1,21 +1,12 @@
 import {
-  httpsCallable,
-  Functions,
-  connectFunctionsEmulator,
-  getFunctions,
+  connectFunctionsEmulator, Functions, getFunctions, httpsCallable
 } from "firebase/functions";
 import { emulator, firebaseApp } from "../main";
 import {
-  BouncingNavigation,
-  EditSkillNavigateResponse,
-  EditSkillSubmit,
+  BouncingNavigation, EditSkillSubmit,
   FormNavigateResponse,
-  FormOptions,
-  FormSubmit,
-  FormSubmitLookup,
-  NavigateTo,
-  NavigationResponse,
-  SaveAllSubmit,
+  FormOptions, FormSubmitLookup,
+  NavigateTo, SaveAllSubmit
 } from "../types/communication_types";
 import { LoginFormParams, LoginSubmissionResponse } from "../types/login_types";
 import { mergeCookies } from "../utils";

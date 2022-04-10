@@ -1,8 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Card from "../../components/home/card";
-import CustomButton from "../../components/home/customButton";
-import PageTitle from "../../components/home/pageTitle";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
@@ -14,55 +11,53 @@ import {
   NoorExam,
   NoorSection,
   NoorSkill,
-  TeacherType,
+  TeacherType
 } from "../../models/home_model";
 import Repository from "../../repository";
 
 interface SaveReportProps {}
 
+function fetchSkill(account: string) {
+  return Repository.instance.navigateTo({
+    account: account,
+    nav1: NoorSection.skill,
+    nav2: NoorSkill.skillModuleSkill,
+  });
+}
+
+function fetchExam(account: string) {
+  return Repository.instance.navigateTo({
+    account: account,
+    nav1: NoorSection.exams,
+    nav2: NoorExam.enter,
+  });
+}
+
+function fetch(type: TeacherType, account: string) {
+  if (type == TeacherType.kindergarten) {
+    return fetchSkill(account);
+  }
+  return fetchExam(account);
+}
+
 const SaveReport: React.FC<SaveReportProps> = ({}) => {
   const navigate = useNavigate();
+
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
   const { inputs, setForm, submit, isAllChosen, updateInputs, loadingIndex } =
     useFormOptions({
-      label: "report" + teacherType,
-      actionName: "",
-      excludedIds: ["PanelSkill"],
-      excludedNames: ["ddlStudySystem", "ddlSkillTypeDesc", "ddlSkills"],
+      excludedNames: ["ddlStudySystem", "ddlSkillTypeDesc", "ddlSkill"],
     });
 
-  function fetchSkill() {
-    Repository.instance
-      .navigateTo({
-        account: currentRole!,
-        nav1: NoorSection.skill,
-        nav2: NoorSkill.skillModuleSkill,
-      })
-      .then((r) => setForm(r.form))
-      .catch(logout);
-  }
-
-  function fetchExam() {
-    Repository.instance
-      .navigateTo({
-        account: currentRole!,
-        nav1: NoorSection.exams,
-        nav2: NoorExam.enter,
-      })
-      .then((r) => setForm(r.form))
-      .catch(logout);
-  }
-
   useEffect(() => {
-    if (teacherType == TeacherType.kindergarten) {
-      fetchSkill();
-    } else fetchExam();
+    fetch(teacherType!, currentRole!)
+      .then((r) => setForm(r.form))
+      .catch(logout);
   }, []);
 
   async function save(isEmpty: boolean = false) {
-    if (loadingIndex != 1000) return;
     await submit("newSkillReport", {
       isEmpty,
     });
@@ -86,6 +81,7 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
       },
     ],
   });
+
   return (
     <Page title="انشاء تقرير جديد" loading={!inputs.length} actions={actions}>
       {inputs.map((input, i) => (

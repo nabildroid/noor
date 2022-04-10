@@ -1,46 +1,49 @@
 import React, { useContext, useEffect, useState } from "react";
-import PageTitle from "../../components/home/pageTitle";
-import RadioList, { RadioListItem } from "../../components/home/radioList";
-import CustomButton from "../../components/home/customButton";
+import RadioList from "../../components/home/radioList";
+import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
-import rates from "../../models/rating";
-import { RatingKinder } from "../../types/home_types";
-import { teacherTypeArabic } from "../../utils";
-import Repository from "../../repository";
+import useFormOptions from "../../hooks/useFormOptions";
+import { createAction } from "../../layout/home/actionBar";
+import Page from "../../layout/home/page";
 import {
   BackgroundTaskType,
   NoorSection,
   NoorSkill,
   SaveAllTask,
-  TeacherType,
+  TeacherType
 } from "../../models/home_model";
-import useFormOptions from "../../hooks/useFormOptions";
-import { AppContext } from "../../context/appContext";
+import rates, { Rating } from "../../models/rating";
+import Repository from "../../repository";
 import DB from "../../repository/db";
-import Page from "../../layout/home/page";
-import { createAction } from "../../layout/home/actionBar";
+import { teacherTypeArabic, wait } from "../../utils";
 
 interface SaveAllProps {}
+
+function fetch(account: string) {
+  return Repository.instance.navigateTo({
+    account,
+    nav1: NoorSection.skill,
+    nav2: NoorSkill.skillModuleSkill,
+  });
+}
+
+function pageTitle(type: TeacherType) {
+  return `رصد الكل ب${teacherTypeArabic(type!)}`;
+}
 
 const SaveAll: React.FC<SaveAllProps> = () => {
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout, user } = useContext(AppContext);
-  const [selected, select] = useState<RatingKinder>();
+  const [selected, select] = useState<Rating>();
   const [loading, setLoading] = useState(false);
 
   const { setForm, letMeHandleIt } = useFormOptions({
-    label: "saveAll" + teacherType,
     actionName: "ibtnSearch",
   });
 
   useEffect(() => {
     setLoading(true);
-    Repository.instance
-      .navigateTo({
-        account: currentRole!,
-        nav1: NoorSection.skill,
-        nav2: NoorSkill.skillModuleSkill,
-      })
+    fetch(currentRole!)
       .then((r) => {
         setForm(r.form);
         setLoading(false);
@@ -48,11 +51,7 @@ const SaveAll: React.FC<SaveAllProps> = () => {
       .catch(logout);
   }, []);
 
-  const checkSave = async () => {
-    console.log("saving", selected);
-    if (selected == undefined) return;
-
-    setLoading(true);
+  const save = async () => {
     const task: SaveAllTask = {
       payload: {
         ...letMeHandleIt(),
@@ -62,30 +61,30 @@ const SaveAll: React.FC<SaveAllProps> = () => {
       type: BackgroundTaskType.saveAll,
       user: user!.uid,
     };
-    await DB.instance.createTask(task);
 
-    setLoading(false);
+    wait(() => DB.instance.createTask(task), setLoading);
   };
 
-  const pageTitle = `رصد الكل ب${teacherTypeArabic(teacherType!)}`;
-  // todo use form automatic submission
+  const title = pageTitle(teacherType!);
 
   const actions = createAction({
     loading: loading,
+    enable:!!selected,
     buttons: [
       {
         label: "رصد",
-        onClick: checkSave,
+        onClick: save,
         progress: true,
         icon: true,
       },
     ],
   });
+
   return (
-    <Page title={pageTitle} actions={actions}>
+    <Page title={title} actions={actions}>
       <RadioList
         disabled={loading}
-        title={pageTitle}
+        title={title}
         onSelect={(e) => select(e as any)}
         items={rates(teacherType!)}
       />

@@ -3,36 +3,40 @@ import CheckTable from "../../components/home/checkTable";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
-import { FormInput } from "../../types/communication_types";
+import Page from "../../layout/home/page";
 import { Report, TeacherType } from "../../models/home_model";
 import DB from "../../repository/db";
 import Storage from "../../repository/storage";
-import Page from "../../layout/home/page";
+import { FormInput } from "../../types/communication_types";
 
 interface SavedReportsProps {}
 
+function getTableHeader(type: TeacherType) {
+  if (type == TeacherType.kindergarten) return ["الموستوى", "الوحدة", ""];
+  return [];
+}
+
+type VisibleReports = {
+  id: string;
+  childs: string[];
+};
+type Selection = {
+  title: string;
+  options: FormInput["options"];
+  id: string;
+};
 const SavedReports: React.FC<SavedReportsProps> = () => {
   const { user } = useContext(AppContext);
   const { teacherType } = useContext(HomeContext);
+
   const [reports, setReports] = useState<Report[]>([]);
-  const [visibleReports, setVisibleReports] = useState<
-    {
-      id: string;
-      childs: string[];
-    }[]
-  >([]);
+
+  const [visibleReports, setVisibleReports] = useState<VisibleReports[]>([]);  
+  const [selection, setSelection] = useState<Selection[]>([]);
+
   const [selected, onSelected] = useState<string[]>([]);
-
-  const tableHead =
-    teacherType == TeacherType.kindergarten ? ["الموستوى", "الوحدة", ""] : [];
-
-  const [selection, setSelection] = useState<
-    {
-      title: string;
-      options: FormInput["options"];
-      id: string;
-    }[]
-  >([]);
+  
+  const tableHead = getTableHeader(teacherType!);
 
   useEffect(() => createSelectionBoxes(), [reports]);
   function createSelectionBoxes() {
@@ -148,7 +152,6 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
       },
     ],
   };
-
 
   return (
     <Page title="التقارير المحفوظة" size="lg" actions={actions}>

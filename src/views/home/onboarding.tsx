@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
-import { Loader, Save } from "react-feather";
-import { Link } from "react-router-dom";
+import { Loader } from "react-feather";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 

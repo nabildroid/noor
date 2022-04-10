@@ -1,18 +1,17 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Repository from "../repository";
 import {
   Form,
   FormInput,
   FormSubmit,
-  FormSubmitLookup,
-  NavigationResponse,
+  FormSubmitLookup
 } from "../types/communication_types";
 
 interface Props {
-  label: {};
+  label?: {};
   excludedIds?: string[];
   excludedNames?: string[];
-  actionName: string;
+  actionName?: string;
 }
 
 type SubmitType = <
@@ -96,7 +95,7 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
 
   const submit: SubmitType = async (type, payload) => {
     const actionButton = form?.actionButtons.find((e) =>
-      e.name?.includes(actionName)
+      e.name?.includes(actionName??"")
     );
 
     setLoadinIndex(-1);
@@ -114,7 +113,7 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
 
   const letMeHandleIt = () => {
     const actionButton = form?.actionButtons.find((e) =>
-      e.name?.includes(actionName)
+      e.name?.includes(actionName??"")
     );
 
     return {

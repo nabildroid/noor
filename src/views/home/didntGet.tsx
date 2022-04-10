@@ -1,20 +1,14 @@
-import { Listbox, Transition } from "@headlessui/react";
+import { Transition } from "@headlessui/react";
 import React, { useContext, useEffect, useState } from "react";
-import PageTitle from "../../components/home/pageTitle";
-import RadioList, { RadioListItem } from "../../components/home/radioList";
 import CustomButton from "../../components/home/customButton";
+import Noti from "../../components/home/noti";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
-import rates, { KinderRating } from "../../models/rating";
-import Repository from "../../repository";
-import { teacherTypeArabic } from "../../utils";
-import CheckBoxs from "../../components/home/checkboxs";
-import { FormInput } from "../../types/communication_types";
-import Noti from "../../components/home/noti";
-import { NoorSection, NoorSkill } from "../../models/home_model";
 import Page from "../../layout/home/page";
+import { NoorSection, NoorSkill } from "../../models/home_model";
+import Repository from "../../repository";
 
 interface DidntGetProps {}
 
@@ -62,10 +56,6 @@ const DidntGet: React.FC<DidntGetProps> = () => {
 
   useEffect(() => {
     const isSecondStage = loadingIndex == inputs.length - 1;
-    if (false && isSecondStage) {
-      fetchSkills();
-      setTimeout(() => setStage(1), 700);
-    }
   }, [loadingIndex]);
 
   useEffect(() => {

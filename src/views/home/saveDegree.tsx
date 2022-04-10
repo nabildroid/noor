@@ -1,20 +1,15 @@
-import { Listbox, Transition } from "@headlessui/react";
+import { Transition } from "@headlessui/react";
 import React, { useContext, useEffect, useState } from "react";
-import PageTitle from "../../components/home/pageTitle";
-import RadioList, { RadioListItem } from "../../components/home/radioList";
+import CheckBoxs from "../../components/home/checkboxs";
 import CustomButton from "../../components/home/customButton";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
-import rates, { KinderRating } from "../../models/rating";
-import Repository from "../../repository";
-import { teacherTypeArabic } from "../../utils";
-import { Presense } from "../../types/home_types";
-import CheckBoxs from "../../components/home/checkboxs";
-import { NoorExam, NoorSection } from "../../models/home_model";
-import { FormInput } from "../../types/communication_types";
 import Page from "../../layout/home/page";
+import { NoorExam, NoorSection } from "../../models/home_model";
+import Repository from "../../repository";
+import { FormInput } from "../../types/communication_types";
 
 interface SaveDegreeProps {}
 

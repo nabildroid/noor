@@ -45,12 +45,14 @@ export function mergeCookies(...cookies: string[][]) {
   }, [] as string[]);
 }
 
+export function taskTitle(taskType: BackgroundTaskType) {
+  if (taskType == BackgroundTaskType.saveAll) return "ةحصيل الكل";
+  else if (taskType == BackgroundTaskType.saveCustom)
+    return "ةحصيل وحدة ومهارة";
+}
 
-
-
-export function taskTitle(taskType:BackgroundTaskType){
-  if(taskType == BackgroundTaskType.saveAll)
-    return "ةحصيل الكل"
-  else if(taskType == BackgroundTaskType.saveCustom)
-    return "ةحصيل وحدة ومهارة"
+export async function wait(fc: () => Promise<any>, loading: (v: boolean) => any) {
+  loading(true);
+  await fc();
+  loading(false);
 }

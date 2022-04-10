@@ -1,29 +1,37 @@
-import { Transition } from "@headlessui/react";
 import React, { useContext, useEffect, useState } from "react";
-import PageTitle from "../../components/home/pageTitle";
 import RadioList from "../../components/home/radioList";
-import CustomButton from "../../components/home/customButton";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
-import rates from "../../models/rating";
-import Repository from "../../repository";
-import { RatingKinder } from "../../types/home_types";
-import { teacherTypeArabic } from "../../utils";
+import { createAction } from "../../layout/home/actionBar";
+import Page from "../../layout/home/page";
+import SlideTransition from "../../layout/home/slideTransition";
 import {
   BackgroundTaskType,
   NoorSection,
   NoorSkill,
   SaveCustomTask,
+  TeacherType
 } from "../../models/home_model";
+import rates, { Rating } from "../../models/rating";
+import Repository from "../../repository";
 import DB from "../../repository/db";
-import Card from "../../components/home/card";
-import Page from "../../layout/home/page";
-import { createAction } from "../../layout/home/actionBar";
-import SlideTransition from "../../layout/home/slideTransition";
+import { teacherTypeArabic, wait } from "../../utils";
 
 interface SaveCustomProps {}
+
+function fetch(account: string) {
+  return Repository.instance.navigateTo({
+    account,
+    nav1: NoorSection.skill,
+    nav2: NoorSkill.skillModuleSkill,
+  });
+}
+
+function pageTitle(type: TeacherType) {
+  return `وحدة ومهارة${teacherTypeArabic(type)}`;
+}
 
 const SaveCustom: React.FC<SaveCustomProps> = () => {
   const { teacherType, currentRole } = useContext(HomeContext);
@@ -37,49 +45,35 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
     updateInputs,
     loadingIndex,
   } = useFormOptions({
-    label: "saveCustom" + teacherType,
     excludedIds: ["PanelSkill"],
-    actionName: "",
   });
 
   useEffect(() => {
-    Repository.instance
-      .navigateTo({
-        account: currentRole!,
-        nav1: NoorSection.skill,
-        nav2: NoorSkill.skillModuleSkill,
-      })
+    fetch(currentRole!)
       .then((r) => setForm(r.form))
       .catch(logout);
   }, []);
 
-  const [rating, setRating] = useState<RatingKinder>();
+  const [rating, setRating] = useState<Rating>();
 
   const [loading, setLoading] = useState(false);
   const [secondStage, setSecondStage] = useState(false);
 
   const next = () => setSecondStage(true);
 
-  const checkSave = async () => {
-    if (rating) {
-      setLoading(true);
-      const task: SaveCustomTask = {
-        payload: {
-          ...letMeHandleIt(),
-          rate: rating,
-        } as any,
-        completed: false,
-        type: BackgroundTaskType.saveCustom,
-        user: user!.uid,
-      };
-
-      await DB.instance.createTask(task);
-
-      console.log("saving ...");
-    }
+  const save = () => {
+    const task: SaveCustomTask = {
+      payload: {
+        ...letMeHandleIt(),
+        rate: rating,
+      } as any,
+      completed: false,
+      type: BackgroundTaskType.saveCustom,
+      user: user!.uid,
+    };
+    
+    wait(() => DB.instance.createTask(task), setLoading);
   };
-
-  const pageTitle = `وحدة ومهارة${teacherTypeArabic(teacherType!)}`;
 
   const actions = [
     createAction({
@@ -94,24 +88,27 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
     }),
     createAction({
       show: secondStage,
-      enable: loadingIndex != -1,
+      enable: loadingIndex != -1 && !!rating,
       loading,
       buttons: [
         {
           label: "رصد",
-          onClick: checkSave,
+          onClick: save,
           icon: true,
           progress: true,
         },
       ],
     }),
   ];
+
+  const title = pageTitle(teacherType!);
+
   return (
     <Page
-      title={pageTitle}
+      title={title}
       size={secondStage ? "sm" : "lg"}
       loading={!inputs.length}
-      actions={actions[secondStage?1:0]}
+      actions={actions[secondStage ? 1 : 0]}
     >
       <SlideTransition
         show={!secondStage}
@@ -137,7 +134,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
       <SlideTransition show={secondStage}>
         <RadioList
           disabled={loading}
-          title={pageTitle}
+          title={title}
           onSelect={(e) => setRating(e as any)}
           items={rates(teacherType!)}
         />

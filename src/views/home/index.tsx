@@ -1,19 +1,16 @@
-import React, { useCallback, useContext, useEffect, useRef } from "react";
-import { HomeContext } from "../../context/homeContext";
-import { ChevronsDown, Loader } from "react-feather";
-
-import NameLabel from "../../components/home/navigation/nameLabel";
-import TabBar from "../../components/home/navigation/tabbar";
-import { HomeTab } from "../../models/home_model";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
-
-import SelectRole from "../../components/home/navigation/selectRole";
-import PhoneMenu from "../../components/home/navigation/phoneMenu";
-import Menu from "../../components/home/navigation/menu";
-import Noti from "../../components/home/noti";
+import React, { useCallback, useContext, useEffect } from "react";
+import { Loader } from "react-feather";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import BuyMessage from "../../components/home/buyMessage";
-import { KinderRating, RateToId } from "../../models/rating";
+import Menu from "../../components/home/navigation/menu";
+import NameLabel from "../../components/home/navigation/nameLabel";
+import PhoneMenu from "../../components/home/navigation/phoneMenu";
+import SelectRole from "../../components/home/navigation/selectRole";
+import Noti from "../../components/home/noti";
+import { HomeContext } from "../../context/homeContext";
 import { taskTitle } from "../../utils";
+
+
 
 const Home: React.FC = ({ children }) => {
   const {
