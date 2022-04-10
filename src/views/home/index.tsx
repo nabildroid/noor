@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect } from "react";
 import { Loader } from "react-feather";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import BuyMessage from "../../components/home/buyMessage";
 import Menu from "../../components/home/navigation/menu";
 import NameLabel from "../../components/home/navigation/nameLabel";
@@ -36,7 +36,7 @@ const Home: React.FC = ({ children }) => {
   const correctNavigation = useCallback(
     (route: HomeTab) => {
       const pausedTabs = getPausedTab(tasks);
-      const routeExists = tabs.includes(route)
+      const routeExists = tabs.includes(route);
 
       const isPauedTab = pausedTabs.includes(route);
       if (routeExists && !isPauedTab) {
@@ -106,7 +106,12 @@ const Home: React.FC = ({ children }) => {
       <nav className="max-w-xs hidden md:block w-full bg-slate-50 shadow-md">
         <div className="pr-4 h-16 w-full bg-indigo-400 flex items-center justify-end">
           {loading && <Loader className="animate-spin" />}
-          <span className="font-arabic text-2xl  text-center">نور</span>
+          <Link
+            to={"/" + HomeTab.home}
+            className="font-arabic text-2xl  text-center"
+          >
+            نور
+          </Link>
         </div>
 
         <Menu items={tabs} selected={tab} />
