@@ -37,7 +37,7 @@ export default class Repository {
   }
 
   constructor() {
-    this.functions = getFunctions(firebaseApp);
+    this.functions = getFunctions(firebaseApp,"asia-south1");
     if (emulator) {
       connectFunctionsEmulator(this.functions, "localhost", 5001);
     }

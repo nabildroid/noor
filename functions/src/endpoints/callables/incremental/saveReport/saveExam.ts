@@ -9,4 +9,4 @@ interface NavigationData extends IncrementalData {
   isEmpty: boolean;
 }
 
-export default functions.https.onCall(async (data: NavigationData) => {});
+export default functions.region("asia-south1").https.onCall(async (data: NavigationData) => {});

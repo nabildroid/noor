@@ -180,10 +180,6 @@ export default class Redirect {
 
         ...config,
       },
-      proxy: {
-        host: "localhost",
-        port: 8082,
-      },
     });
 
     this.weirdData = hiddenInputs(loadHtml(data));

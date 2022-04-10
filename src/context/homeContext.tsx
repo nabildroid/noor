@@ -51,7 +51,13 @@ const HomeProvider: React.FC = ({ children }) => {
 
   const getTeacherTabs = (type: TeacherType) => {
     if (type == TeacherType.elementery)
-      return [HomeTab.saveReport, HomeTab.saveCustom, HomeTab.editSkill];
+      return [
+        HomeTab.saveReport,
+        HomeTab.saveCustom,
+        HomeTab.editSkill,
+
+        HomeTab.savedReports,
+      ];
     else if (type == TeacherType.kindergarten)
       return [
         HomeTab.saveAll,

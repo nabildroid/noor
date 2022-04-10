@@ -1,4 +1,5 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Card from "../../components/home/card";
 import CustomButton from "../../components/home/customButton";
 import PageTitle from "../../components/home/pageTitle";
@@ -7,6 +8,7 @@ import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
 import {
+  HomeTab,
   NoorExam,
   NoorSection,
   NoorSkill,
@@ -17,6 +19,7 @@ import Repository from "../../repository";
 interface SaveReportProps {}
 
 const SaveReport: React.FC<SaveReportProps> = ({}) => {
+  const navigate = useNavigate();
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
@@ -24,7 +27,7 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
     useFormOptions({
       label: "report" + teacherType,
       actionName: "",
-      excludedIds:["PanelSkill"],
+      excludedIds: ["PanelSkill"],
       excludedNames: ["ddlStudySystem", "ddlSkillTypeDesc", "ddlSkills"],
     });
 
@@ -57,9 +60,12 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
   }, []);
 
   async function save(isEmpty: boolean = false) {
-    const a = await submit("newSkillReport", {
-      isEmpty
+    if (loadingIndex != 1000) return;
+    await submit("newSkillReport", {
+      isEmpty,
     });
+
+    navigate("/" + HomeTab.savedReports);
   }
 
   return (
@@ -68,29 +74,42 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
 
       <div className="mt-4 h-full   flex flex-col max-w-sm mx-auto w-full  overflow-hidden  rounded-md ">
         <Card loading={!inputs.length}>
-        {inputs.map((input, i) => (
-          <div key={input.id}>
-            <SelectBox
-              loading={i > loadingIndex}
-              select={(e) => updateInputs(input.name!, e)}
-              label={input.title}
-              options={input.options.map((e) => ({
-                id: e.value,
-                name: e.text,
-                selected: e.selected,
-              }))}
-            />
-          </div>
-        ))}
+          {inputs.map((input, i) => (
+            <div key={input.id}>
+              <SelectBox
+                loading={i > loadingIndex}
+                select={(e) => updateInputs(input.name!, e)}
+                label={input.title}
+                options={input.options.map((e) => ({
+                  id: e.value,
+                  name: e.text,
+                  selected: e.selected,
+                }))}
+              />
+            </div>
+          ))}
 
-        <div className="flex mt-4 justify-between">
-          <CustomButton secondary icon={false} onClick={() => {save(true)}}>
-            انشاء فارغ
-          </CustomButton>
-          <CustomButton icon={false} onClick={() => {save()}}>
-            انشاء مرصود
-          </CustomButton>
-        </div>
+          <div className="flex mt-4 justify-between">
+            <CustomButton
+              secondary
+              loading={loadingIndex == -1}
+              icon={false}
+              onClick={() => {
+                save(true);
+              }}
+            >
+              انشاء فارغ
+            </CustomButton>
+            <CustomButton
+              icon={false}
+              loading={loadingIndex == -1}
+              onClick={() => {
+                save();
+              }}
+            >
+              انشاء مرصود
+            </CustomButton>
+          </div>
         </Card>
       </div>
     </div>

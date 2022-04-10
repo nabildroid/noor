@@ -13,6 +13,7 @@ import Menu from "../../components/home/navigation/menu";
 import Noti from "../../components/home/noti";
 import BuyMessage from "../../components/home/buyMessage";
 import { KinderRating, RateToId } from "../../models/rating";
+import { taskTitle } from "../../utils";
 
 const Home: React.FC = ({ children }) => {
   const {
@@ -25,7 +26,6 @@ const Home: React.FC = ({ children }) => {
     selectRole,
     currentRole,
   } = useContext(HomeContext);
-
 
   const isProMessage =
     teacher?.isPro === true
@@ -91,8 +91,13 @@ const Home: React.FC = ({ children }) => {
         </div>
 
         <div className="w-full overflow-hidden  flex-1 p-4">
-          {!!tasks.length && <Noti text="جاري تنفيذ العملية" />}
-          {teacher && teacher.isPro !== false && <Outlet />}
+          {!!tasks.length && (
+            <Noti 
+            text={` جاري تنفيذ العملية ${taskTitle(tasks[0].type)}`} 
+            color="yellow"
+            />
+          )}
+          {teacher && teacher.isPro !== false && !tasks.length && <Outlet />}
 
           {teacher?.isPro === false && <BuyMessage />}
         </div>

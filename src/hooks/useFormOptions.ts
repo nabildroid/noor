@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Repository from "../repository";
 import {
   Form,
@@ -25,8 +25,7 @@ type SubmitType = <
   payload: C
 ) => Promise<D["response"]["payload"]>;
 
-
-const createPath = (x:{})=>Object.values(x).join("-");
+const createPath = (x: {}) => Object.values(x).join("-");
 
 // todo use label to cach data
 export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
@@ -38,6 +37,17 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
     (e) =>
       !withinIncludes(e.id, excludedIds) &&
       !withinIncludes(e.name ?? "", excludedNames)
+  );
+
+  const isAllChosen = useMemo(
+    () =>
+      visibleInputs.every((inp) => {
+        const selected = inp.options.find((e) => e.selected);
+        if (!selected) return false;
+        if (selected.text == "اختر" || selected.text == "لا يوجد") return false;
+        return true;
+      }),
+    [inputs]
   );
 
   const updateInputs = async (name: string, value: string) => {
@@ -70,7 +80,7 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
     value: string
   ) {
     const index = inputs.findIndex((e) => e.name == name);
-    setLoadinIndex(index);
+    setLoadinIndex(-1);
     if (true && index + 1 < inputs.length) {
       const { form: newForm } = await Repository.instance.formFetchOption({
         action: form!.action,
@@ -80,8 +90,8 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
       });
 
       setForm(newForm);
-      setLoadinIndex(1000);
     }
+    setLoadinIndex(1000);
   }
 
   const submit: SubmitType = async (type, payload) => {
@@ -89,12 +99,15 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
       e.name?.includes(actionName)
     );
 
+    setLoadinIndex(-1);
     const action = await Repository.instance.submitForm(type, {
       ...payload, // CHECK should i deconstruct the payload or not
       action: form!.action,
       actionButton: actionButton!,
       inputs: inputs,
     });
+
+    setLoadinIndex(1000);
 
     return action as any;
   };
@@ -125,7 +138,8 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
     formAction: form?.action,
     loadingIndex,
     submit,
-    letMeHandleIt
+    isAllChosen,
+    letMeHandleIt,
   };
 };
 

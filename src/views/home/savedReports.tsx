@@ -1,50 +1,17 @@
-import { Listbox, Transition } from "@headlessui/react";
+import { Transition } from "@headlessui/react";
 import React, { useContext, useEffect, useState } from "react";
 import PageTitle from "../../components/home/pageTitle";
 import CheckTable from "../../components/home/checkTable";
-import RadioList, { RadioListItem } from "../../components/home/radioList";
 import CustomButton from "../../components/home/customButton";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
-import useFormOptions from "../../hooks/useFormOptions";
-import rates, { KinderRating } from "../../models/rating";
-import Repository from "../../repository";
-import { teacherTypeArabic } from "../../utils";
-import CheckBoxs from "../../components/home/checkboxs";
 import { FormInput } from "../../types/communication_types";
-import Noti from "../../components/home/noti";
-import WhiteTable from "../../components/home/checkTable";
 import { Report, TeacherType } from "../../models/home_model";
 import DB from "../../repository/db";
 import Storage from "../../repository/storage";
 
 interface SavedReportsProps {}
-
-const inputs: FormInput[] = [
-  {
-    id: "dsd",
-    title: "الصف",
-    options: [
-      {
-        selected: true,
-        text: "الكل",
-        value: "dsdsd",
-      },
-    ],
-  },
-  {
-    id: "dsd11",
-    title: "الصف",
-    options: [
-      {
-        selected: true,
-        text: "الكل",
-        value: "dsdsd",
-      },
-    ],
-  },
-];
 
 const SavedReports: React.FC<SavedReportsProps> = () => {
   const { user } = useContext(AppContext);
@@ -59,7 +26,7 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
   const [selected, onSelected] = useState<string[]>([]);
 
   const tableHead =
-    teacherType == TeacherType.kindergarten ? ["الموسةوى", "الوحدة", ""] : [];
+    teacherType == TeacherType.kindergarten ? ["الموستوى", "الوحدة", ""] : [];
 
   const [selection, setSelection] = useState<
     {
@@ -69,7 +36,8 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
     }[]
   >([]);
 
-  useEffect(() => {
+  useEffect(() => createSelectionBoxes(), [reports]);
+  function createSelectionBoxes() {
     if (!reports.length) return;
     const navIds = ["ddlClass", "ddlUnit"];
     const navs = [] as FormInput["options"][];
@@ -96,9 +64,10 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
         options: [{ ...all }, ...n.filter((e) => e.value != "-99")],
       }))
     );
-  }, [reports]);
+  }
 
-  useEffect(() => {
+  useEffect(() => createVisibleReports(), [selection]);
+  function createVisibleReports() {
     const visible = reports.filter(({ params }) => {
       return selection.every((s) => {
         const active = s.options.find((e) => e.selected)!;
@@ -109,7 +78,7 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
         });
       });
     });
-    console.log(visible);
+
     setVisibleReports(
       visible.map(({ id, params, isEmpty }) => {
         const childs = Object.entries(params)
@@ -122,7 +91,7 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
         return { id, childs: [...childs, isEmpty ? "فارغ" : "مرصود"] };
       })
     );
-  }, [selection]);
+  }
 
   const select = (navId: string, value: string) => {
     setSelection(
@@ -148,17 +117,23 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
   function remove() {
     selected.forEach((id) => {
       DB.instance.deleteReport(id);
-      setReports((r) => r.filter((a) => a.id != id));
+      setReports(reports.filter((a) => a.id != id));
     });
   }
 
-  function download(id?: string) {
+  async function download(id?: string) {
     const ids = id ? [id] : selected;
     const paths = reports
       .filter((i) => ids.includes(i.id))
-      .map((e) => e.files.csv);
-
-    Promise.all(paths.map(Storage.instance.getDownloadURL)).then(console.log);
+      .map((e) => e.files.pdf);
+    try {
+      const links = await Promise.all(
+        paths.map(Storage.instance.getDownloadURL)
+      );
+      links.forEach((l) => window.open(l));
+    } catch (e) {
+      console.error("unable to get the urls");
+    }
   }
 
   return (
@@ -201,9 +176,9 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
               </CustomButton>
 
               <CustomButton onClick={download}>ةحميل</CustomButton>
-              <CustomButton icon={false} onClick={() => {}}>
+              {/* <CustomButton icon={false} onClick={() => {}}>
                 مشارك
-              </CustomButton>
+              </CustomButton> */}
             </div>
           </Transition>
         </div>

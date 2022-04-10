@@ -1,4 +1,4 @@
-import { HomeTab, TeacherType } from "../models/home_model";
+import { BackgroundTaskType, HomeTab, TeacherType } from "../models/home_model";
 
 export const tabBarTitle = (tab: HomeTab) =>
   ({
@@ -43,4 +43,14 @@ export function mergeCookies(...cookies: string[][]) {
     if (!v[1]) return acc;
     return [...acc, `${v[0]}=${v[1]}`];
   }, [] as string[]);
+}
+
+
+
+
+export function taskTitle(taskType:BackgroundTaskType){
+  if(taskType == BackgroundTaskType.saveAll)
+    return "ةحصيل الكل"
+  else if(taskType == BackgroundTaskType.saveCustom)
+    return "ةحصيل وحدة ومهارة"
 }

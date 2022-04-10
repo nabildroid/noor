@@ -95,7 +95,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
         } mx-auto w-full`}
       >
         <div className="flex-1 w-full px-4 bg-white  rounded-md shadow py-4">
-          {notyType == NotyType.empty && <Noti text="لا يوجد" />}
+          {notyType == NotyType.empty && <Noti text="لا يوجد" color="red" />}
 
           <Transition className="flex-1" show={stage == 0}>
             {inputs.map((input, i) => (
@@ -115,7 +115,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
 
             {notyType == NotyType.exists && (
               <>
-                <Noti text="يوجد" />
+                <Noti text="يوجد"  color="green"/>
                 <div className="mt-4 text-center">
                   <CustomButton onClick={() => setStage(1)} icon={false}>
                     استعراض

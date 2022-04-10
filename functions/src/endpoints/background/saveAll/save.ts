@@ -16,6 +16,7 @@ interface NavigationData extends IncrementalData {
 }
 
 export default functions
+  .region("asia-south1")
   .runWith({
     timeoutSeconds: 60 * 9,
   })

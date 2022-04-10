@@ -18,8 +18,6 @@ import {
   SaveCustomTask,
 } from "../../models/home_model";
 import DB from "../../repository/db";
-import Loading from "../../components/loading";
-import { Loader } from "react-feather";
 import Card from "../../components/home/card";
 
 interface SaveCustomProps {}
@@ -28,12 +26,18 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout, user } = useContext(AppContext);
 
-  const { inputs, setForm, letMeHandleIt, updateInputs, loadingIndex } =
-    useFormOptions({
-      label: "saveCustom" + teacherType,
-      excludedIds: ["PanelSkill"],
-      actionName: "",
-    });
+  const {
+    inputs,
+    isAllChosen,
+    setForm,
+    letMeHandleIt,
+    updateInputs,
+    loadingIndex,
+  } = useFormOptions({
+    label: "saveCustom" + teacherType,
+    excludedIds: ["PanelSkill"],
+    actionName: "",
+  });
 
   useEffect(() => {
     Repository.instance
@@ -51,16 +55,11 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
   const [loading, setLoading] = useState(false);
   const [secondStage, setSecondStage] = useState(false);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setSecondStage(loadingIndex == inputs.length - 1);
-    }, 700);
-  }, [loadingIndex]);
+  const next = () => setSecondStage(true);
 
   const checkSave = async () => {
     if (rating) {
-      setLoading(true);
-
+      
       setLoading(true);
       const task: SaveCustomTask = {
         payload: {
@@ -84,10 +83,11 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
     <div className="flex flex-1 h-full flex-col">
       <PageTitle title={pageTitle} />
 
-      <div className="mt-4 b flex-1 flex flex-col max-w-sm mx-auto w-full">
+      <div className="mt-4 b flex-1 flex flex-col max-w-lg mx-auto w-full">
         <Card loading={!inputs.length}>
           <Transition
-            className="flex-1 w-full grid md:grid-cols-2  gap-3"
+            style={{ direction: "rtl" }}
+            className="flex-1  w-full grid md:grid-cols-2  gap-3"
             show={!secondStage}
           >
             {inputs.map((input, i) => (
@@ -116,17 +116,17 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
           </Transition>
 
           <div className="flex mt-4 justify-center space-x-12">
-            <button
-              onClick={() => setSecondStage(false)}
-              className={`block w-3 h-3 rounded-full border-2 border-indigo-600 ${
-                loading ? "bg-indigo-500" : ""
-              }`}
-            ></button>
-            <span
-              className={`block w-3 h-3 rounded-full border-2 border-indigo-600 ${
-                secondStage ? "bg-indigo-500" : ""
-              }`}
-            ></span>
+            {!secondStage && !!inputs.length && (
+              <div className="mt-4 text-center w-full flex justify-center">
+                <CustomButton
+                  disabled={!isAllChosen}
+                  icon={false}
+                  onClick={next}
+                >
+                  التالي
+                </CustomButton>
+              </div>
+            )}
           </div>
         </Card>
 

@@ -14,23 +14,28 @@ interface NavigationData extends IncrementalData {
   }[];
 }
 
-export default functions.https.onCall(async (data: NavigationData) => {
-  const homePage = await Redirect.load({
-    cookies: data.cookies,
-    weirdData: data.weirdData,
-    from:
-      data.from ??
-      "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
+export default functions
+  .region("asia-south1")
+  .https.onCall(async (data: NavigationData) => {
+    const homePage = await Redirect.load({
+      cookies: data.cookies,
+      weirdData: data.weirdData,
+      from:
+        data.from ??
+        "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
+    });
+
+    const form = await saveEditedSkills(data, homePage);
+
+    return homePage.sendForm(form, {
+      ...form.toJson(),
+    });
   });
 
-  const form = await saveEditedSkills(data, homePage);
-
-  return homePage.sendForm(form, {
-    ...form.toJson(),
-  });
-});
-
-export async function saveEditedSkills(data: NavigationData, homePage: Redirect) {
+export async function saveEditedSkills(
+  data: NavigationData,
+  homePage: Redirect
+) {
   const form = new EditSkillForm(
     Form.fromJson({
       action: data.action,

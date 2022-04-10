@@ -33,11 +33,18 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   const { logout } = useContext(AppContext);
 
   const ratingSystem = KinderRating;
-  const { inputs, setForm, formAction, submit, updateInputs, loadingIndex } =
-    useFormOptions({
-      label: "editSkill" + teacherType,
-      actionName: "ibtnSearch",
-    });
+  const {
+    inputs,
+    setForm,
+    formAction,
+    submit,
+    updateInputs,
+    loadingIndex,
+    isAllChosen,
+  } = useFormOptions({
+    label: "editSkill" + teacherType,
+    actionName: "ibtnSearch",
+  });
 
   useEffect(() => {
     console.log("teacher type:", teacherType);
@@ -83,12 +90,11 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   const isLastSkill = stage == skills.length + 1;
 
   useEffect(() => {
-    const isSecondStage = loadingIndex == inputs.length - 1;
-    if (isSecondStage) {
+    
+    if (stage == 1) {
       fetchSkills();
-      setTimeout(() => setStage(1), 700);
     }
-  }, [loadingIndex]);
+  }, [stage]);
 
   useEffect(() => {
     if (stage == 1) {
@@ -101,12 +107,15 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   }, [stage]);
 
   async function fetchSkills() {
+    setLoading(true);
     const response = await submit("skillSubmit", {});
-
+    
     setSkills(response.skills);
+    setLoading(false);
   }
 
   const checkSave = async () => {
+    setLoading(true);
     const editedSkills = skills.map((s) => ({
       id: s.skillId,
       value: RateToId(s.value).toString(),
@@ -118,7 +127,8 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     });
 
     setForm(data.form);
-    // setStage(0);
+    setStage(0);
+    setLoading(false);
   };
   const back = () => setStage(Math.max(stage - 1, 0));
   const next = () => {
@@ -126,6 +136,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   };
 
   const save = async () => {
+    setLoading(true)
     const data = await Repository.instance.editSkillSave({
       action: formAction!,
       inputs,
@@ -135,6 +146,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
       })),
     });
 
+    setLoading(false);
     setForm(data.form);
     setStage(0);
   };
@@ -148,7 +160,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
       <div className="mt-4 flex-1 flex flex-col max-w-sm mx-auto w-full">
         <Card loading={!inputs.length}>
           <Transition
-            className="flex-1 w-full grid md:grid-cols-2  gap-3"
+            className="flex-1 w-full grid md:grid-cols-2 gap-3 gap-y-1"
             style={{ direction: "rtl" }}
             show={stage == 0}
           >
@@ -167,6 +179,19 @@ const EditSkill: React.FC<EditSkillProps> = () => {
               </div>
             ))}
           </Transition>
+          <div className="flex mt-4 justify-center space-x-12">
+            {stage == 0 && !!inputs.length && (
+              <div className="mt-4 text-center w-full flex justify-center">
+                <CustomButton
+                  disabled={!isAllChosen}
+                  icon={false}
+                  onClick={() => setStage(1)}
+                >
+                  التالي
+                </CustomButton>
+              </div>
+            )}
+          </div>
 
           <Transition className={"flex-1"} show={stage == 1}>
             <div className="mt-2">
@@ -180,16 +205,17 @@ const EditSkill: React.FC<EditSkillProps> = () => {
               />
             </div>
             <div className="mt-4 flex  justify-center items-stretch space-x-6">
-              <CustomButton icon={false} secondary onClick={back}>
+              <CustomButton loading={loading ||loadingIndex == -1} icon={false} secondary onClick={back}>
                 رجوع
               </CustomButton>
               <button
+              disabled={loading ||loadingIndex == -1}
                 onClick={() => setStage(2)}
-                className="px-4 py-1 text-white font-medium text-sm bg-indigo-700 rounded-md shadow-md shadow-indigo-700/20"
+                className="px-4 py-1 text-white font-medium text-sm bg-indigo-700 disabled:bg-indigo-400 rounded-md shadow-md shadow-indigo-700/20"
               >
                 مهارة على حدة
               </button>
-              <CustomButton onClick={() => save()}>رصد</CustomButton>
+              <CustomButton loading={loading || loadingIndex == -1} onClick={() => save()}>رصد</CustomButton>
             </div>
           </Transition>
 
@@ -227,7 +253,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
                   )}
                 </div>
                 <div className="flex-1 flex justify-between text-right">
-                  <CustomButton icon={false} secondary onClick={back}>
+                  <CustomButton loading={loading ||loadingIndex == -1} icon={false} secondary onClick={back}>
                     رجوع
                   </CustomButton>
                 </div>

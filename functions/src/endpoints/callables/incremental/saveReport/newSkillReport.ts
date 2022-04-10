@@ -2,7 +2,6 @@ import * as functions from "firebase-functions";
 import * as fs from "fs";
 import * as html_to_pdf from "html-pdf-node";
 
-
 import { IncrementalData } from "../../../../types";
 import Redirect from "../../../../core/redirect";
 import { FormInput } from "../../../../core/form";
@@ -31,111 +30,118 @@ function formInputValue(inputs: FormInput[], name: string) {
   );
 }
 
-export default functions.https.onCall(async (data: NavigationData, context) => {
-  const homePage = await Redirect.load({
-    cookies: data.cookies,
-    weirdData: data.weirdData,
-    from:
-      data.from ??
-      "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
-  });
+export default functions
+  .region("asia-south1")
+  .runWith({
+    memory: "512MB",
+  })
+  .https.onCall(async (data: NavigationData, context) => {
+    const homePage = await Redirect.load({
+      cookies: data.cookies,
+      weirdData: data.weirdData,
+      from:
+        data.from ??
+        "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
+    });
 
-  let { action } = data;
+    let { action } = data;
 
-  let items: Item[] = [];
+    let items: Item[] = [];
 
-  await executeVariant(data.inputs, {
-    execute: async (inputs) => {
-      const title = inputs[inputs.length - 1].options.find(
-        (e) => e.selected
-      )!.text;
+    await executeVariant(data.inputs, {
+      execute: async (inputs) => {
+        const title = inputs[inputs.length - 1].options.find(
+          (e) => e.selected
+        )!.text;
 
-      const response = await editSkillSubmit(
-        {
-          ...data,
-          inputs,
-          ...homePage.send({}),
-          action,
-        },
-        homePage
-      );
-      // get all the skills with thier ids
-      let { action: newAction, skills, weirdData } = response.toJson();
+        const response = await editSkillSubmit(
+          {
+            ...data,
+            inputs,
+            ...homePage.send({}),
+            action,
+          },
+          homePage
+        );
+        // get all the skills with thier ids
+        let { action: newAction, skills, weirdData } = response.toJson();
 
-      items.push({
-        title,
-        students: skills,
-      });
+        items.push({
+          title,
+          students: skills,
+        });
 
-      action = newAction;
+        action = newAction;
 
-      homePage.setWeiredData(weirdData);
-    },
-    fetchOptions: async (inputs, name) => {
-      const response = await fetchOptions(
-        {
-          ...data,
-          inputs,
-          ...homePage.send({}),
-          action,
-          actionButtons: [],
-          name,
-        },
-        homePage
-      );
-      // submit the form
-      return response.toJson().inputs;
-    },
-    customSelect: [
-      {
-        name: "ctl00$PlaceHolderMain$ddlUnitTypesDDL",
-        value: "الكل",
+        homePage.setWeiredData(weirdData);
       },
-      {
-        name: "ctl00$PlaceHolderMain$ddlStudySystem",
-        value: "منتظم",
+      fetchOptions: async (inputs, name) => {
+        const response = await fetchOptions(
+          {
+            ...data,
+            inputs,
+            ...homePage.send({}),
+            action,
+            actionButtons: [],
+            name,
+          },
+          homePage
+        );
+        // submit the form
+        return response.toJson().inputs;
       },
-    ],
-  });
+      customSelect: [
+        {
+          name: "ctl00$PlaceHolderMain$ddlUnitTypesDDL",
+          value: "الكل",
+        },
+        {
+          name: "ctl00$PlaceHolderMain$ddlStudySystem",
+          value: "منتظم",
+        },
+      ],
+    });
 
-  items = items.map((e) => ({
-    ...e,
-    students: e.students.map((s) => ({
-      ...s,
-      value: data.isEmpty ? "" : s.value,
-    })),
-  }));
+    items = items.map((e) => ({
+      ...e,
+      students: e.students.map((s) => ({
+        ...s,
+        value: data.isEmpty ? "" : s.value,
+      })),
+    }));
 
-  const fileName = randomString();
+    const fileName = randomString();
 
-  const csv = createCSV(items, fileName);
-  const pdf = await createPDF(items, fileName, data.inputs);
+    const csv = createCSV(items, fileName);
+    const pdf = await createPDF(items, fileName, data.inputs);
 
-  const config = (filePath: string) => ({
-    metadata: {
+    const config = (filePath: string) => ({
       metadata: {
-        userId: context.auth.uid,
-        from: "saveReport/newSkillReport",
+        metadata: {
+          userId: context.auth.uid,
+          from: "saveReport/newSkillReport",
+        },
       },
-    },
-    destination: `reports/${path.basename(filePath)}`,
+      destination: `reports/${path.basename(filePath)}`,
+    });
+
+    const [onlineCSV] = await storage.upload(csv, config(csv));
+    const [onlinePDF] = await storage.upload(pdf, config(pdf));
+
+    const params = createParmsFromInputs(data.inputs);
+
+    await db.collection("reports").add({
+      user: context.auth.uid,
+      files: {
+        csv: onlineCSV.name,
+        pdf: onlinePDF.name,
+      },
+      params,
+      isEmpty: data.isEmpty,
+    });
+
+    return homePage.send({});
   });
-
-  const [onlineCSV] = await storage.upload(csv, config(csv));
-  const [onlinePDF] = await storage.upload(pdf, config(pdf));
-
-  const params = createParmsFromInputs(data.inputs);
-
-  db.collection("reports").add({
-    user: context.auth.uid,
-    files: {
-      csv: onlineCSV.name,
-      pdf: onlinePDF.name,
-    },
-    params,
-    isEmpty: data.isEmpty,
-  });
-});
 
 function createParmsFromInputs(inputs: FormInput[]) {
   const result = {};
@@ -227,13 +233,12 @@ async function createPDF(items: Item[], fileName: string, inputs: FormInput[]) {
 
   const tempFilePath = path.join(os.tmpdir(), fileName + ".pdf");
 
-  await new Promise<void>(res=>{
+  await new Promise<void>((res) => {
     html_to_pdf.generatePdf(file, options).then((pdfBuffer) => {
       fs.writeFileSync(tempFilePath, pdfBuffer);
       res();
     });
-  })
-  
+  });
 
   return tempFilePath;
 }

@@ -22,26 +22,7 @@ const Onboarding: React.FC<OnboardingProps> = () => {
   }
 
   return (
-    <div className="grid  grid-cols-2 md:grid-cols-3 gap-4 max-w-xl w-full mx-auto">
-      {new Array(9).fill("").map((_, i) => (
-        <Link
-          key={i}
-          to="/saveall"
-          className="outline-none p-4 hover:border-2 hover:-m-1 hover:shadow-indigo-200/50  hover:shadow-lg   hover:border-indigo-500
-          focus:border-2 focus:-m-1 focus:shadow-indigo-200/50  focus:shadow-lg   focus:border-indigo-500
-          
-          flex flex-col justify-center items-center rounded-md border bg-white border-indigo-50  shadow"
-        >
-          <Save className="text-indigo-200" />
-          <span className="mt-4 text-indigo-600 font-arabic">
-            مرحبا بالعالم
-          </span>
-          <span className="m-1 text-indigo-400 text-sm font-arabic">
-            مرحبا بالعالم
-          </span>
-        </Link>
-      ))}
-    </div>
+<></>
   );
 };
 

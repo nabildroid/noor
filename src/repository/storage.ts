@@ -4,7 +4,7 @@ import {
   ref,
   FirebaseStorage,
 } from "firebase/storage";
-import {  firebaseApp } from "../main";
+import { firebaseApp } from "../main";
 
 export default class Storage {
   private bucket: FirebaseStorage;
@@ -17,10 +17,10 @@ export default class Storage {
     return Storage._instance!;
   }
   constructor() {
-    this.bucket = getStorage();
+    this.bucket = getStorage(firebaseApp);
   }
 
-  async getDownloadURL(path: string) {
+  getDownloadURL = async (path: string) => {
     return await getDownloadURL(ref(this.bucket, path));
-  }
+  };
 }

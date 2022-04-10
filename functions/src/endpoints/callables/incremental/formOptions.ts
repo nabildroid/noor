@@ -11,7 +11,7 @@ interface NavigationData extends IncrementalData {
   name: string;
 }
 
-export default functions.https.onCall(async (data: NavigationData, context) => {
+export default functions.region("asia-south1").https.onCall(async (data: NavigationData, context) => {
   const homePage = await Redirect.load({
     cookies: data.cookies,
     weirdData: data.weirdData,

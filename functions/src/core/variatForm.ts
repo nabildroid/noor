@@ -103,7 +103,6 @@ export async function executeVariant(
         config,
         i + 1
       );
-      return; // todo remove this!
     }
     return;
   }
@@ -116,10 +115,6 @@ function clean(x: string) {
 
 function selectOpt(ops: FormInput["options"], text: string) {
   return ops.map((e) => ({ ...e, selected: clean(e.text) == text }));
-}
-
-function containOpt(ops: FormInput["options"], text: string) {
-  return ops.some((e) => e.text.includes(text));
 }
 
 function containExactOpt(ops: FormInput["options"], text: string) {
