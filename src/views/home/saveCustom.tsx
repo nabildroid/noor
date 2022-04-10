@@ -19,6 +19,9 @@ import {
 } from "../../models/home_model";
 import DB from "../../repository/db";
 import Card from "../../components/home/card";
+import Page from "../../layout/home/page";
+import { createAction } from "../../layout/home/actionBar";
+import SlideTransition from "../../layout/home/slideTransition";
 
 interface SaveCustomProps {}
 
@@ -59,7 +62,6 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
 
   const checkSave = async () => {
     if (rating) {
-      
       setLoading(true);
       const task: SaveCustomTask = {
         payload: {
@@ -79,69 +81,68 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
 
   const pageTitle = `وحدة ومهارة${teacherTypeArabic(teacherType!)}`;
 
+  const actions = [
+    createAction({
+      show: !!inputs.length,
+      enable: isAllChosen && loadingIndex != -1,
+      buttons: [
+        {
+          label: "التالي",
+          onClick: next,
+        },
+      ],
+    }),
+    createAction({
+      show: secondStage,
+      enable: loadingIndex != -1,
+      loading,
+      buttons: [
+        {
+          label: "رصد",
+          onClick: checkSave,
+          icon: true,
+          progress: true,
+        },
+      ],
+    }),
+  ];
   return (
-    <div className="flex flex-1 h-full flex-col">
-      <PageTitle title={pageTitle} />
-
-      <div className="mt-4 b flex-1 flex flex-col max-w-lg mx-auto w-full">
-        <Card loading={!inputs.length}>
-          <Transition
-            style={{ direction: "rtl" }}
-            className="flex-1  w-full grid md:grid-cols-2  gap-3"
-            show={!secondStage}
-          >
-            {inputs.map((input, i) => (
-              <div key={input.id}>
-                <SelectBox
-                  loading={i > loadingIndex}
-                  select={(e) => updateInputs(input.name!, e)}
-                  label={input.title}
-                  options={input.options.map((e) => ({
-                    id: e.value,
-                    name: e.text,
-                    selected: e.selected,
-                  }))}
-                />
-              </div>
-            ))}
-          </Transition>
-
-          <Transition className={"flex-1"} show={secondStage}>
-            <RadioList
-              disabled={loading}
-              title={pageTitle}
-              onSelect={(e) => setRating(e as any)}
-              items={rates(teacherType!)}
+    <Page
+      title={pageTitle}
+      size={secondStage ? "sm" : "lg"}
+      loading={!inputs.length}
+      actions={actions[secondStage?1:0]}
+    >
+      <SlideTransition
+        show={!secondStage}
+        isRtl
+        className="flex-1  w-full grid md:grid-cols-2 h-full gap-3 "
+      >
+        {inputs.map((input, i) => (
+          <div key={input.id}>
+            <SelectBox
+              loading={i > loadingIndex}
+              select={(e) => updateInputs(input.name!, e)}
+              label={input.title}
+              options={input.options.map((e) => ({
+                id: e.value,
+                name: e.text,
+                selected: e.selected,
+              }))}
             />
-          </Transition>
-
-          <div className="flex mt-4 justify-center space-x-12">
-            {!secondStage && !!inputs.length && (
-              <div className="mt-4 text-center w-full flex justify-center">
-                <CustomButton
-                  disabled={!isAllChosen}
-                  icon={false}
-                  onClick={next}
-                >
-                  التالي
-                </CustomButton>
-              </div>
-            )}
           </div>
-        </Card>
+        ))}
+      </SlideTransition>
 
-        {/* todo hide button instead of opacity */}
-        <div
-          className={`my-4 mb-16 text-center ${
-            !secondStage ? "opacity-0" : "opacity-100"
-          }`}
-        >
-          <CustomButton loading={loading} onClick={checkSave}>
-            رصد
-          </CustomButton>
-        </div>
-      </div>
-    </div>
+      <SlideTransition show={secondStage}>
+        <RadioList
+          disabled={loading}
+          title={pageTitle}
+          onSelect={(e) => setRating(e as any)}
+          items={rates(teacherType!)}
+        />
+      </SlideTransition>
+    </Page>
   );
 };
 

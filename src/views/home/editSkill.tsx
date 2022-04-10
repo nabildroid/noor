@@ -18,6 +18,9 @@ import { teacherTypeArabic } from "../../utils";
 import { EditSkillNavigateResponse } from "../../types/communication_types";
 import { NoorSection, NoorSkill, TeacherType } from "../../models/home_model";
 import Card from "../../components/home/card";
+import Page from "../../layout/home/page";
+import SlideTransition from "../../layout/home/slideTransition";
+import { createAction } from "../../layout/home/actionBar";
 
 interface EditSkillProps {}
 
@@ -90,7 +93,6 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   const isLastSkill = stage == skills.length + 1;
 
   useEffect(() => {
-    
     if (stage == 1) {
       fetchSkills();
     }
@@ -109,7 +111,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   async function fetchSkills() {
     setLoading(true);
     const response = await submit("skillSubmit", {});
-    
+
     setSkills(response.skills);
     setLoading(false);
   }
@@ -136,7 +138,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   };
 
   const save = async () => {
-    setLoading(true)
+    setLoading(true);
     const data = await Repository.instance.editSkillSave({
       action: formAction!,
       inputs,
@@ -153,116 +155,121 @@ const EditSkill: React.FC<EditSkillProps> = () => {
 
   const pageTitle = `تعديل ${teacherTypeArabic(teacherType!)}`;
 
+  const actions = [
+    createAction({
+      enable: isAllChosen,
+      show: stage == 0,
+      buttons: [
+        {
+          label: "التالي",
+          onClick: () => setStage(1),
+        },
+      ],
+    }),
+    createAction({
+      show: stage == 1,
+      loading: loading || loadingIndex == -1,
+      buttons: [
+        {
+          label: "رجوع",
+          onClick: back,
+          secondary: true,
+        },
+        {
+          label: "مهارة على حدة",
+          onClick: () => setStage(2),
+        },
+        {
+          label: "رصد",
+          onClick: save,
+          icon: true,
+          progress: true,
+        },
+      ],
+    }),
+
+    createAction({
+      loading: loading || loadingIndex == -1,
+      buttons: [
+        {
+          label: "رصد",
+          progress: true,
+          onClick: checkSave,
+          icon: true,
+          visible: isLastSkill,
+        },
+        {
+          label: "رجوع",
+          secondary: true,
+          progress: true,
+          onClick: back,
+        },
+        {
+          label: "التالي",
+          onClick: next,
+          visible: !isLastSkill,
+        },
+      ],
+    }),
+  ];
+
   return (
-    <div className="flex flex-1 h-full flex-col">
-      <PageTitle title={pageTitle} />
-
-      <div className="mt-4 flex-1 flex flex-col max-w-sm mx-auto w-full">
-        <Card loading={!inputs.length}>
-          <Transition
-            className="flex-1 w-full grid md:grid-cols-2 gap-3 gap-y-1"
-            style={{ direction: "rtl" }}
-            show={stage == 0}
-          >
-            {inputs.map((input, i) => (
-              <div key={input.id}>
-                <SelectBox
-                  loading={i > loadingIndex}
-                  select={(e) => updateInputs(input.name!, e)}
-                  label={input.title}
-                  options={input.options.map((e) => ({
-                    id: e.value,
-                    name: e.text,
-                    selected: e.selected,
-                  }))}
-                />
-              </div>
-            ))}
-          </Transition>
-          <div className="flex mt-4 justify-center space-x-12">
-            {stage == 0 && !!inputs.length && (
-              <div className="mt-4 text-center w-full flex justify-center">
-                <CustomButton
-                  disabled={!isAllChosen}
-                  icon={false}
-                  onClick={() => setStage(1)}
-                >
-                  التالي
-                </CustomButton>
-              </div>
-            )}
+    <Page
+      size={stage == 0 ? "lg" : "sm"}
+      title={pageTitle}
+      actions={actions[Math.min(stage, 2)]}
+      loading={!inputs.length}
+    >
+      <SlideTransition
+        className="h-full w-full grid md:grid-cols-2 gap-3 gap-y-1"
+        show={stage == 0}
+        isRtl
+      >
+        {inputs.map((input, i) => (
+          <div key={input.id}>
+            <SelectBox
+              loading={i > loadingIndex}
+              select={(e) => updateInputs(input.name!, e)}
+              label={input.title}
+              options={input.options.map((e) => ({
+                id: e.value,
+                name: e.text,
+                selected: e.selected,
+              }))}
+            />
           </div>
+        ))}
+      </SlideTransition>
 
-          <Transition className={"flex-1"} show={stage == 1}>
-            <div className="mt-2">
-              <RadioList
-                disabled={loading}
-                title={pageTitle}
-                onSelect={(e) =>
-                  setAllOneSkill(RateById(ratingSystem, e as any))
-                }
-                items={rates(teacherType!)}
-              />
-            </div>
-            <div className="mt-4 flex  justify-center items-stretch space-x-6">
-              <CustomButton loading={loading ||loadingIndex == -1} icon={false} secondary onClick={back}>
-                رجوع
-              </CustomButton>
-              <button
-              disabled={loading ||loadingIndex == -1}
-                onClick={() => setStage(2)}
-                className="px-4 py-1 text-white font-medium text-sm bg-indigo-700 disabled:bg-indigo-400 rounded-md shadow-md shadow-indigo-700/20"
-              >
-                مهارة على حدة
-              </button>
-              <CustomButton loading={loading || loadingIndex == -1} onClick={() => save()}>رصد</CustomButton>
-            </div>
-          </Transition>
+      <SlideTransition className="flex-1" show={stage == 1}>
+        <RadioList
+          disabled={loading}
+          title={pageTitle}
+          onSelect={(e) => setAllOneSkill(RateById(ratingSystem, e as any))}
+          items={rates(teacherType!)}
+        />
+      </SlideTransition>
 
-          {skills.map((s, i) => (
-            <Transition key={s.id} className={"flex-1"} show={stage == i + 2}>
-              <h3 className="text-indigo-500 font-arabic text-center text-sm">
-                {student}
-              </h3>
-              <h3 className="text-indigo-600 bg-indigo-50 py-1 font-arabic text-center text-md">
-                {skill}
-              </h3>
-              <div className="mt-2">
-                <RadioList
-                  current={RateByName(ratingSystem, s.value)}
-                  disabled={loading}
-                  title={s.title}
-                  onSelect={(e) => setSkillsById(s.skillId, e as any)}
-                  items={rates(teacherType!)}
-                />
-              </div>
-
-              <div className="flex mt-4 flex-row-reverse items-center justify-between">
-                <div className="flex-1"></div>
-                <div className="flex space-x-2">
-                  {/* todo bullet navigation */}
-                  {!isLastSkill && (
-                    <CustomButton icon={false} onClick={next}>
-                      التالي
-                    </CustomButton>
-                  )}
-                  {isLastSkill && (
-                    <CustomButton loading={loading} onClick={checkSave}>
-                      رصد
-                    </CustomButton>
-                  )}
-                </div>
-                <div className="flex-1 flex justify-between text-right">
-                  <CustomButton loading={loading ||loadingIndex == -1} icon={false} secondary onClick={back}>
-                    رجوع
-                  </CustomButton>
-                </div>
-              </div>
-            </Transition>
-          ))}
-        </Card>
-      </div>
-    </div>
+      {skills.map((s, i) => (
+        <SlideTransition key={s.id} className="flex-1" show={stage == i + 2}>
+          <h3 className="text-indigo-500 font-arabic text-center text-sm">
+            {student}
+          </h3>
+          <h3 className="text-indigo-600 bg-indigo-50 py-1 font-arabic text-center text-md">
+            {skill}
+          </h3>
+          <div className="mt-2">
+            <RadioList
+              current={RateByName(ratingSystem, s.value)}
+              disabled={loading}
+              title={s.title}
+              onSelect={(e) => setSkillsById(s.skillId, e as any)}
+              items={rates(teacherType!)}
+            />
+          </div>
+        </SlideTransition>
+      ))}
+    </Page>
   );
 };
 

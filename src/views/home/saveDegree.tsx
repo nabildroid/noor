@@ -14,6 +14,7 @@ import { Presense } from "../../types/home_types";
 import CheckBoxs from "../../components/home/checkboxs";
 import { NoorExam, NoorSection } from "../../models/home_model";
 import { FormInput } from "../../types/communication_types";
+import Page from "../../layout/home/page";
 
 interface SaveDegreeProps {}
 
@@ -82,90 +83,84 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
   const next = () => setStage((s) => s + 1);
 
   return (
-    <div className="flex flex-1 h-full flex-col">
-      <PageTitle title="رصد درجات الفصل" />
+    <Page title="رصد درجات الفصل">
+      <Transition
+        className="flex-1 w-full grid md:grid-cols-2  gap-3"
+        show={stage == 0}
+      >
+        {inputs.map((input, i) => (
+          <div key={input.id + i}>
+            <SelectBox
+              loading={i > loadingIndex}
+              select={(e) => updateInputs(input.name!, e)}
+              label={input.title}
+              options={input.options.map((e) => ({
+                id: e.value,
+                name: e.text,
+                selected: e.selected,
+              }))}
+            />
+          </div>
+        ))}
+      </Transition>
 
-      <div className="mt-4 b flex-1 flex flex-col max-w-sm mx-auto w-full">
-        <div className="flex-1  w-full px-4 bg-white  rounded-md shadow  py-4">
-          <Transition
-            className="flex-1 w-full grid md:grid-cols-2  gap-3"
-            show={stage == 0}
-          >
-            {inputs.map((input, i) => (
-              <div key={input.id + i}>
-                <SelectBox
-                  loading={i > loadingIndex}
-                  select={(e) => updateInputs(input.name!, e)}
-                  label={input.title}
-                  options={input.options.map((e) => ({
-                    id: e.value,
-                    name: e.text,
-                    selected: e.selected,
-                  }))}
-                />
+      {degrees.map((s, i) => (
+        <Transition
+          key={s.studentID}
+          className={"flex-1"}
+          show={stage == i + 2}
+        >
+          <h3 className="text-indigo-500 font-arabic text-center text-sm">
+            {s.studentName}
+          </h3>
+
+          <div className="mt-2">
+            {currentDegree?.modules.map((m) => (
+              <div className="border-b items-end border-b-indigo-500/20 py-2 px-2 space-x-2 flex flex-row-reverse">
+                <div className="">
+                  <p className="text-sm text-right text-indigo-700">
+                    {m.title}
+                  </p>
+                  <div className="flex items-center shadow-sm focus-within:border-indigo-500 border rounded-md border-gray-300 pr-2">
+                    <input
+                      type="number"
+                      className=" bg-white -mr-1  text-right outline-none rounded-md w-20 text-lg text-indigo-900"
+                    />
+                    <p className="font-mono -mb-1 text-md text-slate-500">
+                      / {m.input.max}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex-1 h-8 justify-center">
+                  <CheckBoxs
+                    className="flex space-x-2"
+                    onSelect={() => {}}
+                    options={m.presence.options.map((e) => ({
+                      id: e.value,
+                      value: e.text,
+                    }))}
+                  />
+                </div>
               </div>
             ))}
-          </Transition>
+          </div>
 
-          {degrees.map((s, i) => (
-            <Transition
-              key={s.studentID}
-              className={"flex-1"}
-              show={stage == i + 2}
-            >
-              <h3 className="text-indigo-500 font-arabic text-center text-sm">
-                {s.studentName}
-              </h3>
+          <div className="flex mt-4 flex-row-reverse  items-center justify-between">
+            {/* todo bullet navigation */}
 
-              <div className="mt-2">
-                {currentDegree?.modules.map((m) => (
-                  <div className="border-b items-end border-b-indigo-500/20 py-2 px-2 space-x-2 flex flex-row-reverse">
-                    <div className="">
-                      <p className="text-sm text-right text-indigo-700">
-                        {m.title}
-                      </p>
-                      <div className="flex items-center shadow-sm focus-within:border-indigo-500 border rounded-md border-gray-300 pr-2">
-                        <input
-                          type="number"
-                          className=" bg-white -mr-1  text-right outline-none rounded-md w-20 text-lg text-indigo-900"
-                        />
-                        <p className="font-mono -mb-1 text-md text-slate-500">
-                          / {m.input.max}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex-1 h-8 justify-center">
-                      <CheckBoxs
-                        className="flex space-x-2"
-                        onSelect={() => {}}
-                        options={m.presence.options.map((e) => ({
-                          id: e.value,
-                          value: e.text,
-                        }))}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex mt-4 flex-row-reverse  items-center justify-between">
-                {/* todo bullet navigation */}
-
-                <CustomButton icon={false} onClick={next}>
-                  الطاب الةالي
-                </CustomButton>
-                <CustomButton loading={false} onClick={checkSave}>
-                  رصد
-                </CustomButton>
-                <CustomButton icon={false} secondary onClick={back}>
-                  رجوع
-                </CustomButton>
-              </div>
-            </Transition>
-          ))}
-        </div>
-      </div>
-    </div>
+            <CustomButton icon={false} onClick={next}>
+              الطاب الةالي
+            </CustomButton>
+            <CustomButton loading={false} onClick={checkSave}>
+              رصد
+            </CustomButton>
+            <CustomButton icon={false} secondary onClick={back}>
+              رجوع
+            </CustomButton>
+          </div>
+        </Transition>
+      ))}
+    </Page>
   );
 };
 

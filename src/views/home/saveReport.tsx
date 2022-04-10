@@ -7,6 +7,8 @@ import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
+import { createAction } from "../../layout/home/actionBar";
+import Page from "../../layout/home/page";
 import {
   HomeTab,
   NoorExam,
@@ -23,7 +25,7 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
-  const { inputs, setForm, submit, updateInputs, loadingIndex } =
+  const { inputs, setForm, submit, isAllChosen, updateInputs, loadingIndex } =
     useFormOptions({
       label: "report" + teacherType,
       actionName: "",
@@ -68,51 +70,39 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
     navigate("/" + HomeTab.savedReports);
   }
 
+  const actions = createAction({
+    enable: isAllChosen && loadingIndex != -1,
+    buttons: [
+      {
+        label: "انشاء فارغ",
+        onClick: () => save(true),
+        secondary: true,
+        progress: true,
+      },
+      {
+        label: "انشاء مرصود",
+        onClick: save,
+        progress: true,
+      },
+    ],
+  });
   return (
-    <div className="flex flex-1 h-full flex-col">
-      <PageTitle title="انشاء تقرير جديد" />
-
-      <div className="mt-4 h-full   flex flex-col max-w-sm mx-auto w-full  overflow-hidden  rounded-md ">
-        <Card loading={!inputs.length}>
-          {inputs.map((input, i) => (
-            <div key={input.id}>
-              <SelectBox
-                loading={i > loadingIndex}
-                select={(e) => updateInputs(input.name!, e)}
-                label={input.title}
-                options={input.options.map((e) => ({
-                  id: e.value,
-                  name: e.text,
-                  selected: e.selected,
-                }))}
-              />
-            </div>
-          ))}
-
-          <div className="flex mt-4 justify-between">
-            <CustomButton
-              secondary
-              loading={loadingIndex == -1}
-              icon={false}
-              onClick={() => {
-                save(true);
-              }}
-            >
-              انشاء فارغ
-            </CustomButton>
-            <CustomButton
-              icon={false}
-              loading={loadingIndex == -1}
-              onClick={() => {
-                save();
-              }}
-            >
-              انشاء مرصود
-            </CustomButton>
-          </div>
-        </Card>
-      </div>
-    </div>
+    <Page title="انشاء تقرير جديد" loading={!inputs.length} actions={actions}>
+      {inputs.map((input, i) => (
+        <div key={input.id}>
+          <SelectBox
+            loading={i > loadingIndex}
+            select={(e) => updateInputs(input.name!, e)}
+            label={input.title}
+            options={input.options.map((e) => ({
+              id: e.value,
+              name: e.text,
+              selected: e.selected,
+            }))}
+          />
+        </div>
+      ))}
+    </Page>
   );
 };
 

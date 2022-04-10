@@ -17,6 +17,8 @@ import {
 import useFormOptions from "../../hooks/useFormOptions";
 import { AppContext } from "../../context/appContext";
 import DB from "../../repository/db";
+import Page from "../../layout/home/page";
+import { createAction } from "../../layout/home/actionBar";
 
 interface SaveAllProps {}
 
@@ -68,25 +70,26 @@ const SaveAll: React.FC<SaveAllProps> = () => {
   const pageTitle = `رصد الكل ب${teacherTypeArabic(teacherType!)}`;
   // todo use form automatic submission
 
+  const actions = createAction({
+    loading: loading,
+    buttons: [
+      {
+        label: "رصد",
+        onClick: checkSave,
+        progress: true,
+        icon: true,
+      },
+    ],
+  });
   return (
-    <div>
-      <PageTitle title={pageTitle} />
-
-      <div className="mt-4 max-w-sm mx-auto w-full">
-        <RadioList
-          disabled={loading}
-          title={pageTitle}
-          onSelect={(e) => select(e as any)}
-          items={rates(teacherType!)}
-        />
-
-        <div className="mt-4 text-center">
-          <CustomButton loading={loading} onClick={checkSave}>
-            رصد
-          </CustomButton>
-        </div>
-      </div>
-    </div>
+    <Page title={pageTitle} actions={actions}>
+      <RadioList
+        disabled={loading}
+        title={pageTitle}
+        onSelect={(e) => select(e as any)}
+        items={rates(teacherType!)}
+      />
+    </Page>
   );
 };
 

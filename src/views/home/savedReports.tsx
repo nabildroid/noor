@@ -1,8 +1,5 @@
-import { Transition } from "@headlessui/react";
 import React, { useContext, useEffect, useState } from "react";
-import PageTitle from "../../components/home/pageTitle";
 import CheckTable from "../../components/home/checkTable";
-import CustomButton from "../../components/home/customButton";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
@@ -10,6 +7,7 @@ import { FormInput } from "../../types/communication_types";
 import { Report, TeacherType } from "../../models/home_model";
 import DB from "../../repository/db";
 import Storage from "../../repository/storage";
+import Page from "../../layout/home/page";
 
 interface SavedReportsProps {}
 
@@ -136,54 +134,49 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
     }
   }
 
+  const actions = {
+    buttons: [
+      {
+        label: "حدف",
+        onClick: () => remove(),
+        secondary: true,
+      },
+      {
+        label: "ةحميل",
+        onClick: () => download(),
+        progress: true,
+      },
+    ],
+  };
+
+
   return (
-    <div className="flex flex-1 h-full flex-col">
-      <PageTitle title="التقارير المحفوظة" />
-
-      <div
-        className={`mt-4 b flex-1 flex flex-col max-w-sm md:max-w-xl mx-auto w-full`}
-      >
-        <div className="flex-1 w-full px-4 bg-white  rounded-md shadow py-4">
-          <div className="mx-auto max-w-sm w-full">
-            {selection.map((input, i) => (
-              <div key={i}>
-                <SelectBox
-                  loading={false}
-                  select={(e) => select(input.id, e)}
-                  label={input.title}
-                  options={input.options.map((e) => ({
-                    id: e.value,
-                    name: e.text,
-                    selected: e.selected,
-                  }))}
-                />
-              </div>
-            ))}
+    <Page title="التقارير المحفوظة" size="lg" actions={actions}>
+      <div className="mx-auto max-w-sm w-full">
+        {selection.map((input, i) => (
+          <div key={i}>
+            <SelectBox
+              loading={false}
+              select={(e) => select(input.id, e)}
+              label={input.title}
+              options={input.options.map((e) => ({
+                id: e.value,
+                name: e.text,
+                selected: e.selected,
+              }))}
+            />
           </div>
-
-          <CheckTable
-            head={tableHead}
-            action="ةحميل"
-            onAction={download}
-            onSelecte={onSelected}
-            items={visibleReports}
-          />
-
-          <Transition show={!!selected.length}>
-            <div className="flex space-x-2 justify-center mt-4">
-              <CustomButton icon={false} secondary onClick={remove}>
-                حدف
-              </CustomButton>
-
-              <CustomButton onClick={download}>ةحميل</CustomButton>
-              {/* <CustomButton icon={false} onClick={() => {}}>
-                مشارك
-              </CustomButton> */}
-            </div>
-          </Transition>
-        </div>
+        ))}
       </div>
-    </div>
+
+      <CheckTable
+        head={tableHead}
+        action="ةحميل"
+        onAction={download}
+        onSelecte={onSelected}
+        items={visibleReports}
+      />
+    </Page>
   );
 };
 
