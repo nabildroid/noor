@@ -1,9 +1,10 @@
 import React, { Suspense, useContext } from "react";
-import { BrowserRouter, Route, Navigate, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Loading from "./components/loading";
-
 import { AppContext } from "./context/appContext";
-import { HomeTab, NoorSection } from "./models/home_model";
+import { HomeTab } from "./models/home_model";
+import Login from "./views/login";
+
 
 const DidntGet = React.lazy(() => import("./views/home/didntGet"));
 const EditSkill = React.lazy(() => import("./views/home/editSkill"));
@@ -14,7 +15,6 @@ const SaveDegree = React.lazy(() => import("./views/home/saveDegree"));
 const SavedReports = React.lazy(() => import("./views/home/savedReports"));
 const SaveReport = React.lazy(() => import("./views/home/saveReport"));
 
-import Login from "./views/login";
 
 const Home = React.lazy(() => import("./views/home"));
 const HomeProvider = React.lazy(() => import("./context/homeContext"));
@@ -109,8 +109,8 @@ function App() {
                 }
               />
               <Route
-                path={HomeTab.selectRole}
-                element={<span>Hello tab4</span>}
+                path={HomeTab.logout}
+                element={<span>bay bay</span>}
               />
 
               <Route

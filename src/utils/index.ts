@@ -1,4 +1,9 @@
-import { BackgroundTaskType, HomeTab, TeacherType } from "../models/home_model";
+import {
+  BackgroundTask,
+  BackgroundTaskType,
+  HomeTab,
+  TeacherType
+} from "../models/home_model";
 
 export const tabBarTitle = (tab: HomeTab) =>
   ({
@@ -6,7 +11,8 @@ export const tabBarTitle = (tab: HomeTab) =>
     [HomeTab.saveReport]: "تقرير جديد",
     [HomeTab.savedegree]: "رصد درجات الفصل",
     [HomeTab.savedReports]: "التقرارير",
-    [HomeTab.selectRole]: "اختيار الحسياب",
+    [HomeTab.home]: "الرئيسية",
+    [HomeTab.logout]: "خروج",
     [HomeTab.saveCustom]: "رصد وحدة ومهارة",
     [HomeTab.studentsNotAccepted]: "رصد وحدة ومهارة",
     [HomeTab.editSkill]: "تعديل المهارت",
@@ -51,7 +57,20 @@ export function taskTitle(taskType: BackgroundTaskType) {
     return "ةحصيل وحدة ومهارة";
 }
 
-export async function wait(fc: () => Promise<any>, loading: (v: boolean) => any) {
+export function getPausedTab(tasks: BackgroundTask<any>[]) {
+  return tasks
+    .map((task) => {
+      if (task.type == BackgroundTaskType.saveAll) return HomeTab.saveAll;
+      else if (task.type == BackgroundTaskType.saveCustom)
+        return HomeTab.saveCustom;
+    })
+    .filter(Boolean) as HomeTab[];
+}
+
+export async function wait(
+  fc: () => Promise<any>,
+  loading: (v: boolean) => any
+) {
   loading(true);
   await fc();
   loading(false);

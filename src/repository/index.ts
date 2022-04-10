@@ -1,12 +1,18 @@
 import {
-  connectFunctionsEmulator, Functions, getFunctions, httpsCallable
+  connectFunctionsEmulator,
+  Functions,
+  getFunctions,
+  httpsCallable
 } from "firebase/functions";
 import { emulator, firebaseApp } from "../main";
 import {
-  BouncingNavigation, EditSkillSubmit,
+  BouncingNavigation,
+  EditSkillSubmit,
   FormNavigateResponse,
-  FormOptions, FormSubmitLookup,
-  NavigateTo, SaveAllSubmit
+  FormOptions,
+  FormSubmitLookup,
+  NavigateTo,
+  SaveAllSubmit
 } from "../types/communication_types";
 import { LoginFormParams, LoginSubmissionResponse } from "../types/login_types";
 import { mergeCookies } from "../utils";
@@ -23,12 +29,21 @@ export default class Repository {
     return Repository._instance!;
   }
 
+  isExpired() {
+    console.log(this);
+    const expirationTime = 50 * 60; // 5mins
+    return (
+      Date.now() - (new Date(this.bouncingData?.date ?? "").getTime() ?? 0) >
+      expirationTime * 1000
+    );
+  }
+
   trustMe() {
     return this.bouncingData;
   }
 
   constructor() {
-    this.functions = getFunctions(firebaseApp,"asia-south1");
+    this.functions = getFunctions(firebaseApp, "asia-south1");
     if (emulator) {
       connectFunctionsEmulator(this.functions, "localhost", 5001);
     }
@@ -147,12 +162,14 @@ export default class Repository {
       this.bouncingData = {
         cookies: [],
         ...config,
+        date: new Date(),
       };
     } else {
       this.bouncingData = {
         cookies: config.cookies ?? this.bouncingData.cookies,
         from: config.from ?? this.bouncingData.from,
         weirdData: config.weirdData ?? this.bouncingData.weirdData,
+        date: new Date(),
       };
     }
 
@@ -162,6 +179,7 @@ export default class Repository {
         weirdData: this.bouncingData.weirdData,
         cookies: mergeCookies(this.bouncingData.cookies),
         from: this.bouncingData.from,
+        date: this.bouncingData.date,
       })
     );
   }

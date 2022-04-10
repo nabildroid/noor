@@ -8,9 +8,8 @@ import PhoneMenu from "../../components/home/navigation/phoneMenu";
 import SelectRole from "../../components/home/navigation/selectRole";
 import Noti from "../../components/home/noti";
 import { HomeContext } from "../../context/homeContext";
-import { taskTitle } from "../../utils";
-
-
+import { HomeTab } from "../../models/home_model";
+import { getPausedTab, taskTitle } from "../../utils";
 
 const Home: React.FC = ({ children }) => {
   const {
@@ -35,12 +34,15 @@ const Home: React.FC = ({ children }) => {
   const navigate = useNavigate();
 
   const correctNavigation = useCallback(
-    (route: string) => {
-      console.log(route, tabs);
-      if (tabs.some((e) => e == route) && route != tab) {
+    (route: HomeTab) => {
+      const pausedTabs = getPausedTab(tasks);
+      const routeExists = tabs.includes(route)
+
+      const isPauedTab = pausedTabs.includes(route);
+      if (routeExists && !isPauedTab) {
         selectTab(route as any);
       } else if (route != undefined) {
-        navigate(tabs[0]);
+        navigate(HomeTab.home);
       }
     },
     [selectTab, navigate, tab, tabs[0]]
@@ -48,7 +50,7 @@ const Home: React.FC = ({ children }) => {
 
   useEffect(() => {
     const [route] = pathname.split("/").filter((e) => e);
-    correctNavigation(route);
+    correctNavigation(route as any);
   }, [pathname, tabs]);
 
   return (
@@ -89,12 +91,12 @@ const Home: React.FC = ({ children }) => {
 
         <div className="w-full overflow-hidden  flex-1 p-4">
           {!!tasks.length && (
-            <Noti 
-            text={` جاري تنفيذ العملية ${taskTitle(tasks[0].type)}`} 
-            color="yellow"
+            <Noti
+              text={` جاري تنفيذ العملية ${taskTitle(tasks[0].type)}`}
+              color="yellow"
             />
           )}
-          {teacher && teacher.isPro !== false && !tasks.length && <Outlet />}
+          {teacher && teacher.isPro !== false && <Outlet />}
 
           {teacher?.isPro === false && <BuyMessage />}
         </div>

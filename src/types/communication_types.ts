@@ -23,6 +23,7 @@ export type BouncingNavigation = {
   cookies: string[];
   from?: string;
   weirdData?: { [key: string]: string };
+  date: Date;
 };
 
 export interface NavigateTo {

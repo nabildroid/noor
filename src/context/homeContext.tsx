@@ -5,8 +5,7 @@ import {
   HomeStateInit,
   HomeTab,
   IHomeProvider,
-  Teacher,
-  TeacherType,
+  TeacherType
 } from "../models/home_model";
 import Repository from "../repository";
 import DB from "../repository/db";
@@ -22,14 +21,18 @@ const HomeProvider: React.FC = ({ children }) => {
   const teacher = useFetchTeacher({ user });
 
   useEffect(() => {
-    console.log("subscribing to the task list");
-    return DB.instance.subscribeToTasks(user!.uid, (task, isDeleted) => {
-      console.log(task.id, isDeleted ? "deleted" : "added");
-      if (isDeleted) dispatch({ type: "deleteTask", payload: task.id! });
-      else {
-        dispatch({ type: "addTask", payload: task });
-      }
-    });
+    if (Repository.instance.isExpired()) {
+      logout();
+    } else {
+      console.log("subscribing to the task list");
+      return DB.instance.subscribeToTasks(user!.uid, (task, isDeleted) => {
+        console.log(task.id, isDeleted ? "deleted" : "added");
+        if (isDeleted) dispatch({ type: "deleteTask", payload: task.id! });
+        else {
+          dispatch({ type: "addTask", payload: task });
+        }
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -38,7 +41,7 @@ const HomeProvider: React.FC = ({ children }) => {
       dispatch({ type: "setRole", payload: teacher.currentRole });
       const type = getTeacherType(teacher.currentRole);
       dispatch({ type: "setTeacherType", payload: type });
-      dispatch({ type: "setTab", payload: HomeTab.selectRole });
+      dispatch({ type: "setTab", payload: HomeTab.home });
     }
   }, [teacher]);
 
@@ -46,7 +49,7 @@ const HomeProvider: React.FC = ({ children }) => {
     const type = getTeacherType(state.currentRole);
     dispatch({ type: "setTeacherType", payload: type });
     dispatch({ type: "setTabs", payload: getTeacherTabs(type) });
-    dispatch({ type: "setTab", payload: HomeTab.selectRole });
+    dispatch({ type: "setTab", payload: HomeTab.home });
   }, [state.currentRole]);
 
   const getTeacherTabs = (type: TeacherType) => {
@@ -65,6 +68,7 @@ const HomeProvider: React.FC = ({ children }) => {
         HomeTab.editSkill,
         HomeTab.saveReport,
         HomeTab.savedReports,
+        HomeTab.logout,
       ];
     return [
       HomeTab.savedReports,
@@ -84,7 +88,11 @@ const HomeProvider: React.FC = ({ children }) => {
   };
 
   async function selectTab(tab: HomeTab) {
-    dispatch({ type: "setTab", payload: tab });
+    if (tab == HomeTab.logout) {
+      logout();
+    } else {
+      dispatch({ type: "setTab", payload: tab });
+    }
   }
 
   function selectRole(role: string) {

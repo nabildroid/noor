@@ -1,15 +1,21 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { HomeContext } from "../../../context/homeContext";
-import { HomeTab } from "../../../models/home_model";
-import { tabBarTitle } from "../../../utils";
+import {
+  HomeTab
+} from "../../../models/home_model";
+import { getPausedTab, tabBarTitle } from "../../../utils";
 
 interface props {
   items: HomeTab[];
   selected: HomeTab;
 }
+
+
 const Menu: React.FC<props> = ({ items, selected }) => {
   const { tasks } = useContext(HomeContext);
+  const pausedTabs = getPausedTab(tasks);
+
   return (
     <ul className="mt-4 font-arabic space-y-2">
       {items.map((i) => (
@@ -24,7 +30,9 @@ const Menu: React.FC<props> = ({ items, selected }) => {
             flex-1 ${
               i == selected ? "bg-indigo-100 text-indigo-800" : "text-slate-700"
             }
-            ${!tasks.length  ? "" : "pointer-events-none text-slate-400"}
+            ${
+              pausedTabs.includes(i) ?  "pointer-events-none text-slate-400":""
+            }
             
             `}
           >

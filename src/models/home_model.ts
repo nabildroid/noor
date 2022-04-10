@@ -1,7 +1,7 @@
 import {
   BouncingNavigation,
   FormInput,
-  SaveAllSubmit,
+  SaveAllSubmit
 } from "../types/communication_types";
 
 export enum TeacherType {
@@ -69,7 +69,7 @@ export interface SaveCustomTask extends BackgroundTask<SaveAllSubmit> {
 }
 
 export enum HomeTab {
-  selectRole = "/",
+  home = "/",
   saveAll = "saveall",
   savedegree = "savedegree",
   editSkill = "editSkill",
@@ -78,6 +78,7 @@ export enum HomeTab {
   savedReports = "reports",
   saveReport = "newreport",
   saveCustom = "savecustom",
+  logout = "out",
 }
 
 export type HomeActions =
@@ -127,7 +128,7 @@ export type HomeState = {
 };
 
 export const HomeStateInit: HomeState = {
-  tab: HomeTab.selectRole,
+  tab: HomeTab.home,
   loading: false,
   tabs: [],
   tasks: [],
