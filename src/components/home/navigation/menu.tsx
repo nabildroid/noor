@@ -13,7 +13,7 @@ interface props {
 
 
 const Menu: React.FC<props> = ({ items, selected }) => {
-  const { tasks } = useContext(HomeContext);
+  const { tasks ,teacherType} = useContext(HomeContext);
   const pausedTabs = getPausedTab(tasks);
 
   return (
@@ -36,7 +36,7 @@ const Menu: React.FC<props> = ({ items, selected }) => {
             
             `}
           >
-            {tabBarTitle(i)}
+            {tabBarTitle(i,teacherType!)}
           </Link>
         </li>
       ))}

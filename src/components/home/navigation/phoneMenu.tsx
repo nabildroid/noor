@@ -1,4 +1,4 @@
-import { Menu, Transition } from "@headlessui/react";
+import { Menu } from "@headlessui/react";
 import { useContext } from "react";
 import { Menu as Humberger } from "react-feather";
 import { Link } from "react-router-dom";
@@ -11,7 +11,7 @@ interface props {
   selected: HomeTab;
 }
 const PhoneMenu: React.FC<props> = ({ items, selected }) => {
-  const { tasks } = useContext(HomeContext);
+  const { tasks ,teacherType} = useContext(HomeContext);
 
   return (
     <Menu>
@@ -41,7 +41,7 @@ const PhoneMenu: React.FC<props> = ({ items, selected }) => {
                       : "text-indigo-50"
                   }`}
                 >
-                  {tabBarTitle(i)}
+                  {tabBarTitle(i,teacherType!)}
                 </div>
               </Link>
             )}

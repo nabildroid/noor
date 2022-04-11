@@ -14,6 +14,7 @@ import {
   TeacherType
 } from "../../models/home_model";
 import Repository from "../../repository";
+import { tabBarTitle } from "../../utils";
 
 interface SaveReportProps {}
 
@@ -32,6 +33,13 @@ function fetchExam(account: string) {
     nav2: NoorExam.enter,
   });
 }
+
+
+
+function pageTitle(type: TeacherType) {
+  return tabBarTitle(HomeTab.saveReport, type);
+}
+
 
 function fetch(type: TeacherType, account: string) {
   if (type == TeacherType.kindergarten) {
@@ -82,8 +90,11 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
     ],
   });
 
+
+  const title = pageTitle(teacherType!);
+
   return (
-    <Page title="انشاء تقرير جديد" loading={!inputs.length} actions={actions}>
+    <Page title={title} loading={!inputs.length} actions={actions}>
       {inputs.map((input, i) => (
         <div key={input.id}>
           <SelectBox

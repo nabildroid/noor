@@ -54,13 +54,7 @@ const HomeProvider: React.FC = ({ children }) => {
 
   const getTeacherTabs = (type: TeacherType) => {
     if (type == TeacherType.elementery)
-      return [
-        HomeTab.saveReport,
-        HomeTab.saveCustom,
-        HomeTab.editSkill,
-
-        HomeTab.savedReports,
-      ];
+      return [HomeTab.savedegree, HomeTab.saveReport, HomeTab.savedReports];
     else if (type == TeacherType.kindergarten)
       return [
         HomeTab.saveAll,
@@ -81,7 +75,7 @@ const HomeProvider: React.FC = ({ children }) => {
 
   const getTeacherType = (currentRole?: string) => {
     if (!currentRole) return TeacherType.elementery;
-    if (currentRole.includes("ابتدائية")) return TeacherType.primary;
+    if (currentRole.includes("ابتدائية")) return TeacherType.elementery; // todo remove this!
     if (currentRole.includes("روضة")) return TeacherType.kindergarten;
 
     return TeacherType.elementery;
