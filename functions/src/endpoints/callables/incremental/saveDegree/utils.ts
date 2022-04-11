@@ -4,7 +4,7 @@ import Form, { FormInput } from "../../../../core/form";
 import Redirect from "../../../../core/redirect";
 import Table from "../../../../core/table";
 
-export class SaveDegreeForm extends Form {
+export class DegreesForm extends Form {
   constructor(html: string) {
     super(html);
   }
@@ -26,7 +26,7 @@ export class SaveDegreeForm extends Form {
       [target.name!]: target.title,
       __EVENTTARGET: "",
     };
-    
+
     Object.entries(data).forEach((v) => formData.append(v[0], v[1]));
 
     formData.append(
@@ -48,8 +48,103 @@ export class SaveDegreeForm extends Form {
     return response;
   }
 
-  save(data: Degrees[], redirect: Redirect) {
-    return "";
+  async save(
+    degrees: Degrees[],
+    details: {
+      courseId: string;
+      period: string;
+    },
+    redirect: Redirect
+  ) {
+    // ctl00$PlaceHolderMain$ddlCoursesToSearch
+
+    const profileIds = degrees
+      .map((d) => {
+        let id = "";
+        d.modules.forEach(() => (id += `${d.studentID},`));
+        return id;
+      })
+      .join("");
+
+    const absents =
+      degrees
+        .map((e) => e.modules)
+        .flat()
+        .reduce(
+          (acc, v) =>
+            `${acc},${v.presence.options.find((e) => e.selected).value}`,
+          ""
+        )
+        .slice(1) + ",";
+
+    const grads =
+      degrees
+        .map((e) => e.modules)
+        .flat()
+        .reduce((acc, v) => `${acc},${v.input.value || ""}`, "")
+        .slice(1) + ",";
+
+    const exams = degrees.map((e) => e.ids).join("");
+
+    const degreeGrid = {};
+
+    degrees.forEach((degree) => {
+      degree.modules.forEach((module) => {
+        degreeGrid[module.input.name] = module.input.value;
+        degreeGrid[module.presence.name] = module.presence.options.find(
+          (s) => s.selected
+        ).value;
+      });
+    });
+
+    const action = this.getFormAction();
+
+    let payload = this.fetchOptionRequestPayload(
+      {
+        name: "ctl00$PlaceHolderMain$ohdnGradesIDz",
+        value: grads,
+      },
+      [],
+      true
+    );
+
+    payload = {
+      ...payload,
+      ...degreeGrid,
+      ctl00$PlaceHolderMain$ohdnExamsIDz: exams,
+      ctl00$PlaceHolderMain$ohdnUserPlofilesIDz: profileIds,
+      ctl00$PlaceHolderMain$ohdnAbsentsIDz: absents,
+      __EVENTTARGET: "",
+      ctl00$PlaceHolderMain$ibtnSave: "حفظ",
+      ctl00$PlaceHolderMain$ddlCoursesToSearch: details.courseId,
+      ctl00$PlaceHolderMain$cbHeader: "on",
+      ctl00$PlaceHolderMain$ddlPeriodEnterSearch: details.period,
+      ctl00$hdnData_Data: "",
+    };
+
+    const formData = new FormData();
+
+    Object.entries(payload).forEach((v) => formData.append(v[0], v[1]));
+
+    formData.append(
+      "ctl00$PlaceHolderMain$oFileUploadAttachment",
+      Buffer.alloc(1),
+      {
+        filename: "",
+        contentType: "application/octet-stream",
+      }
+    );
+
+    const response = await redirect.fork(
+      action,
+      formData,
+
+      formData.getHeaders()
+    );
+
+    // const response = await redirect.fork(action, payload);
+
+    return response;
   }
 
   static updateFromSreachSubmission(data: string) {
@@ -57,7 +152,7 @@ export class SaveDegreeForm extends Form {
     const target = panel(".GridClass").parent().html();
 
     const form = new Form(data);
-    const table = new SaveDegreeTable(target);
+    const table = new DegreesTable(target);
 
     return {
       form,
@@ -78,6 +173,7 @@ export type Module = {
 };
 
 export type Degrees = {
+  ids: string;
   studentID: number;
   // todo add userProfileID
   studentName: string;
@@ -85,7 +181,7 @@ export type Degrees = {
   modules: Module[];
 };
 
-export class SaveDegreeTable extends Table<Degrees, Module[]> {
+export class DegreesTable extends Table<Degrees, Module[]> {
   protected filter(tr: cheerio.Cheerio): boolean {
     return true;
   }
@@ -102,7 +198,15 @@ export class SaveDegreeTable extends Table<Degrees, Module[]> {
     items.each((i, e) => {
       const elm = this.root(e);
       if (i == 0) {
-        degree.studentID = parseInt(elm.text());
+        let id =
+          elm.attr("studentprofileid") ||
+          elm.attr("userprofileid") ||
+          elm.text() ||
+          "";
+        id = id.replace(/,.*/g, "");
+
+        degree.ids = elm.attr("examid");
+        degree.studentID = parseInt(id) ?? 0;
       } else if (i == 1) {
         degree.studentName = elm.text();
       } else if (i == 2) {

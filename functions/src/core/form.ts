@@ -23,7 +23,6 @@ export default class Form {
   }
 
   constructor(html: string) {
-
     this.root = loadHtml(html);
     this.form = this.root("body > form").first();
   }
@@ -126,9 +125,10 @@ export default class Form {
 
   protected fetchOptionRequestPayload(
     config: { id?: string; name: string; value: string },
-    settings: { name: string; value: string }[]
+    settings: { name: string; value: string }[],
+    igoneInputs: boolean = false
   ) {
-    const params = this.getInputs();
+    const params = igoneInputs ? [] : this.getInputs();
 
     let payload = params.reduce(
       (acc, v) => ({
@@ -159,7 +159,7 @@ export default class Form {
     return payload;
   }
 
-  async submit(name: string, redirect: Redirect, config?:{}) {
+  async submit(name: string, redirect: Redirect, config?: {}) {
     const actionButtons = this.getActionButtons();
     const target = actionButtons.find((e) => e.name == name)!;
 

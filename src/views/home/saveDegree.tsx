@@ -11,7 +11,7 @@ import SlideTransition from "../../layout/home/slideTransition";
 import { NoorExam, NoorSection } from "../../models/home_model";
 import Repository from "../../repository";
 import { FormInput } from "../../types/communication_types";
-import { staticDegress, wait } from "../../utils";
+import { wait } from "../../utils";
 
 interface SaveDegreeProps {}
 
@@ -27,6 +27,7 @@ export type Module = {
 };
 
 export type Degrees = {
+  ids:string,
   studentID: number;
   // todo add userProfileID
   studentName: string;
@@ -46,22 +47,29 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
   const { currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
-  const { inputs, setForm, submit, updateInputs, isAllChosen, loadingIndex } =
-    useFormOptions({
-      actionName: "ibtnSearch",
-    });
+  const {
+    inputs,
+    setForm,
+    submit,
+    formAction,
+    updateInputs,
+    isAllChosen,
+    loadingIndex,
+  } = useFormOptions({
+    actionName: "ibtnSearch",
+  });
 
-  const [stage, setStage] = useState(1);
+  const [stage, setStage] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const [degrees, setDegrees] = useState<Degrees[]>(staticDegress);
+  const [degrees, setDegrees] = useState<Degrees[]>([]);
 
   useIfIffect(() => {
     fetchDegress();
   }, [stage == 1]);
 
   async function fetchDegress() {
-    const { degrees } = await submit("saveDegreeSubmit", {});
+    const { degrees } = await submit("degreeSubmit", {});
 
     setDegrees(degrees);
   }
@@ -74,7 +82,40 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
     }, setLoading);
   }, []);
 
-  const checkSave = async () => {};
+  const savelAll = async () => {
+    saveDegrees(
+      degrees.map((de) => {
+        const modules = de.modules.map((m, i) => {
+          const { presence, input } = singleModule![i];
+          const selectedId = presence.options.find((e) => e.selected)!;
+          m.presence.options = m.presence.options.map((e) => ({
+            ...e,
+            selected: selectedId.value == e.value,
+          }));
+          m.input.value = input.value;
+
+          return m;
+        });
+        return {
+          ...de,
+          modules,
+        };
+      })
+    );
+  };
+
+  const save = () => {
+    saveDegrees(degrees);
+  };
+
+  const saveDegrees = async (degrees: Degrees[]) => {
+    const data = await Repository.instance.saveDegree({
+      action: formAction!,
+      inputs,
+      degrees: degrees,
+    });
+  };
+
   const back = () => setStage(Math.max(stage - 1, 0));
   const next = () => setStage((s) => s + 1);
 
@@ -152,10 +193,10 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
 
   const [singleModule, setSingleModule] = useState<Module[]>();
 
-  useEffect(() => {
+  useIfIffect(() => {
     const { modules } = degrees[0];
     setSingleModule(JSON.parse(JSON.stringify(modules)));
-  }, [degrees.length]);
+  }, [!!degrees.length]);
 
   const isLast = stage - 1 >= degrees.length;
 
@@ -180,8 +221,8 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
         },
         {
           label: "رصد",
-          onClick: checkSave,
-          progress:true,
+          onClick: savelAll,
+          progress: true,
           icon: true,
         },
         {
@@ -205,7 +246,7 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
         },
         {
           label: "رصد",
-          onClick: checkSave,
+          onClick: save,
           visible: isLast,
           icon: true,
         },
@@ -217,12 +258,13 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
     <Page
       title="رصد درجات الفصل"
       size={stage > 0 ? "lg" : "sm"}
-      loading={false}
+      loading={loading}
       actions={actions[Math.max(Math.min(stage, 2), 0)]}
     >
       <SlideTransition
         className="flex-1 w-full grid md:grid-cols-2  gap-3"
         show={stage == 0}
+        isRtl
       >
         {inputs.map((input, i) => (
           <SelectBox

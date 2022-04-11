@@ -2,8 +2,7 @@ import * as functions from "firebase-functions";
 import Form, { FormInput } from "../../../../core/form";
 import Redirect from "../../../../core/redirect";
 import { IncrementalData } from "../../../../types";
-import { SaveDegreeForm } from "./utils";
-
+import { DegreesForm } from "./utils";
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -11,6 +10,7 @@ interface NavigationData extends IncrementalData {
   actionButton: FormInput;
 }
 
+// todo gzip the response data;
 export default functions
   .region("asia-south1")
   .https.onCall(async (data: NavigationData) => {
@@ -24,7 +24,7 @@ export default functions
       title: "ابحث",
     };
 
-    const form = new SaveDegreeForm(
+    const form = new DegreesForm(
       Form.fromJson({
         action: data.action,
         weirdData: data.weirdData,
@@ -35,7 +35,7 @@ export default functions
 
     const search = await form.submit(data.actionButton.name!, homePage);
 
-    const response = SaveDegreeForm.updateFromSreachSubmission(search);
+    const response = DegreesForm.updateFromSreachSubmission(search);
     return homePage.sendForm(response.form, {
       degrees: response.degrees,
     });

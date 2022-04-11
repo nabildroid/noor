@@ -7,12 +7,12 @@ import {
 import { emulator, firebaseApp } from "../main";
 import {
   BouncingNavigation,
+  DegreeSave,
   EditSkillSubmit,
   FormNavigateResponse,
   FormOptions,
   FormSubmitLookup,
-  NavigateTo,
-  SaveAllSubmit
+  NavigateTo
 } from "../types/communication_types";
 import { LoginFormParams, LoginSubmissionResponse } from "../types/login_types";
 import { mergeCookies } from "../utils";
@@ -142,8 +142,9 @@ export default class Repository {
     return response.data.payload;
   }
 
-  async saveAll(config: SaveAllSubmit) {
-    const response = await this.call<FormNavigateResponse>("saveAll", {
+
+  async saveDegree(config: DegreeSave) {
+    const response = await this.call<FormNavigateResponse>("degreeSave", {
       ...config,
       ...(this.bouncingData ?? {}),
     });

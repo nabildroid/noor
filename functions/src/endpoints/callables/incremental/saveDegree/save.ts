@@ -2,8 +2,7 @@ import * as functions from "firebase-functions";
 import Form, { FormInput } from "../../../../core/form";
 import Redirect from "../../../../core/redirect";
 import { IncrementalData } from "../../../../types";
-import { Degrees, SaveDegreeForm } from "./utils";
-
+import { Degrees, DegreesForm } from "./utils";
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -16,7 +15,7 @@ export default functions
   .https.onCall(async (data: NavigationData) => {
     const homePage = await Redirect.load(data);
 
-    const form = new SaveDegreeForm(
+    const form = new DegreesForm(
       Form.fromJson({
         action: data.action,
         weirdData: data.weirdData,
@@ -25,8 +24,20 @@ export default functions
       }).html
     );
 
-    // const search = await form.save(data.degrees, homePage);
-    // const response = SaveDegreeForm.updateFromSreachSubmission(search);
+    const courseId = data.inputs
+      .find((i) => i.name.includes("rMain$ddlCours"))
+      .options.find((s) => s.selected).value;
 
-    return homePage.sendForm(form);
+    const period = data.inputs
+      .find((i) => i.name.includes("ddlPeriodEnter"))
+      .options.find((s) => s.selected).value;
+
+    const search = await form.save(
+      data.degrees,
+      { courseId, period },
+      homePage
+    );
+    const response = DegreesForm.updateFromSreachSubmission(search);
+
+    return homePage.sendForm(response.form);
   });

@@ -61,6 +61,12 @@ export interface SaveAllSubmit {
   rate: number | string;
 }
 
+export interface DegreeSave {
+  action: string;
+  inputs: FormInput[];
+  degrees: Degrees[];
+}
+
 export interface ReportSubmit {
   action: string;
   inputs: FormInput[];
@@ -80,7 +86,7 @@ export type FormSubmitLookup =
       response: EditSkillNavigateResponse;
     }
   | {
-      type: "saveDegreeSubmit";
+      type: "degreeSubmit";
       payload: FormSubmit;
       response: SaveDegreeNavigateResponse;
     }
