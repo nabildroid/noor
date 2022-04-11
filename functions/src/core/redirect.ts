@@ -1,18 +1,17 @@
-import * as FormData from "form-data";
-
 import http from "axios";
-import { stringify as QueryEncode } from "querystring";
 import { load as loadHtml } from "cheerio";
+import * as FormData from "form-data";
+import { stringify as QueryEncode } from "querystring";
 import { weird } from "../types";
-import { replaceNullValues } from "../utils";
-
 import {
   defaultHeader,
   hiddenInputs,
   mergeCookies,
-  pageNameBase64,
+  pageNameBase64, replaceNullValues
 } from "../utils";
 import Form from "./form";
+
+
 
 type RedirectionType =
   | "MenuItemRedirect"
@@ -179,6 +178,10 @@ export default class Redirect {
         "Content-Type": "application/x-www-form-urlencoded",
 
         ...config,
+      },
+      proxy: {
+        host: "localhost",
+        port: 8082,
       },
     });
 

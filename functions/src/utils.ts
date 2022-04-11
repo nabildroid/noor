@@ -1,5 +1,5 @@
-import { weird } from "./types";
 import * as Str from "@supercharge/strings";
+import { weird } from "./types";
 
 export const randomString = (size: number = 16) => {
   return Str.random(size);
@@ -76,7 +76,7 @@ export function mergeCookies(...cookies: string[][]) {
 
 export function replaceNullValues(ob: { [key: string]: any }, repalce: any) {
   Object.keys(ob).forEach(
-    (k) => (ob[k] = ob[k] == null || ob[k] == "null" ? repalce : ob[k])
+    (k) => (ob[k] = ob[k] == null || (ob[k] == "null"||ob[k]  == "undefined") ? repalce : ob[k])
   );
   return ob;
 }

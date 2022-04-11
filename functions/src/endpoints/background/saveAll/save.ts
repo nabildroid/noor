@@ -1,12 +1,12 @@
 import * as functions from "firebase-functions";
-
-import { IncrementalData } from "../../../types";
-import Redirect from "../../../core/redirect";
 import { FormInput } from "../../../core/form";
+import Redirect from "../../../core/redirect";
 import { executeVariant } from "../../../core/variatForm";
-import { editSkillSubmit } from "../../callables/incremental/editSkill/submit";
+import { IncrementalData } from "../../../types";
 import { saveEditedSkills } from "../../callables/incremental/editSkill/save";
+import { editSkillSubmit } from "../../callables/incremental/editSkill/submit";
 import { fetchOptions } from "../../callables/incremental/formOptions";
+import { navigateToForm } from "../../callables/incremental/navigation";
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -24,6 +24,9 @@ export default functions
   .onCreate(async (snapshot) => {
     const data = snapshot.data().payload as NavigationData;
 
+    // todo remove thisx
+    snapshot.ref.update({ completed: true, payload: {} });
+
     const homePage = Redirect.load({
       cookies: data.cookies,
       weirdData: data.weirdData,
@@ -36,36 +39,52 @@ export default functions
 
     let { action } = data;
 
-    await executeVariant(data.inputs, {
-      execute: async (inputs) => {
+    await executeVariant(data.inputs, homePage, {
+      execute: async (inputs, redirect) => {
         // go to the seach button
         const response = await executeSkillEdits(
           {
             ...data,
             inputs,
-            ...homePage.send({}),
+            ...redirect.send({}),
             action,
           },
-          homePage
+          redirect
         );
 
         action = response.action;
-        homePage.setWeiredData(response.weirdData);
+        redirect.setWeiredData(response.weirdData);
       },
-      fetchOptions: async (inputs, name) => {
+      fetchOptions: async (inputs, name, redirect) => {
         const response = await fetchOptions(
           {
             ...data,
             inputs,
-            ...homePage.send({}),
+            ...redirect.send({}),
             action,
             actionButtons: [],
             name,
           },
-          homePage
+          redirect
         );
         // submit the form
         return response.toJson().inputs;
+      },
+      recreation: async (redirect) => {
+        const newR = await Redirect.start(redirect.send({}));
+
+        // get page title
+        const navs = ["المهارات", "إدخال نتائج المهارة على مستوى وحدة ومهارة"];
+        const { secondNav, form } = await navigateToForm(newR, {
+          nav1: navs[0],
+          nav2: navs[1],
+          account: "",
+          ...newR.send({}),
+        });
+
+        secondNav.setWeiredData(form.getWeirdData());
+
+        return secondNav;
       },
       customSelect: [
         {
@@ -78,8 +97,6 @@ export default functions
         },
       ],
     });
-
-    snapshot.ref.update({ completed: true, payload: {} });
   });
 
 async function executeSkillEdits(data: NavigationData, homePage: Redirect) {
