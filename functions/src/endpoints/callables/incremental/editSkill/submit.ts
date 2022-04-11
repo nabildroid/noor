@@ -31,9 +31,10 @@ export async function fetchSkills(data: NavigationData, homePage: Redirect) {
 
   const form = SkillsForm.fromJson({
     action: data.action,
-    weird: data.weirdData,
+    weirdData: data.weirdData,
     inputs: data.inputs,
     actionButtons: [data.actionButton],
+    ...homePage.send({})
   });
 
   const search = await form.submit(data.actionButton.name!, homePage);

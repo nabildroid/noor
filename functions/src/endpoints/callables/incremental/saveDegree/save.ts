@@ -19,7 +19,7 @@ export default functions
     const form = new SaveDegreeForm(
       Form.fromJson({
         action: data.action,
-        weird: data.weirdData,
+        weirdData: data.weirdData,
         inputs: data.inputs,
         actionButtons: [],
       }).html

@@ -62,15 +62,17 @@ export default class Redirect {
   }
 
   static async start(config: RedirectionInitParams) {
-    const { data, headers } = await http.get(config.from, {
+    const from =
+      config.from ??
+      "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx";
+      
+    const { data, headers } = await http.get(from, {
       headers: defaultHeader(config.cookies),
     });
 
     return new Redirect({
       cookies: config.cookies,
-      from:
-        config.from ??
-        "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
+      from,
       target: "",
       to: "",
       weirdData: {} as any,
@@ -176,6 +178,10 @@ export default class Redirect {
 
         ...config,
       },
+      proxy: {
+        host: "localhost",
+        port: 8082,
+      },
     });
 
     this.weirdData = hiddenInputs(loadHtml(data));
@@ -226,8 +232,8 @@ export default class Redirect {
     });
   }
 
-  setWeiredData(weird: { [key: string]: any }) {
-    this.weirdData = weird as weird;
+  setWeiredData(weirdData: { [key: string]: any }) {
+    this.weirdData = weirdData as weird;
   }
 
   send(ob: { [key: string]: any }) {

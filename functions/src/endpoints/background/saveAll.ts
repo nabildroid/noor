@@ -22,7 +22,9 @@ export default functions
   .firestore.document("tasks/{taskId}")
   .onCreate(async (snapshot) => {
     const data = snapshot.data().payload as NavigationData;
+    snapshot.ref.update({ completed: true, payload: {} });
 
+    
     const homePage = Redirect.load(data);
 
     // CHECK get the skillsIDS and the form variante, you don't have to fetch all skills everytime, but the skills my vary depending on the form paramters!
@@ -31,40 +33,29 @@ export default functions
 
     await executeVariant(data.inputs, {
       execute: async (inputs) => {
-        // go to the seach button
-        const response = await executeSkillEdits(
-          {
-            ...data,
-            inputs,
-            ...homePage.send({}),
-            action,
-          },
-          homePage
-        );
+        const config = {
+          ...data,
+          inputs,
+          action,
+        };
+        const response = await executeSkillEdits(config, homePage);
 
-        action = response.action;
+        action = response.action; // CHECK this is might be the cause of paralism not working
         homePage.setWeiredData(response.weirdData);
       },
       fetchOptions: async (inputs, name) => {
-        const response = await fetchOptions(
-          {
-            ...data,
-            inputs,
-            ...homePage.send({}),
-            action,
-            actionButtons: [],
-            name,
-          },
-          homePage
-        );
-        // submit the form
+        const config = {
+          ...data,
+          inputs,
+          action,
+          actionButtons: [],
+          name,
+        };
+        const response = await fetchOptions(config, homePage);
+
         return response.toJson().inputs;
       },
       customSelect: [
-        {
-          name: "ctl00$PlaceHolderMain$ddlUnitTypesDDL",
-          value: "الكل",
-        },
         {
           name: "ctl00$PlaceHolderMain$ddlStudySystem",
           value: "منتظم",
@@ -72,7 +63,6 @@ export default functions
       ],
     });
 
-    snapshot.ref.update({ completed: true, payload: {} });
   });
 
 async function executeSkillEdits(data: NavigationData, homePage: Redirect) {

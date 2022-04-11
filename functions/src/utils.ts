@@ -1,5 +1,5 @@
-import { weird } from "./types";
 import * as Str from "@supercharge/strings";
+import { weird } from "./types";
 
 export const randomString = (size: number = 16) => {
   return Str.random(size);
@@ -89,3 +89,7 @@ export function clone<T>(ob: T) {
   if (ob) return JSON.parse(JSON.stringify(ob)) as T;
   return undefined;
 }
+
+
+
+

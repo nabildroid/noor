@@ -1,7 +1,6 @@
 import { load, load as loadHtml } from "cheerio";
-import { checkValidity } from "../helpers";
-import Redirect from "./redirect";
 import { mergeNodeTexts } from "../utils";
+import Redirect from "./redirect";
 
 export type FormInput = {
   title: string; // label
@@ -24,10 +23,6 @@ export default class Form {
   }
 
   constructor(html: string) {
-    // todo set the previlege checks
-    if (false && !checkValidity(html)) {
-      throw Error("you don't have the previlege to access this");
-    }
 
     this.root = loadHtml(html);
     this.form = this.root("body > form").first();
@@ -199,8 +194,6 @@ export default class Form {
 
     this.updateForm(data);
     redirect.setWeiredData(this.getWeirdData());
-
-    
   }
 
   /**
@@ -250,17 +243,17 @@ export default class Form {
 
   static fromJson(config: {
     action: string;
-    weird: { [key: string]: string };
+    weirdData: { [key: string]: string };
     inputs: FormInput[];
     actionButtons: FormInput[];
   }) {
-    const { action, actionButtons, weird, inputs } = config;
+    const { action, actionButtons, weirdData, inputs } = config;
     const root = loadHtml("<body></body>");
 
     root("body").append(`<form action="${action}"></div>`);
     const form = root("form");
 
-    Object.entries(weird)
+    Object.entries(weirdData)
       .map(([k, v]) => `<div type='special' name='${k}'>${v}</div>`)
       .forEach((e) => form.append(e));
 

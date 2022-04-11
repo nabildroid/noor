@@ -1,8 +1,8 @@
 import * as functions from "firebase-functions";
-
-import { IncrementalData } from "../../../types";
-import Redirect from "../../../core/redirect";
 import Form, { FormInput } from "../../../core/form";
+import Redirect from "../../../core/redirect";
+import { IncrementalData } from "../../../types";
+
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -30,9 +30,10 @@ export default functions.region("asia-south1").https.onCall(async (data: Navigat
 export async function fetchOptions(data: NavigationData, homePage: Redirect) {
   const form = Form.fromJson({
     action: data.action,
-    weird: data.weirdData,
+    weirdData: data.weirdData,
     inputs: data.inputs,
     actionButtons: data.actionButtons,
+    ...homePage.send({})
   });
 
   const selected = data.inputs.find((e) => e.name == data.name)!;

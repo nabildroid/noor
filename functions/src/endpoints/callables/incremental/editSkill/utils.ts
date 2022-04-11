@@ -137,7 +137,7 @@ export class SkillsForm extends Form {
 
   static fromJson(config: {
     action: string;
-    weird: { [key: string]: string };
+    weirdData: { [key: string]: string };
     inputs: FormInput[];
     actionButtons: FormInput[];
   }) {

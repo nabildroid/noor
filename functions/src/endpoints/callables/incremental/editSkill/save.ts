@@ -25,11 +25,11 @@ export default functions
 
 export async function saveSkills(data: NavigationData, homePage: Redirect) {
   const form = SkillsForm.fromJson({
-    ...homePage.send({}),
     action: data.action,
-    weird: data.weirdData,
+    weirdData: data.weirdData,
     inputs: data.inputs,
     actionButtons: [],
+    ...homePage.send({}),
   });
 
   const response = await form.save(data.skills, homePage);
