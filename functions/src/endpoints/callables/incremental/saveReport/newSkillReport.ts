@@ -1,18 +1,18 @@
 import * as functions from "firebase-functions";
 import * as fs from "fs";
 import * as html_to_pdf from "html-pdf-node";
-
-import { IncrementalData } from "../../../../types";
-import Redirect from "../../../../core/redirect";
+import { db, storage } from "../../../../common";
 import { FormInput } from "../../../../core/form";
+import Redirect from "../../../../core/redirect";
 import { executeVariant } from "../../../../core/variatForm";
+import { IncrementalData } from "../../../../types";
+import { randomString } from "../../../../utils";
+import { fetchSkills } from "../editSkill/submit";
 import { fetchOptions } from "../formOptions";
-import { editSkillSubmit } from "../editSkill/submit";
 import { skill } from "./utils";
+
 import path = require("path");
 import os = require("os");
-import { randomString } from "../../../../utils";
-import { db, storage } from "../../../../common";
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -36,13 +36,7 @@ export default functions
     memory: "512MB",
   })
   .https.onCall(async (data: NavigationData, context) => {
-    const homePage = await Redirect.load({
-      cookies: data.cookies,
-      weirdData: data.weirdData,
-      from:
-        data.from ??
-        "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
-    });
+    const homePage = await Redirect.load(data);
 
     let { action } = data;
 
@@ -54,11 +48,10 @@ export default functions
           (e) => e.selected
         )!.text;
 
-        const response = await editSkillSubmit(
+        const response = await fetchSkills(
           {
             ...data,
             inputs,
-            ...homePage.send({}),
             action,
           },
           homePage

@@ -1,9 +1,8 @@
 import * as functions from "firebase-functions";
-
-import { IncrementalData } from "../../../../types";
+import { FormInput } from "../../../../core/form";
 import Redirect from "../../../../core/redirect";
-import Form, { FormInput } from "../../../../core/form";
-import { EditSkillForm } from "./utils";
+import { IncrementalData } from "../../../../types";
+import { SkillsForm } from "./utils";
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -17,35 +16,23 @@ interface NavigationData extends IncrementalData {
 export default functions
   .region("asia-south1")
   .https.onCall(async (data: NavigationData) => {
-    const homePage = await Redirect.load({
-      cookies: data.cookies,
-      weirdData: data.weirdData,
-      from:
-        data.from ??
-        "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
-    });
+    const homePage = await Redirect.load(data);
 
-    const form = await saveEditedSkills(data, homePage);
+    const form = await saveSkills(data, homePage);
 
-    return homePage.sendForm(form, {
-      ...form.toJson(),
-    });
+    return homePage.sendForm(form);
   });
 
-export async function saveEditedSkills(
-  data: NavigationData,
-  homePage: Redirect
-) {
-  const form = new EditSkillForm(
-    Form.fromJson({
-      action: data.action,
-      weird: data.weirdData,
-      inputs: data.inputs,
-      actionButtons: [],
-    }).html
-  );
+export async function saveSkills(data: NavigationData, homePage: Redirect) {
+  const form = SkillsForm.fromJson({
+    ...homePage.send({}),
+    action: data.action,
+    weird: data.weirdData,
+    inputs: data.inputs,
+    actionButtons: [],
+  });
 
   const response = await form.save(data.skills, homePage);
-  form.updateFromSreachSubmission(response);
+  form.updateFromSubmission(response);
   return form;
 }

@@ -1,9 +1,9 @@
 import * as functions from "firebase-functions";
-
-import { IncrementalData } from "../../../../types";
-import Redirect from "../../../../core/redirect";
 import Form, { FormInput } from "../../../../core/form";
+import Redirect from "../../../../core/redirect";
+import { IncrementalData } from "../../../../types";
 import { SaveDegreeForm } from "./utils";
+
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -14,13 +14,7 @@ interface NavigationData extends IncrementalData {
 export default functions
   .region("asia-south1")
   .https.onCall(async (data: NavigationData) => {
-    const homePage = await Redirect.load({
-      cookies: data.cookies,
-      weirdData: data.weirdData,
-      from:
-        data.from ??
-        "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
-    });
+    const homePage = await Redirect.load(data);
 
     data.actionButton = {
       name: "ctl00$PlaceHolderMain$btY21",

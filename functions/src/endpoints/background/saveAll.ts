@@ -1,12 +1,11 @@
 import * as functions from "firebase-functions";
-
-import { IncrementalData } from "../../../types";
-import Redirect from "../../../core/redirect";
-import { FormInput } from "../../../core/form";
-import { executeVariant } from "../../../core/variatForm";
-import { editSkillSubmit } from "../../callables/incremental/editSkill/submit";
-import { saveEditedSkills } from "../../callables/incremental/editSkill/save";
-import { fetchOptions } from "../../callables/incremental/formOptions";
+import { FormInput } from "../../core/form";
+import Redirect from "../../core/redirect";
+import { executeVariant } from "../../core/variatForm";
+import { IncrementalData } from "../../types";
+import { saveSkills } from "../callables/incremental/editSkill/save";
+import { fetchSkills } from "../callables/incremental/editSkill/submit";
+import { fetchOptions } from "../callables/incremental/formOptions";
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -24,13 +23,7 @@ export default functions
   .onCreate(async (snapshot) => {
     const data = snapshot.data().payload as NavigationData;
 
-    const homePage = Redirect.load({
-      cookies: data.cookies,
-      weirdData: data.weirdData,
-      from:
-        data.from ??
-        "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
-    });
+    const homePage = Redirect.load(data);
 
     // CHECK get the skillsIDS and the form variante, you don't have to fetch all skills everytime, but the skills my vary depending on the form paramters!
 
@@ -83,28 +76,21 @@ export default functions
   });
 
 async function executeSkillEdits(data: NavigationData, homePage: Redirect) {
-  const response = await editSkillSubmit(
-    {
-      ...data,
-      ...homePage.send({}),
-    },
-    homePage
-  );
+  const response = await fetchSkills(data, homePage);
   // get all the skills with thier ids
   let { action, skills, inputs } = response.toJson();
   // submit
-  let editSkills = skills.map((s) => ({
+  let editedSkill = skills.map((s) => ({
     id: s.skillId,
     value: data.rate,
   }));
 
-  const savedResponse = await saveEditedSkills(
+  const savedResponse = await saveSkills(
     {
       ...data,
       inputs,
-      ...homePage.send({}),
       action,
-      skills: editSkills,
+      skills: editedSkill,
     },
     homePage
   );

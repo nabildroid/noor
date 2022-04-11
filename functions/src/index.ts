@@ -1,17 +1,21 @@
-import postSignForm from "./endpoints/callables/postSignForm";
-import signForm from "./endpoints/callables/signForm";
 import newAccount from "./endpoints/background/newAccount";
-import navigation from "./endpoints/callables/incremental/navigation";
-import formOption from "./endpoints/callables/incremental/formOptions";
-import formSubmit from "./endpoints/callables/incremental/formSubmit";
-
-import skillSubmit from "./endpoints/callables/incremental/editSkill/submit";
+// saveAll
+import saveAll from "./endpoints/background/saveAll";
+// edit skill
 import skillSave from "./endpoints/callables/incremental/editSkill/save";
-
-import newSkillReport from "./endpoints/callables/incremental/saveReport/newSkillReport";
-
+import skillSubmit from "./endpoints/callables/incremental/editSkill/submit";
+// navigation
+import formOption from "./endpoints/callables/incremental/formOptions";
+import navigation from "./endpoints/callables/incremental/navigation";
 import saveDegreeSubmit from "./endpoints/callables/incremental/saveDegree/submit";
-import saveAll from "./endpoints/background/saveAll/save";
+// reports
+import newSkillReport from "./endpoints/callables/incremental/saveReport/newSkillReport";
+import postSignForm from "./endpoints/callables/postSignForm";
+// login
+import signForm from "./endpoints/callables/signForm";
+
+
+
 
 export {
   signForm,
@@ -19,7 +23,6 @@ export {
   newAccount,
   navigation,
   formOption,
-  formSubmit,
   skillSave,
   skillSubmit,
   newSkillReport,

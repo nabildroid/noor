@@ -1,9 +1,8 @@
 import * as functions from "firebase-functions";
-
-import { IncrementalData } from "../../../../types";
+import { FormInput } from "../../../../core/form";
 import Redirect from "../../../../core/redirect";
-import Form, { FormInput } from "../../../../core/form";
-import { EditSkillForm } from "./utils";
+import { IncrementalData } from "../../../../types";
+import { SkillsForm } from "./utils";
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -14,26 +13,14 @@ interface NavigationData extends IncrementalData {
 export default functions
   .region("asia-south1")
   .https.onCall(async (data: NavigationData) => {
-    const homePage = await Redirect.load({
-      cookies: data.cookies,
-      weirdData: data.weirdData,
-      from:
-        data.from ??
-        "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
-    });
+    const homePage = await Redirect.load(data);
 
-    const form = await editSkillSubmit(data, homePage);
+    const form = await fetchSkills(data, homePage);
 
-    // todo include the cookies and redirected;
-    return homePage.sendForm(form, {
-      ...form.toJson(),
-    });
+    return homePage.sendForm(form);
   });
 
-export async function editSkillSubmit(
-  data: NavigationData,
-  homePage: Redirect
-) {
+export async function fetchSkills(data: NavigationData, homePage: Redirect) {
   data.actionButton = {
     name: "ctl00$PlaceHolderMain$ibtnSearch",
     value: "ابحث",
@@ -42,18 +29,16 @@ export async function editSkillSubmit(
     title: "ssx",
   };
 
-  const form = new EditSkillForm(
-    Form.fromJson({
-      action: data.action,
-      weird: data.weirdData,
-      inputs: data.inputs,
-      actionButtons: [data.actionButton],
-    }).html
-  );
+  const form = SkillsForm.fromJson({
+    action: data.action,
+    weird: data.weirdData,
+    inputs: data.inputs,
+    actionButtons: [data.actionButton],
+  });
 
   const search = await form.submit(data.actionButton.name!, homePage);
 
-  const weirdData = form.updateFromSreachSubmission(search);
+  const weirdData = form.updateFromSubmission(search);
   homePage.setWeiredData(weirdData);
   return form;
 }

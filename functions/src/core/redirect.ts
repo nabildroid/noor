@@ -1,16 +1,14 @@
-import * as FormData from "form-data";
-
 import http from "axios";
-import { stringify as QueryEncode } from "querystring";
 import { load as loadHtml } from "cheerio";
-import { weird } from "../types";
-import { replaceNullValues } from "../utils";
-
+import * as FormData from "form-data";
+import { stringify as QueryEncode } from "querystring";
+import { IncrementalData, weird } from "../types";
 import {
   defaultHeader,
   hiddenInputs,
   mergeCookies,
   pageNameBase64,
+  replaceNullValues
 } from "../utils";
 import Form from "./form";
 
@@ -26,14 +24,8 @@ interface RedirectionNavigationParams {
   weirdData?: weird;
 }
 
-interface RedirectionLoadParams {
-  from: string;
-  cookies: string[];
-  weirdData: weird;
-}
-
 interface RedirectionInitParams {
-  from: string;
+  from?: string;
   cookies: string[];
 }
 
@@ -76,7 +68,9 @@ export default class Redirect {
 
     return new Redirect({
       cookies: config.cookies,
-      from: config.from,
+      from:
+        config.from ??
+        "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
       target: "",
       to: "",
       weirdData: {} as any,
@@ -86,10 +80,12 @@ export default class Redirect {
     });
   }
 
-  static load(config: RedirectionLoadParams) {
+  static load(config: IncrementalData) {
     return new Redirect({
       cookies: config.cookies,
-      from: config.from,
+      from:
+        config.from ??
+        "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
       target: "",
       to: "",
       weirdData: config.weirdData,
@@ -252,6 +248,7 @@ export default class Redirect {
       weirdData: form.getWeirdData(),
       payload: {
         form: form.toJson(),
+        ...form.toJson(),
         ...(ob ?? {}),
       },
     };

@@ -1,9 +1,16 @@
 import { load as loadHtml } from "cheerio";
-import Form from "../../../../core/form";
+import Form, { FormInput } from "../../../../core/form";
 import Redirect from "../../../../core/redirect";
 import Table from "../../../../core/table";
 
-export class EditSkillForm extends Form {
+export type skill = {
+  id: string;
+  value: string;
+  skillId: number;
+  title: string; // sometimes is the student
+};
+
+export class SkillsForm extends Form {
   constructor(html: string) {
     super(html);
   }
@@ -24,7 +31,7 @@ export class EditSkillForm extends Form {
           ],
           []
         )
-        .join(",") + `,${skills.length-1}#`;
+        .join(",") + `,${skills.length - 1}#`;
 
     const payload = this.fetchOptionRequestPayload(
       {
@@ -34,9 +41,13 @@ export class EditSkillForm extends Form {
       []
     );
 
-    skills.forEach((_,i)=>{
-      payload[`ctl00$PlaceHolderMain$gvInsertSkillByUnitAndSkill$ctl${i+2}$tbTeacherNotes`]=""
-    })
+    skills.forEach((_, i) => {
+      payload[
+        `ctl00$PlaceHolderMain$gvInsertSkillByUnitAndSkill$ctl${
+          i + 2
+        }$tbTeacherNotes`
+      ] = "";
+    });
 
     const action = this.getFormAction();
 
@@ -51,7 +62,7 @@ export class EditSkillForm extends Form {
     return data;
   }
 
-  updateFromSreachSubmission(data: string) {
+  updateFromSubmission(data: string) {
     this.updateForm(data);
 
     Form.parseResponse(data, {
@@ -63,7 +74,7 @@ export class EditSkillForm extends Form {
 
           const target = panel(".GridClass").parent().html();
           if (target) {
-            const table = new SkillEditTable(target);
+            const table = new SkillsTable(target);
 
             const skills = table.lines();
             this.appendSkills(name, skills);
@@ -123,16 +134,18 @@ export class EditSkillForm extends Form {
         </div>`);
     });
   }
+
+  static fromJson(config: {
+    action: string;
+    weird: { [key: string]: string };
+    inputs: FormInput[];
+    actionButtons: FormInput[];
+  }) {
+    return new SkillsForm(Form.fromJson(config).html);
+  }
 }
 
-export type skill = {
-  id: string;
-  value: string;
-  skillId: number;
-  title: string;
-};
-
-export class SkillEditTable extends Table<skill, undefined> {
+export class SkillsTable extends Table<skill, undefined> {
   protected filter(tr: cheerio.Cheerio): boolean {
     return this.$("img", tr).length != 0;
   }

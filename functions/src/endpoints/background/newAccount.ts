@@ -1,11 +1,11 @@
 import * as functions from "firebase-functions";
 import * as fs from "fs";
+import { auth, db, storage } from "../../common";
+import Redirect from "../../core/redirect";
+import { extractHomeData } from "../../helpers";
 
 const path = require("path");
 const os = require("os");
-import { auth, db, storage } from "../../common";
-import { extractHomeData } from "../../helpers";
-import Redirect from "../../core/redirect";
 
 export default functions
   .region("asia-south1")
@@ -21,10 +21,7 @@ export default functions
     try {
       const cookieDoc = await db.collection("cookies").doc(name).get();
       const cookies = (cookieDoc.data() as any).cookies as string[];
-      const homePage = await Redirect.start({
-        from: "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx",
-        cookies,
-      });
+      const homePage = await Redirect.start({ cookies });
 
       const homedata = (await extractHomeData(homePage.stop().html))!;
 
