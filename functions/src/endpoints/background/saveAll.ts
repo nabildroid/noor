@@ -6,6 +6,7 @@ import { IncrementalData } from "../../types";
 import { saveSkills } from "../callables/incremental/editSkill/save";
 import { fetchSkills } from "../callables/incremental/editSkill/submit";
 import { fetchOptions } from "../callables/incremental/formOptions";
+import { navigateToForm } from "../callables/incremental/navigation";
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -31,7 +32,7 @@ export default functions
 
     let { action } = data;
 
-    await executeVariant(data.inputs, {
+    await executeVariant(data.inputs,homePage, {
       execute: async (inputs) => {
         const config = {
           ...data,
@@ -42,6 +43,22 @@ export default functions
 
         action = response.action; // CHECK this is might be the cause of paralism not working
         homePage.setWeiredData(response.weirdData);
+      },
+      recreation: async (redirect) => {
+        const newR = await Redirect.start(redirect.send({}));
+
+        // get page title
+        const navs = ["المهارات", "إدخال نتائج المهارة على مستوى وحدة ومهارة"];
+        const { secondNav, form } = await navigateToForm(newR, {
+          nav1: navs[0],
+          nav2: navs[1],
+          account: "",
+          ...newR.send({}),
+        });
+
+        secondNav.setWeiredData(form.getWeirdData());
+
+        return secondNav;
       },
       fetchOptions: async (inputs, name) => {
         const config = {
@@ -64,6 +81,7 @@ export default functions
     });
 
   });
+  
 
 async function executeSkillEdits(data: NavigationData, homePage: Redirect) {
   const response = await fetchSkills(data, homePage);

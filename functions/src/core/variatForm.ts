@@ -1,5 +1,6 @@
 import { clone } from "../utils";
 import { FormInput } from "./form";
+import Redirect from "./redirect";
 
 function createdPath(inputs: FormInput[]) {
   let path = "";
@@ -20,9 +21,15 @@ function createdPath(inputs: FormInput[]) {
 //BUG racing with WeiredData !
 export async function executeVariant(
   inputsOrg: FormInput[],
+  redirect: Redirect,
   config: {
-    execute(inputs: FormInput[]): Promise<any>;
-    fetchOptions(inputs: FormInput[], name: string): Promise<FormInput[]>;
+    execute(inputs: FormInput[], redirect: Redirect): Promise<any>;
+    fetchOptions(
+      inputs: FormInput[],
+      name: string,
+      redirect: Redirect
+    ): Promise<FormInput[]>;
+    recreation(redirect: Redirect): Promise<Redirect>;
     customSelect: { name: string; value: string }[];
     walked?: Set<string>;
     isDone?: boolean;
@@ -47,7 +54,7 @@ export async function executeVariant(
       return;
     } else {
       config.walked.add(currentPath);
-      await config.execute(inputs);
+      await config.execute(inputs, redirect);
       return;
     }
   } else if (i - inputs.length > 0) {
@@ -62,49 +69,96 @@ export async function executeVariant(
 
   const current = inputs[i];
 
-  const left = inputs.slice(0, i);
-  const right = inputs.slice(i + 1);
-
   const options = removeEmpty(current.options);
   const nextInputOptions = removeEmpty(inputs[i + 1]?.options ?? []);
   // custom values
   const isTarget = config.customSelect.find((e) => e.name == current.name);
   if (isTarget) {
     current.options = selectOpt(options, isTarget.value);
-    return await executeVariant(inputs, config, i + 1);
+    return await executeVariant(inputs, redirect, config, i + 1);
   }
 
   // select all if this option exists
   if (!getSelected(options) && containExactOpt(options, "الكل")) {
     current.options = selectOpt(options, "الكل");
-    return await executeVariant(inputs, config, i + 1);
+    return await executeVariant(inputs, redirect, config, i + 1);
 
     // in case of the current options is empty fetch from the parent
   } else if (!options.length) {
-    const filled = await config.fetchOptions(inputs, inputs[i - 1].name);
-    return await executeVariant(filled, config, i);
+    const filled = await config.fetchOptions(
+      inputs,
+      inputs[i - 1].name,
+      redirect
+    );
+    return await executeVariant(filled, redirect, config, i);
   } else if (getSelected(options) && !nextInputOptions.length) {
-    const filled = await config.fetchOptions(inputs, current.name);
-    return await executeVariant(filled, config, i + 2);
+    const filled = await config.fetchOptions(inputs, current.name, redirect);
+    return await executeVariant(filled, redirect, config, i + 2);
   } else if (getSelected(options)) {
-    return await executeVariant(inputs, config, i + 1);
+    return await executeVariant(inputs, redirect, config, i + 1);
   } else {
-    // for each option select one
-    for (const e of removeEmpty(options)) {
-      await executeVariant(
-        [
-          ...left,
-          {
-            ...current,
-            options: selectOpt(options, e.text),
-          },
-          ...right,
-        ],
-        config,
-        i + 1
-      );
+    // create slices
+    const notSelectedOptions = options.map((e) => ({
+      ...e,
+      selected: false,
+    }));
+
+    const parts: FormInput["options"][] = [];
+    const total = notSelectedOptions.length;
+    const slices = Math.round(total / 2);
+
+    let s = 0;
+    for (s; s < total; s += slices) {
+      parts.push(notSelectedOptions.slice(s, s + slices));
     }
-    return;
+
+    const tempInputs = clone(inputs);
+
+    current.options = parts.shift();
+
+    const variations = parts.map((part) => {
+      const temp = clone(tempInputs);
+      temp[i].options = part;
+      return temp;
+    });
+
+    const newRedirects = await Promise.all(
+      parts.map((_) => config.recreation(redirect))
+    );
+
+    // include current
+    if (!parts.length) {
+      parts.unshift(current.options);
+      variations.unshift(inputs);
+      newRedirects.unshift(redirect);
+    }
+
+    const promises = variations.map(async (_, index) => {
+      const newRedirect = newRedirects[index];
+      const variation = variations[index];
+      const part = parts[index];
+
+      const left = variation.slice(0, i);
+      const right = variation.slice(i + 1);
+
+      for (const e of removeEmpty(part)) {
+        await executeVariant(
+          [
+            ...left,
+            {
+              ...current,
+              options: selectOpt(part, e.text),
+            },
+            ...right,
+          ],
+          newRedirect,
+          config,
+          i + 1
+        );
+      }
+    });
+
+    return await Promise.all(promises);
   }
 }
 

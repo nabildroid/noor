@@ -76,7 +76,7 @@ export function mergeCookies(...cookies: string[][]) {
 
 export function replaceNullValues(ob: { [key: string]: any }, repalce: any) {
   Object.keys(ob).forEach(
-    (k) => (ob[k] = ob[k] == null || ob[k] == "null" ? repalce : ob[k])
+    (k) => (ob[k] = ob[k] == null || (ob[k] == "null"||ob[k]  == "undefined") ? repalce : ob[k])
   );
   return ob;
 }
