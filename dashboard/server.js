@@ -44,6 +44,8 @@ app.delete("/api/user/:id", async (req, res) => {
   const { id } = req.params;
   await auth.deleteUser(id);
   await db.collection("users").doc(id).delete();
+  res.send("ok");
+
 });
 
 app.post("/api/free/:id", async (req, res) => {
