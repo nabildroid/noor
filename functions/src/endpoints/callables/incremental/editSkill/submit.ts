@@ -21,13 +21,6 @@ export default functions
   });
 
 export async function fetchSkills(data: NavigationData, homePage: Redirect) {
-  data.actionButton = {
-    name: "ctl00$PlaceHolderMain$ibtnSearch",
-    value: "ابحث",
-    id: "",
-    options: [],
-    title: "ssx",
-  };
 
   const form = SkillsForm.fromJson({
     action: data.action,

@@ -58,7 +58,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     loadingIndex,
     isAllChosen,
   } = useFormOptions({
-    actionName: "ibtnSearch",
+    actionName: teacherType == TeacherType.primary ? "Rtb44" : "ibtnSearch",
   });
 
   useEffect(() => {
@@ -156,7 +156,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     }),
     createAction({
       show: stage == 1,
-      loading: loading || loadingIndex == -1,
+      loading: false && (loading || loadingIndex == -1),
       buttons: [
         {
           label: "رجوع",
