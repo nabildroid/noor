@@ -95,7 +95,7 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
 
   const submit: SubmitType = async (type, payload) => {
     const actionButton = form?.actionButtons.find((e) =>
-      e.name?.includes(actionName??"")
+      e.name?.includes(actionName ?? "")
     );
 
     setLoadinIndex(-1);
@@ -113,7 +113,7 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
 
   const letMeHandleIt = () => {
     const actionButton = form?.actionButtons.find((e) =>
-      e.name?.includes(actionName??"")
+      e.name?.includes(actionName ?? "")
     );
 
     return {
@@ -150,17 +150,34 @@ function withinIncludes(id: string, ids?: string[]) {
 }
 
 function formatInputs(inputs: FormInput[]) {
-  return (
-    inputs
-      .map((input, i) => ({
-        ...input,
-        title: input.title.replaceAll("*", ""),
-        options: input.options.map((e) => ({
-          ...e,
-          text: e.text.replaceAll("--", "").trim(),
-        })),
-      }))
-      // CHECK e.options for inputs that provide only informations!
-      .filter((e) => e.value != undefined && e.title != "" && e.options.length)
-  );
+  const formated = inputs
+    .map((input, i) => ({
+      ...input,
+      title: input.title.replaceAll("*", ""),
+      options: input.options.map((e) => ({
+        ...e,
+        text: e.text.replaceAll("--", "").trim(),
+      })),
+    }))
+    // CHECK e.options for inputs that provide only informations!
+    .filter((e) => e.value != undefined && e.title != "" && e.options.length);
+
+  const first: FormInput[] = [];
+  const last: FormInput[] = [];
+  let flip = false;
+
+  console.log(inputs);
+  formated .forEach((inp) => {
+    if (inp.name?.includes("$ddlSpecialty")) {
+      return first.push(inp);
+    }
+    if (flip) last.push(inp);
+    else first.push(inp);
+    if (inp.name?.includes("$ddlClass")) {
+      flip = true;
+    }
+  });
+  // todo sort the inputs so the class comes before
+
+  return [...first, ...last];
 }
