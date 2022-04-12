@@ -21,16 +21,23 @@ import { teacherTypeArabic, wait } from "../../utils";
 
 interface SaveCustomProps {}
 
-function fetch(account: string) {
+function fetch(account: string, type: TeacherType) {
+  const nav2 =
+    type == TeacherType.kindergarten
+      ? NoorSkill.skillModuleSkill
+      : NoorSkill.moduleSkill;
+
   return Repository.instance.navigateTo({
     account,
     nav1: NoorSection.skill,
-    nav2: NoorSkill.skillModuleSkill,
+    nav2,
   });
 }
 
 function pageTitle(type: TeacherType) {
-  return `وحدة ومهارة${teacherTypeArabic(type)}`;
+  if(type == TeacherType.kindergarten)
+  return `وحدة ومهارة ${teacherTypeArabic(type)}`;
+  return `مادة ومهارة ${teacherTypeArabic(type)}`;
 }
 
 const SaveCustom: React.FC<SaveCustomProps> = () => {
@@ -45,11 +52,11 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
     updateInputs,
     loadingIndex,
   } = useFormOptions({
-    excludedIds: ["PanelSkill"],
+    excludedNames: ["ddlSkills"],
   });
 
   useEffect(() => {
-    fetch(currentRole!)
+    fetch(currentRole!, teacherType!)
       .then((r) => setForm(r.form))
       .catch(logout);
   }, []);
@@ -71,7 +78,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
       type: BackgroundTaskType.saveCustom,
       user: user!.uid,
     };
-    
+
     wait(() => DB.instance.createTask(task), setLoading);
   };
 

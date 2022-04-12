@@ -9,15 +9,26 @@ export const tabBarTitle = (tab: HomeTab, type: TeacherType) =>
   ({
     [HomeTab.saveAll]: "تحصيل الكل",
     [HomeTab.saveReport]:
-      type == TeacherType.elementery ? "انشاء كشف درجات" : "تقرير جديد",
+      type == TeacherType.elementery
+        ? "انشاء كشف درجات"
+        : type == TeacherType.primary
+        ? "انشاء كشف درجاة الفصل"
+        : "تقرير جديد",
     [HomeTab.savedegree]: "رصد درجات الفصل",
     [HomeTab.savedReports]: "التقرارير",
     [HomeTab.home]: "الرئيسية",
     [HomeTab.logout]: "خروج",
-    [HomeTab.saveCustom]: "رصد وحدة ومهارة",
+    [HomeTab.saveCustom]:
+      type == TeacherType.primary
+        ? "رصد على مسةوة مادة ومهارة"
+        : "رصد وحدة ومهارة",
     [HomeTab.studentsNotAccepted]: "رصد وحدة ومهارة",
-    [HomeTab.editSkill]: "تعديل المهارت",
-    [HomeTab.didntGet]: "لم يتقنو المهارت",
+    [HomeTab.editSkill]:
+      type == TeacherType.primary ? "تعديل المهارت الطالب" : "تعديل المهارت",
+    [HomeTab.didntGet]:
+      type == TeacherType.primary
+        ? "طلاب لم يةقنو المهارة"
+        : "لم يتقنو المهارت",
   }[tab]);
 
 export const teacherTypeArabic = (type: TeacherType) => {
@@ -76,6 +87,3 @@ export async function wait(
   await fc();
   loading(false);
 }
-
-
-

@@ -12,68 +12,79 @@ export default function rates(type: TeacherType) {
 export const KinderRating: Rating = [
   {
     name: "أتقن",
-    description: "الطلاب عملو بشكل جدي",
+    description: "",
     id: "1",
   },
   {
     name: "لم يتقن",
-    description: "الطلاب عملو بشكل جدي",
+    description: "",
     id: "2",
   },
   {
     name: "إلى حد ما",
-    description: "الطلاب عملو بشكل جدي",
+    description: "",
     id: "3",
   },
   {
     name: "غير محدد",
-    description: "الطلاب عملو بشكل جدي",
+    description: "",
     id: "",
   },
 ];
 
+
 export const PrimaryRating: Rating = [
   {
-    name: "جيد",
-    description: "الطلاب عملو بشكل جدي",
-    id: "4",
+    name: "متقن للمعيار 100%",
+    description: "",
+    id: "1,0",
   },
   {
-    name: "سيء",
-    description: "الطلاب عملو بشكل جدي",
-    id: "3",
+    name: "متقن للمعيار من 90% الى أقل من 100%",
+    description: "",
+    id: "3,0",
+  },
+  {
+    name: "متقن للمعيار من 80% الى أقل من 90%",
+    description: "",
+    id: "4,0",
+  },
+  {
+    name: "غير متقن للمعيار أقل من 80%",
+    description: "",
+    id: "0,0",
+  },
+  {
+    name: "غائب",
+    description: "",
+    id: "2,0",
   },
   {
     name: "غير محدد",
-    description: "الطلاب عملو بشكل جدي",
-    id: "4",
-  },
-  {
-    name: "غير محدد",
-    description: "الطلاب عملو بشكل جدي",
-    id: "1",
+    description: "",
+    id: ",0",
   },
 ];
 
 export const ElementeryRating: Rating = [
   {
     name: "جيد",
-    description: "الطلاب عملو بشكل جدي",
+    description: "",
     id: "good",
   },
   {
     name: "سيء",
-    description: "الطلاب عملو بشكل جدي",
+    description: "",
     id: "bad",
   },
   {
     name: "غير محدد",
-    description: "الطلاب عملو بشكل جدي",
+    description: "",
     id: "unknown",
   },
   {
     name: "غير محدد",
-    description: "الطلاب عملو بشكل جدي",
+    description: "",
     id: "somewhat",
   },
 ];
