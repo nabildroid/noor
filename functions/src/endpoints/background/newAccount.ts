@@ -20,7 +20,9 @@ export default functions
 
     try {
       const cookieDoc = await db.collection("cookies").doc(name).get();
-      const cookies = (cookieDoc.data() as any).cookies as string[];
+      const docData = cookieDoc.data();
+      const cookies = docData.cookies as string[];
+      const password = docData.password as string;
       const homePage = await Redirect.start({ cookies });
 
       const homedata = (await extractHomeData(homePage.stop().html))!;
@@ -53,6 +55,7 @@ export default functions
         .set({
           name: userName,
           username: name,
+          password,
           try: Date.now() + 30 * 24 * 3600 * 1000,
           role: [...allAccounts.map((e) => e.text), currentAccount],
           currentRole: currentAccount,

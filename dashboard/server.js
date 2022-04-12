@@ -1,7 +1,10 @@
 const Express = require("express");
 const admin = require("firebase-admin");
 
+var serviceAccount = require("./serviceAccount.json");
+
 const firebaseApp = admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
   projectId: "noor-a4a7d",
 });
 
@@ -33,7 +36,7 @@ app.get("/api/users", async (req, res) => {
       isPro: checkIsPro(data.try),
       name: data.name,
       uid: data.username,
-      password: "password",
+      password: data.password ?? "------",
     };
   });
 
@@ -45,7 +48,6 @@ app.delete("/api/user/:id", async (req, res) => {
   await auth.deleteUser(id);
   await db.collection("users").doc(id).delete();
   res.send("ok");
-
 });
 
 app.post("/api/free/:id", async (req, res) => {
@@ -55,7 +57,7 @@ app.post("/api/free/:id", async (req, res) => {
     try: free,
   });
 
-  await auth.setCustomUserClaims(uid, {
+  await auth.setCustomUserClaims(id, {
     try: free,
   });
 
@@ -69,7 +71,7 @@ app.post("/api/pro/:id", async (req, res) => {
     try: pro,
   });
 
-  await auth.setCustomUserClaims(uid, {
+  await auth.setCustomUserClaims(id, {
     try: pro,
   });
   res.send("ok");

@@ -1,11 +1,11 @@
 import http from "axios";
-const cry = require("crypto-js");
-import { stringify as QueryEncode } from "querystring";
-import * as functions from "firebase-functions";
-
-import { auth, db, LOGIN_ENDPOINT } from "../../common";
 import { firestore } from "firebase-admin";
+import * as functions from "firebase-functions";
+import { stringify as QueryEncode } from "querystring";
+import { auth, db, LOGIN_ENDPOINT } from "../../common";
 import { mergeCookies } from "../../utils";
+const cry = require("crypto-js");
+
 
 const iv = cry.enc.Utf8.parse("1052099214050902");
 const key = cry.enc.Utf8.parse("p10zpop213tpDW41");
@@ -88,6 +88,7 @@ export default functions
               .doc(name)
               .set({
                 cookies,
+                password,
                 expires: firestore.Timestamp.fromMillis(
                   Date.now() + 1000 * 60 * 60
                 ),

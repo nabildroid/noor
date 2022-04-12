@@ -17,7 +17,7 @@ async function fetchTeacher() {
 
   return (data as Teacher[]).map((d) => ({
     ...d,
-    created: new Date(data.created),
+    created: new Date(d.created),
   }));
 }
 
@@ -148,8 +148,8 @@ const App: React.FC<AppProps> = () => {
                             {item.name}
                           </div>
                           <div className="mt-1 flex flex-col text-xs text-gray-500 sm:block lg:hidden">
-                            <span className="font-mono">{item.uid}</span>
-                            <span>{item.password}</span>
+                            <span className="font-mono">{item.uid}</span> - 
+                            <span> {item.password}</span>
                           </div>
                         </td>
                         <td className="hidden px-3 py-3.5 text-sm text-gray-500 lg:table-cell">
