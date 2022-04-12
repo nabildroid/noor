@@ -127,16 +127,16 @@ export async function executeVariant(
     );
 
     // include current
-    if (!parts.length) {
-      parts.unshift(current.options);
-      variations.unshift(inputs);
-      newRedirects.unshift(redirect);
-    }
+
+    parts.unshift(current.options);
+    variations.unshift(inputs);
+    newRedirects.unshift(redirect);
 
     const promises = variations.map(async (_, index) => {
       const newRedirect = newRedirects[index];
       const variation = variations[index];
       const part = parts[index];
+      console.log(newRedirect.id+ " -> " + redirect.id)
 
       const left = variation.slice(0, i);
       const right = variation.slice(i + 1);

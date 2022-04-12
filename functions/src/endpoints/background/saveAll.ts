@@ -25,29 +25,38 @@ export default functions
     const data = snapshot.data().payload as NavigationData;
     snapshot.ref.update({ completed: true, payload: {} });
 
-    
     const homePage = Redirect.load(data);
 
     // CHECK get the skillsIDS and the form variante, you don't have to fetch all skills everytime, but the skills my vary depending on the form paramters!
 
     let { action } = data;
 
-    await executeVariant(data.inputs,homePage, {
-      execute: async (inputs) => {
+
+    await executeVariant(data.inputs, homePage, {
+      execute: async (inputs, redirect) => {
+        const { cookies, redirected, weirdData } = redirect.send({});
+
         const config = {
           ...data,
           inputs,
           action,
+          cookies,
+          from: redirected,
+          weirdData,
         };
-        const response = await executeSkillEdits(config, homePage);
+        const response = await executeSkillEdits(config, redirect);
 
         action = response.action; // CHECK this is might be the cause of paralism not working
-        homePage.setWeiredData(response.weirdData);
+        redirect.setWeiredData(response.weirdData);
       },
       recreation: async (redirect) => {
-        const newR = await Redirect.start(redirect.send({}));
+        const params = await redirect.send({});
+        const newR = await Redirect.start({
+          cookies: params.cookies,
+        });
 
         // get page title
+
         const navs = ["المهارات", "إدخال نتائج المهارة على مستوى وحدة ومهارة"];
         const { secondNav, form } = await navigateToForm(newR, {
           nav1: navs[0],
@@ -60,15 +69,21 @@ export default functions
 
         return secondNav;
       },
-      fetchOptions: async (inputs, name) => {
-        const config = {
-          ...data,
-          inputs,
-          action,
-          actionButtons: [],
-          name,
-        };
-        const response = await fetchOptions(config, homePage);
+
+      fetchOptions: async (inputs, name, redirect) => {
+        const { cookies,from, redirected, weirdData } = redirect.send({});
+        const response = await fetchOptions(
+          {
+            inputs,
+            action,
+            actionButtons: [],
+            name,
+            cookies,
+            from: redirected,
+            weirdData,
+          },
+          redirect
+        );
 
         return response.toJson().inputs;
       },
@@ -79,9 +94,7 @@ export default functions
         },
       ],
     });
-
   });
-  
 
 async function executeSkillEdits(data: NavigationData, homePage: Redirect) {
   const response = await fetchSkills(data, homePage);

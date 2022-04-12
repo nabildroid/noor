@@ -53,6 +53,7 @@ export default class Redirect {
   private target: RedirectionType;
   private redirected: string;
   private html: string;
+   id:number;
 
   private create(config: RedirectionResponse) {
     const instance = new Redirect({
@@ -100,6 +101,7 @@ export default class Redirect {
   }
 
   private constructor(config: RedirectionParams & RedirectionResponse) {
+    console.log("new Instance é~~~~~~~~~~~~~~~~~~~~~~~~~~éé");
     this.from = config.from;
     this.cookies = config.cookies;
 
@@ -110,6 +112,7 @@ export default class Redirect {
     this.html = config.html;
     this.redirected = config.redirected;
     this.prevCookies = config.prevCookies;
+    this.id  = Math.floor(Math.random() * 1000);
   }
 
   async nextIf(
