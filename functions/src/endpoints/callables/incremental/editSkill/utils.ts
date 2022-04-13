@@ -17,7 +17,7 @@ export class SkillsForm extends Form {
 
   async save(
     skills: {
-      id: number;
+      skillId: string;
       value: number;
     }[],
     redirect: Redirect
@@ -27,7 +27,7 @@ export class SkillsForm extends Form {
         .reduce(
           (acc, v, i) => [
             ...acc,
-            `${i == 0 ? "" : i - 1 + "#"}${v.value},${v.id}`,
+            `${i == 0 ? "" : i - 1 + "#"}${v.value},${v.skillId}`,
           ],
           []
         )
@@ -69,12 +69,19 @@ export class SkillsForm extends Form {
       updatePanel: (id, value) => {
         const panel = loadHtml(value);
         // CHECK hardcoded
-        if (id == "ctl00$PlaceHolderMain$UpdatePanel7") {
+
+        const isSkillsKinder = id == "ctl00$PlaceHolderMain$UpdatePanel7";
+        const isSkillsPrimary = id == "ctl00$PlaceHolderMain$UpdatePanel6";
+        const isTableWithId = !!panel("table[id]").length;
+
+        if ((isSkillsKinder || isSkillsPrimary) && isTableWithId) {
           const name = panel("table[id]").attr("id").replace(/_/g, "$");
 
           const target = panel(".GridClass").parent().html();
           if (target) {
-            const table = new SkillsTable(target);
+            let table!: Table<skill, undefined>;
+            if (isSkillsPrimary) table = new PrimarySkillsTable(target);
+            else table = new KinderSkillsTable(target);
 
             const skills = table.lines();
             this.appendSkills(name, skills);
@@ -145,7 +152,71 @@ export class SkillsForm extends Form {
   }
 }
 
-export class SkillsTable extends Table<skill, undefined> {
+export class PrimarySkillForm extends SkillsForm {
+  async save(
+    skills: {
+      id: string;
+      skillId: string;
+      value: number;
+    }[],
+    redirect: Redirect
+  ) {
+    const skillValues =
+      skills
+        .reduce(
+          (acc, v, i) => [
+            ...acc,
+            `${i == 0 ? "" : i - 1 + "#"}${v.value},${v.skillId}`,
+          ],
+          []
+        )
+        .join(",") + `,${skills.length - 1}#`;
+
+    const payload = this.fetchOptionRequestPayload(
+      {
+        name: "ctl00$PlaceHolderMain$hdnPassFlags",
+        value: skillValues,
+      },
+      []
+    );
+
+    const perfix = skills[0].id.split("$").slice(0, 3).join("$");
+    skills.forEach((skill, i) => {
+      payload[skill.id] = `${skill.value},${skill.skillId}`;
+      const isEmpty = (skill.value as any as string) === "";
+
+      if (!isEmpty) {
+        payload[
+          `${perfix}$ctl${(i + 2).toString().padStart(2, "0")}$tbTeacherNotes`
+        ] = "";
+      }
+    });
+
+    const action = this.getFormAction();
+
+    const data = await redirect.fork(action, {
+      ...payload,
+      [`${perfix}$ctl01$ddlCurentPassFlag`]: ",0",
+      __EVENTTARGET: "",
+      ctl00$ibtnYes: "نعم",
+      ctl00$hdnData_Data: "",
+      ctl00$hdnData_Operation: "Save",
+    });
+
+    return data;
+  }
+
+  static fromJson(config: {
+    action: string;
+    weirdData: { [key: string]: string };
+    inputs: FormInput[];
+    actionButtons: FormInput[];
+  }) {
+    return new PrimarySkillForm(Form.fromJson(config).html);
+  }
+}
+
+export class KinderSkillsTable extends Table<skill, undefined> {
   protected filter(tr: cheerio.Cheerio): boolean {
     return this.$("img", tr).length != 0;
   }
@@ -156,6 +227,30 @@ export class SkillsTable extends Table<skill, undefined> {
 
     const id = tr.attr("id").replace(/_/g, "$");
     const title = this.$("td", tr).first().text();
+
+    return {
+      id,
+      value,
+      title,
+      skillId: parseInt(skillId),
+    };
+  }
+}
+
+export class PrimarySkillsTable extends Table<skill, undefined> {
+  protected filter(tr: cheerio.Cheerio): boolean {
+    return this.$(".StandardFontPlain", tr).length != 0;
+  }
+  protected processLine(tr: cheerio.Cheerio): skill {
+    const select = this.$("select", tr);
+    const id = select.attr("name");
+
+    const selected = this.$("option[selected]", select);
+    const selectedValues = selected.attr("value").split(",");
+    const value = selectedValues[0];
+    const skillId = selectedValues[1];
+
+    const title = this.$("td:nth-child(3)", tr).text();
 
     return {
       id,

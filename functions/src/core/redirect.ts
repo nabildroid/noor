@@ -12,8 +12,6 @@ import {
 } from "../utils";
 import Form from "./form";
 
-
-
 type RedirectionType =
   | "MenuItemRedirect"
   | "OperationOnMenu"
@@ -53,7 +51,7 @@ export default class Redirect {
   private target: RedirectionType;
   private redirected: string;
   private html: string;
-   id:number;
+  id: number;
 
   private create(config: RedirectionResponse) {
     const instance = new Redirect({
@@ -68,7 +66,7 @@ export default class Redirect {
     const from =
       config.from ??
       "https://noor.moe.gov.sa/Noor/EduWavek12Portal/HomePage.aspx";
-      
+
     const { data, headers } = await http.get(from, {
       headers: defaultHeader(config.cookies),
     });
@@ -112,7 +110,7 @@ export default class Redirect {
     this.html = config.html;
     this.redirected = config.redirected;
     this.prevCookies = config.prevCookies;
-    this.id  = Math.floor(Math.random() * 1000);
+    this.id = Math.floor(Math.random() * 1000);
   }
 
   async nextIf(
@@ -182,6 +180,10 @@ export default class Redirect {
         "Content-Type": "application/x-www-form-urlencoded",
 
         ...config,
+      },
+      proxy: {
+        host: "localhost",
+        port: 8082,
       },
     });
 

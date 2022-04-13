@@ -32,37 +32,36 @@ export const KinderRating: Rating = [
   },
 ];
 
-
 export const PrimaryRating: Rating = [
   {
     name: "متقن للمعيار 100%",
     description: "",
-    id: "1,0",
+    id: "1",
   },
   {
     name: "متقن للمعيار من 90% الى أقل من 100%",
     description: "",
-    id: "3,0",
+    id: "3",
   },
   {
     name: "متقن للمعيار من 80% الى أقل من 90%",
     description: "",
-    id: "4,0",
+    id: "4",
   },
   {
     name: "غير متقن للمعيار أقل من 80%",
     description: "",
-    id: "0,0",
+    id: "0",
   },
   {
     name: "غائب",
     description: "",
-    id: "2,0",
+    id: "2",
   },
   {
     name: "غير محدد",
     description: "",
-    id: ",0",
+    id: "",
   },
 ];
 
@@ -96,8 +95,3 @@ export function RateByName(arr: Rating, name: string) {
 export function RateById(arr: Rating, id: string) {
   return arr.find((e) => e.id == id) || arr[0];
 }
-
-export const RateToId = (name: string) =>
-  [...KinderRating,...ElementeryRating, , ...PrimaryRating].find(
-    (e) => e!.name == name
-  )!.id;

@@ -50,9 +50,11 @@ export interface EditSkillSubmit {
   action: string;
   inputs: FormInput[];
   skills: {
-    id: number;
+    id: string;
+    skillId: number;
     value: number | string;
   }[];
+  isPrimary: boolean;
 }
 
 export interface SaveAllSubmit {

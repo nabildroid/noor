@@ -11,9 +11,9 @@ import SlideTransition from "../../layout/home/slideTransition";
 import { NoorSection, NoorSkill, TeacherType } from "../../models/home_model";
 import rates, {
   KinderRating,
+  PrimaryRating,
   RateById,
-  RateByName,
-  RateToId
+  RateByName
 } from "../../models/rating";
 import Repository from "../../repository";
 import { teacherTypeArabic, wait } from "../../utils";
@@ -48,7 +48,9 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
-  const ratingSystem = KinderRating;
+  const ratingSystem =
+    teacherType == TeacherType.kindergarten ? KinderRating : PrimaryRating;
+
   const {
     inputs,
     setForm,
@@ -100,20 +102,28 @@ const EditSkill: React.FC<EditSkillProps> = () => {
   function fetchSkills() {
     wait(async () => {
       const response = await submit("skillSubmit", {});
-      setSkills(response.skills);
+      setSkills(
+        response.skills.map((e) => ({
+          ...e,
+          value: ratingSystem.find((i) => i.id == e.value)!.name,
+        }))
+      );
     }, setLoading);
   }
 
   const saveCustom = () =>
     wait(async () => {
+      const skillValue = teacherType == TeacherType.primary ? "id" : "name";
       const editedSkills = skills.map((s) => ({
-        id: s.skillId,
-        value: RateToId(s.value).toString(),
+        ...s,
+        value: RateByName(ratingSystem, s.value)[skillValue],
       }));
+
       const data = await Repository.instance.editSkillSave({
         action: formAction!,
         inputs,
         skills: editedSkills,
+        isPrimary: teacherType == TeacherType.primary,
       });
 
       setForm(data.form);
@@ -129,9 +139,10 @@ const EditSkill: React.FC<EditSkillProps> = () => {
         action: formAction!,
         inputs,
         skills: skills.map((s) => ({
-          id: s.skillId,
+          ...s,
           value: allOneSkill.id as any,
         })),
+        isPrimary: teacherType == TeacherType.primary,
       });
 
       setForm(data.form);

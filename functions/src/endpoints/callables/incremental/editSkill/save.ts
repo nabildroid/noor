@@ -2,15 +2,17 @@ import * as functions from "firebase-functions";
 import { FormInput } from "../../../../core/form";
 import Redirect from "../../../../core/redirect";
 import { IncrementalData } from "../../../../types";
-import { SkillsForm } from "./utils";
+import { PrimarySkillForm, SkillsForm } from "./utils";
 
 interface NavigationData extends IncrementalData {
   action: string;
   inputs: FormInput[];
   skills: {
-    id: number;
+    id: string;
+    skillId: string;
     value: number;
   }[];
+  isPrimary: boolean;
 }
 
 export default functions
@@ -20,17 +22,31 @@ export default functions
 
     const form = await saveSkills(data, homePage);
 
+    console.log("#####################");
+    console.log(form.toJson().skills.map(m=>m.value));
     return homePage.sendForm(form);
   });
 
 export async function saveSkills(data: NavigationData, homePage: Redirect) {
-  const form = SkillsForm.fromJson({
-    action: data.action,
-    weirdData: data.weirdData,
-    inputs: data.inputs,
-    actionButtons: [],
-    ...homePage.send({}),
-  });
+  let form: SkillsForm;
+
+  if (data.isPrimary) {
+    form = PrimarySkillForm.fromJson({
+      action: data.action,
+      weirdData: data.weirdData,
+      inputs: data.inputs,
+      actionButtons: [],
+      ...homePage.send({}),
+    });
+  } else {
+    form = SkillsForm.fromJson({
+      action: data.action,
+      weirdData: data.weirdData,
+      inputs: data.inputs,
+      actionButtons: [],
+      ...homePage.send({}),
+    });
+  }
 
   const response = await form.save(data.skills, homePage);
   form.updateFromSubmission(response);
