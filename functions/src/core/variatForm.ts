@@ -1,4 +1,4 @@
-import { clone } from "../utils";
+import { clone, randomDelay } from "../utils";
 import { FormInput } from "./form";
 import Redirect from "./redirect";
 
@@ -29,7 +29,6 @@ export async function executeVariant(
       name: string,
       redirect: Redirect
     ): Promise<FormInput[]>;
-    recreation(redirect: Redirect): Promise<Redirect>;
     customSelect: { name: string; value: string }[];
     walked?: Set<string>;
     isDone?: boolean;
@@ -54,8 +53,8 @@ export async function executeVariant(
       return;
     } else {
       config.walked.add(currentPath);
-      await config.execute(inputs, redirect);
-      return;
+      await randomDelay(3000);
+      return config.execute(inputs, redirect);
     }
   } else if (i - inputs.length > 0) {
     console.error(
@@ -68,6 +67,8 @@ export async function executeVariant(
   }
 
   const current = inputs[i];
+  const left = inputs.slice(0, i);
+  const right = inputs.slice(i + 1);
 
   const options = removeEmpty(current.options);
   const nextInputOptions = removeEmpty(inputs[i + 1]?.options ?? []);
@@ -97,68 +98,29 @@ export async function executeVariant(
   } else if (getSelected(options)) {
     return await executeVariant(inputs, redirect, config, i + 1);
   } else {
-    // create slices
-    const notSelectedOptions = options.map((e) => ({
-      ...e,
-      selected: false,
-    }));
+    const alls: Promise<any>[] = [];
+    for (const e of removeEmpty(options)) {
+      let request = executeVariant(
+        [
+          ...left,
+          {
+            ...current,
+            options: selectOpt(options, e.text),
+          },
+          ...right,
+        ],
+        redirect,
+        config,
+        i + 1
+      );
 
-    const parts: FormInput["options"][] = [];
-    const total = notSelectedOptions.length;
-    const slices = Math.round(total / 2);
-
-    let s = 0;
-    for (s; s < total; s += slices) {
-      parts.push(notSelectedOptions.slice(s, s + slices));
+      if (last.length) {
+        alls.push(request);
+      } else await request;
     }
 
-    const tempInputs = clone(inputs);
-
-    current.options = parts.shift();
-
-    const variations = parts.map((part) => {
-      const temp = clone(tempInputs);
-      temp[i].options = part;
-      return temp;
-    });
-
-    const newRedirects = await Promise.all(
-      parts.map((_) => config.recreation(redirect))
-    );
-
-    // include current
-
-    parts.unshift(current.options);
-    variations.unshift(inputs);
-    newRedirects.unshift(redirect);
-
-    const promises = variations.map(async (_, index) => {
-      const newRedirect = newRedirects[index];
-      const variation = variations[index];
-      const part = parts[index];
-      console.log(newRedirect.id+ " -> " + redirect.id)
-
-      const left = variation.slice(0, i);
-      const right = variation.slice(i + 1);
-
-      for (const e of removeEmpty(part)) {
-        await executeVariant(
-          [
-            ...left,
-            {
-              ...current,
-              options: selectOpt(part, e.text),
-            },
-            ...right,
-          ],
-          newRedirect,
-          config,
-          i + 1
-        );
-      }
-    });
-
-    return await Promise.all(promises);
+    await Promise.all(alls);
+    console.log("---------------------");
   }
 }
 

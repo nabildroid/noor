@@ -6,7 +6,6 @@ import { IncrementalData } from "../../types";
 import { saveSkills } from "../callables/incremental/editSkill/save";
 import { fetchSkills } from "../callables/incremental/editSkill/submit";
 import { fetchOptions } from "../callables/incremental/formOptions";
-import { navigateToForm } from "../callables/incremental/navigation";
 
 interface NavigationData extends IncrementalData {
   action: string;
@@ -31,7 +30,6 @@ export default functions
 
     let { action } = data;
 
-
     await executeVariant(data.inputs, homePage, {
       execute: async (inputs, redirect) => {
         const { cookies, redirected, weirdData } = redirect.send({});
@@ -49,29 +47,9 @@ export default functions
         action = response.action; // CHECK this is might be the cause of paralism not working
         redirect.setWeiredData(response.weirdData);
       },
-      recreation: async (redirect) => {
-        const params = await redirect.send({});
-        const newR = await Redirect.start({
-          cookies: params.cookies,
-        });
-
-        // get page title
-
-        const navs = ["المهارات", "إدخال نتائج المهارة على مستوى وحدة ومهارة"];
-        const { secondNav, form } = await navigateToForm(newR, {
-          nav1: navs[0],
-          nav2: navs[1],
-          account: "",
-          ...newR.send({}),
-        });
-
-        secondNav.setWeiredData(form.getWeirdData());
-
-        return secondNav;
-      },
 
       fetchOptions: async (inputs, name, redirect) => {
-        const { cookies,from, redirected, weirdData } = redirect.send({});
+        const { cookies, from, redirected, weirdData } = redirect.send({});
         const response = await fetchOptions(
           {
             inputs,
@@ -102,7 +80,8 @@ async function executeSkillEdits(data: NavigationData, homePage: Redirect) {
   let { action, skills, inputs } = response.toJson();
   // submit
   let editedSkill = skills.map((s) => ({
-    id: s.skillId,
+    id: s.id,
+    skillId: s.skillId.toString(),
     value: data.rate,
   }));
 
@@ -111,6 +90,7 @@ async function executeSkillEdits(data: NavigationData, homePage: Redirect) {
       ...data,
       inputs,
       action,
+      isPrimary: false,
       skills: editedSkill,
     },
     homePage

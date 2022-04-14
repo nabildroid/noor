@@ -76,7 +76,11 @@ export function mergeCookies(...cookies: string[][]) {
 
 export function replaceNullValues(ob: { [key: string]: any }, repalce: any) {
   Object.keys(ob).forEach(
-    (k) => (ob[k] = ob[k] == null || (ob[k] == "null"||ob[k]  == "undefined") ? repalce : ob[k])
+    (k) =>
+      (ob[k] =
+        ob[k] == null || ob[k] == "null" || ob[k] == "undefined"
+          ? repalce
+          : ob[k])
   );
   return ob;
 }
@@ -90,6 +94,9 @@ export function clone<T>(ob: T) {
   return undefined;
 }
 
-
-
-
+export function randomDelay(max: number) {
+  const rand = Math.floor(Math.random() * max);
+  return new Promise((res) => {
+    setTimeout(res, rand);
+  });
+}
