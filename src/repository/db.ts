@@ -29,7 +29,6 @@ export default class DB {
 
     return onSnapshot(teacherDoc, {}, (snapshot) => {
       if (snapshot.exists()) {
-        console.log(snapshot.id);
         listener(snapshot.data() as Teacher);
       }
     });

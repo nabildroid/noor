@@ -42,14 +42,14 @@ export default functions
           from: redirected,
           weirdData,
         };
-        const response = await executeSkillEdits(config, redirect);
+        const response = await executeSkillEdits(config,true, redirect);
 
         action = response.action; // CHECK this is might be the cause of paralism not working
         redirect.setWeiredData(response.weirdData);
       },
 
       fetchOptions: async (inputs, name, redirect) => {
-        const { cookies, from, redirected, weirdData } = redirect.send({});
+        const { cookies, redirected, weirdData } = redirect.send({});
         const response = await fetchOptions(
           {
             inputs,
@@ -72,10 +72,16 @@ export default functions
         },
       ],
     });
+
+    console.log("############################################");
   });
 
-async function executeSkillEdits(data: NavigationData, homePage: Redirect) {
-  const response = await fetchSkills(data, homePage);
+async function executeSkillEdits(
+  data: NavigationData,
+  isPrimary: boolean,
+  homePage: Redirect
+) {
+  const response = await fetchSkills(data, isPrimary, homePage);
   // get all the skills with thier ids
   let { action, skills, inputs } = response.toJson();
   // submit
@@ -90,7 +96,7 @@ async function executeSkillEdits(data: NavigationData, homePage: Redirect) {
       ...data,
       inputs,
       action,
-      isPrimary: false,
+      isPrimary,
       skills: editedSkill,
     },
     homePage

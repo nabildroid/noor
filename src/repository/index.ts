@@ -30,7 +30,6 @@ export default class Repository {
   }
 
   isExpired() {
-    console.log(this);
     const expirationTime = 50 * 60; // 5mins
     return (
       Date.now() - (new Date(this.bouncingData?.date ?? "").getTime() ?? 0) >

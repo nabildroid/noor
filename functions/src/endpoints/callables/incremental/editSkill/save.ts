@@ -23,7 +23,6 @@ export default functions
     const form = await saveSkills(data, homePage);
 
     console.log("#####################");
-    console.log(form.toJson().skills.map(m=>m.value));
     return homePage.sendForm(form);
   });
 

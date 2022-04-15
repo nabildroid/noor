@@ -5,7 +5,6 @@ import * as html_to_pdf from "html-pdf-node";
 import { FormInput } from "../../../../core/form";
 import Table from "../../../../core/table";
 
-
 export type skill = {
   id: string;
   value: string;
@@ -44,9 +43,7 @@ export function createParmsFromInputs(inputs: FormInput[]) {
   return result;
 }
 
-
-export type Item  = { title: string; students: skill[] };
-
+export type Item = { title: string; students: skill[] };
 
 export function createCSV(items: Item[], fileName: string) {
   let csv = "";
@@ -70,18 +67,24 @@ export function createCSV(items: Item[], fileName: string) {
   return tempFilePath;
 }
 
-export async function createPDF(items: Item[], fileName: string, inputs: FormInput[]) {
+export async function createPDF(
+  items: Item[],
+  fileName: string,
+  inputs: FormInput[]
+) {
   //  todo use the rating from front end
 
-  const ratings = [
+  let ratings = [
     ...items.reduce((acc, i) => {
       i.students.reduce((a, s) => {
         a.add(s.value);
         return a;
       }, acc);
       return acc;
-    }, new Set<string>()),
-  ];
+    }, new Set<string>(Ratins[0].map((e) => e.name))),
+  ].filter(Boolean);
+
+  console.log(ratings);
 
   const students = {};
 
@@ -249,12 +252,88 @@ ${config.head
   `;
 }
 
-
-
-
- function formInputValue(inputs: FormInput[], name: string) {
+function formInputValue(inputs: FormInput[], name: string) {
   return (
     inputs.find((i) => i.name == name)?.options.find((o) => o.selected)?.text ??
     ""
   );
 }
+
+export const Ratins = [
+  [
+    {
+      name: "أتقن",
+      description: "",
+      id: "1",
+    },
+    {
+      name: "لم يتقن",
+      description: "",
+      id: "2",
+    },
+    {
+      name: "إلى حد ما",
+      description: "",
+      id: "3",
+    },
+    {
+      name: "غير محدد",
+      description: "",
+      id: "",
+    },
+  ],
+  [
+    {
+      name: "متقن للمعيار 100%",
+      description: "",
+      id: "1",
+    },
+    {
+      name: "متقن للمعيار من 90% الى أقل من 100%",
+      description: "",
+      id: "3",
+    },
+    {
+      name: "متقن للمعيار من 80% الى أقل من 90%",
+      description: "",
+      id: "4",
+    },
+    {
+      name: "غير متقن للمعيار أقل من 80%",
+      description: "",
+      id: "0",
+    },
+    {
+      name: "غائب",
+      description: "",
+      id: "2",
+    },
+    {
+      name: "غير محدد",
+      description: "",
+      id: "",
+    },
+  ],
+  [
+    {
+      name: "جيد",
+      description: "",
+      id: "good",
+    },
+    {
+      name: "سيء",
+      description: "",
+      id: "bad",
+    },
+    {
+      name: "غير محدد",
+      description: "",
+      id: "unknown",
+    },
+    {
+      name: "غير محدد",
+      description: "",
+      id: "somewhat",
+    },
+  ],
+];

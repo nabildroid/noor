@@ -31,7 +31,6 @@ const useFetchTeacher = ({ user }: params) => {
             ? dateDiffInDays(data.try, Date.now())
             : false,
       });
-      console.log(data);
     });
   }, [user]);
 

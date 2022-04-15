@@ -144,7 +144,6 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
   };
 
   const setPresense = (studentId: number, moduleTitle: string, id: string) => {
-    console.log(id);
     if (!currentDegree) return;
 
     setDegrees(

@@ -57,7 +57,7 @@ export class SkillsForm extends Form {
       ctl00$ibtnYes: "نعم",
       ctl00$hdnData_Data: "",
       ctl00$hdnData_Operation: "Save",
-    });
+    },undefined,3000);
 
     return data;
   }
@@ -71,17 +71,16 @@ export class SkillsForm extends Form {
         // CHECK hardcoded
 
         const isSkillsKinder = id == "ctl00$PlaceHolderMain$UpdatePanel7";
-        const isSkillsPrimary = id == "ctl00$PlaceHolderMain$UpdatePanel6";
-        const isTableWithId = !!panel("table[id]").length;
+        const isGridClass = !!panel(".GridClass").length;
 
-        if ((isSkillsKinder || isSkillsPrimary) && isTableWithId) {
-          const name = panel("table[id]").attr("id").replace(/_/g, "$");
+        if (isGridClass) {
+          const name = panel("table[id]")?.attr("id")?.replace(/_/g, "$");
 
           const target = panel(".GridClass").parent().html();
           if (target) {
             let table!: Table<skill, undefined>;
-            if (isSkillsPrimary) table = new PrimarySkillsTable(target);
-            else table = new KinderSkillsTable(target);
+            if (isSkillsKinder) table = new KinderSkillsTable(target);
+            else table = new PrimarySkillsTable(target);
 
             const skills = table.lines();
             this.appendSkills(name, skills);

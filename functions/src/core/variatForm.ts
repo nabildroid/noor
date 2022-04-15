@@ -53,7 +53,7 @@ export async function executeVariant(
       return;
     } else {
       config.walked.add(currentPath);
-      await randomDelay(3000);
+      await randomDelay(500);
       return config.execute(inputs, redirect);
     }
   } else if (i - inputs.length > 0) {
@@ -92,7 +92,7 @@ export async function executeVariant(
       redirect
     );
     return await executeVariant(filled, redirect, config, i);
-  } else if (getSelected(options) && !nextInputOptions.length) {
+  } else if (getSelected(options) && !nextInputOptions.length && i + 1 < inputs.length) {
     const filled = await config.fetchOptions(inputs, current.name, redirect);
     return await executeVariant(filled, redirect, config, i + 2);
   } else if (getSelected(options)) {
@@ -119,7 +119,7 @@ export async function executeVariant(
       } else await request;
     }
 
-    await Promise.all(alls);
+    await Promise.allSettled(alls);
     console.log("---------------------");
   }
 }

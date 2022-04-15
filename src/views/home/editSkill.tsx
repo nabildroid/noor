@@ -101,11 +101,14 @@ const EditSkill: React.FC<EditSkillProps> = () => {
 
   function fetchSkills() {
     wait(async () => {
+      const skillValue = teacherType == TeacherType.primary ? "id" : "name";
+
       const response = await submit("skillSubmit", {});
+
       setSkills(
         response.skills.map((e) => ({
           ...e,
-          value: ratingSystem.find((i) => i.id == e.value)!.name,
+          value: RateByName(ratingSystem, e.value)[skillValue] as string,
         }))
       );
     }, setLoading);
@@ -113,10 +116,9 @@ const EditSkill: React.FC<EditSkillProps> = () => {
 
   const saveCustom = () =>
     wait(async () => {
-      const skillValue = teacherType == TeacherType.primary ? "id" : "name";
       const editedSkills = skills.map((s) => ({
         ...s,
-        value: RateByName(ratingSystem, s.value)[skillValue],
+        value: RateByName(ratingSystem, s.value).id,
       }));
 
       const data = await Repository.instance.editSkillSave({

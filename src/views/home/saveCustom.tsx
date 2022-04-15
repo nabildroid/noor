@@ -53,6 +53,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
     loadingIndex,
   } = useFormOptions({
     excludedNames: ["ddlSkills"],
+    actionName:teacherType == TeacherType.primary?"ibtnS10": "ibtnSearch",
   });
 
   useEffect(() => {

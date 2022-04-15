@@ -98,6 +98,7 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
       e.name?.includes(actionName ?? "")
     );
 
+   
     setLoadinIndex(-1);
     const action = await Repository.instance.submitForm(type, {
       ...payload, // CHECK should i deconstruct the payload or not
@@ -166,7 +167,6 @@ function formatInputs(inputs: FormInput[]) {
   const last: FormInput[] = [];
   let flip = false;
 
-  console.log(inputs);
   formated .forEach((inp) => {
     if (inp.name?.includes("$ddlSpecialty")) {
       return first.push(inp);

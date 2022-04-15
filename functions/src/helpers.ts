@@ -1,6 +1,6 @@
 import { load as loadHtml } from "cheerio";
-
 import { extractRoleId, hiddenInputs } from "./utils";
+
 
 export async function extractHomeData(data: string) {
   try {

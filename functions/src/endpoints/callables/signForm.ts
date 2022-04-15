@@ -1,15 +1,12 @@
 import http from "axios";
 import { load as loadHtml } from "cheerio";
-
 import * as functions from "firebase-functions";
 import { LOGIN_ENDPOINT } from "../../common";
 import { hiddenInputs } from "../../utils";
 
 export default functions
   .region("asia-south1")
-  .runWith({
-    minInstances: 1,
-  })
+
   .https.onCall(async (_, __) => {
     const response = await http.get(LOGIN_ENDPOINT, {
       headers: {

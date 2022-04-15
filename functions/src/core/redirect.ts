@@ -1,4 +1,5 @@
 import http from "axios";
+import axiosRetry from "axios-retry";
 import { load as loadHtml } from "cheerio";
 import * as FormData from "form-data";
 import { stringify as QueryEncode } from "querystring";
@@ -41,6 +42,14 @@ interface RedirectionResponse {
   redirected: string;
   prevCookies: string[];
 }
+
+axiosRetry(http, {
+  retryCondition: (err) => {
+    if(err.config.data.includes("ctl00$ibtnYes")){
+      return false;
+    }else return true
+  },
+});
 
 export default class Redirect {
   private from: string;
@@ -99,7 +108,7 @@ export default class Redirect {
   }
 
   private constructor(config: RedirectionParams & RedirectionResponse) {
-    console.log("new Instance é~~~~~~~~~~~~~~~~~~~~~~~~~~éé");
+    console.log("new Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~éé");
     this.from = config.from;
     this.cookies = config.cookies;
 
@@ -165,7 +174,8 @@ export default class Redirect {
       "X-MicrosoftAjax": "Delta=true",
       "X-Requested-With": "XMLHttpRequest",
       ADRUM: "isAjax:true",
-    } as {}
+    } as {},
+    timeout: number = 30000
   ) {
     const cookies = mergeCookies(this.prevCookies, this.cookies);
     if (!(payload instanceof FormData)) {
@@ -181,10 +191,12 @@ export default class Redirect {
 
         ...config,
       },
-      proxy: {
-        host: "localhost",
-        port: 8082,
-      },
+
+      timeout,
+      proxy:{
+        host:"localhost",
+        port:8082,
+      }
     });
 
     this.weirdData = hiddenInputs(loadHtml(data));

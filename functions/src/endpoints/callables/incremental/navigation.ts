@@ -15,9 +15,7 @@ interface NavigationData extends IncrementalData {
 
 export default functions
   .region("asia-south1")
-  .runWith({
-    minInstances: 1,
-  })
+  
   .https.onCall(async (data: NavigationData, context) => {
     const homePage = await Redirect.start({
       from:

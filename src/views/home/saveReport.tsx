@@ -57,6 +57,7 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
   const { inputs, setForm, submit, isAllChosen, updateInputs, loadingIndex } =
     useFormOptions({
       excludedNames: ["ddlStudySystem", "ddlSkillTypeDesc", "ddlSkill"],
+      actionName:"ibtnSearch"
     });
 
   useEffect(() => {
@@ -70,11 +71,11 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
       isEmpty,
     });
 
-    navigate("/" + HomeTab.savedReports);
+    // navigate("/" + HomeTab.savedReports);
   }
 
   const actions = createAction({
-    enable: isAllChosen && loadingIndex != -1,
+    // enable: isAllChosen && loadingIndex != -1,
     buttons: [
       {
         label: "انشاء فارغ",
@@ -84,7 +85,7 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
       },
       {
         label: "انشاء مرصود",
-        onClick: save,
+        onClick: ()=>save(),
         progress: true,
       },
     ],

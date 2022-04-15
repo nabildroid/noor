@@ -9,7 +9,6 @@ import { fetchSkills } from "../editSkill/submit";
 import { fetchOptions } from "../formOptions";
 import { createCSV, createParmsFromInputs, createPDF, Item } from "./utils";
 
-
 import path = require("path");
 
 interface NavigationData extends IncrementalData {
@@ -18,9 +17,6 @@ interface NavigationData extends IncrementalData {
   actionButton?: FormInput;
   isEmpty: boolean;
 }
-
-
-
 
 export default functions
   .region("asia-south1")
@@ -34,31 +30,33 @@ export default functions
 
     let items: Item[] = [];
 
-    await executeVariant(data.inputs, {
-      execute: async (inputs) => {
+    await executeVariant(data.inputs, homePage, {
+      execute: async (inputs, redirect) => {
+        const { cookies, redirected, weirdData } = redirect.send({});
+
         const title = inputs[inputs.length - 1].options.find(
           (e) => e.selected
         )!.text;
 
-        const response = await fetchSkills(
-          {
-            ...data,
-            inputs,
-            action,
-          },
-          homePage
-        );
+        const config = {
+          ...data,
+          inputs,
+          action,
+          cookies,
+          from: redirected,
+          weirdData,
+        };
+
+        const response = await fetchSkills(config, false,homePage);
         // get all the skills with thier ids
-        let { action: newAction, skills, weirdData } = response.toJson();
+        action = response.toJson().action;
 
         items.push({
           title,
-          students: skills,
+          students: response.toJson().skills,
         });
 
-        action = newAction;
-
-        homePage.setWeiredData(weirdData);
+        redirect.setWeiredData(response.getWeirdData());
       },
       fetchOptions: async (inputs, name) => {
         const response = await fetchOptions(
@@ -127,4 +125,3 @@ export default functions
 
     return homePage.send({});
   });
-

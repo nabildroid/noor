@@ -27,7 +27,6 @@ const Login: React.FC = ({}) => {
 
   const submit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    console.log("hello world");
     if (captchCode?.toString().length != 4) {
       return;
     }
