@@ -43,6 +43,7 @@ export interface FormSubmit {
   action: string;
   inputs: FormInput[];
   actionButton: FormInput;
+  isPrimary: boolean;
   // type: // todo submit type!
 }
 
@@ -61,18 +62,21 @@ export interface SaveAllSubmit {
   action: string;
   inputs: FormInput[];
   rate: number | string;
+  isPrimary: boolean;
 }
 
 export interface DegreeSave {
   action: string;
   inputs: FormInput[];
   degrees: Degrees[];
+  isPrimary: boolean;
 }
 
 export interface ReportSubmit {
   action: string;
   inputs: FormInput[];
   isEmpty: boolean;
+  isPrimary: boolean;
 }
 
 // ensuring the communication between the backend and frontend using typescript!
@@ -91,6 +95,11 @@ export type FormSubmitLookup =
       type: "degreeSubmit";
       payload: FormSubmit;
       response: SaveDegreeNavigateResponse;
+    }
+  | {
+      type: "newExamReport";
+      payload: ReportSubmit;
+      response: NavigationResponse;
     }
   | {
       type: "newSkillReport";

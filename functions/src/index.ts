@@ -6,6 +6,7 @@ import formOption from "./endpoints/callables/incremental/formOptions";
 import navigation from "./endpoints/callables/incremental/navigation";
 import degreeSave from "./endpoints/callables/incremental/saveDegree/save";
 import degreeSubmit from "./endpoints/callables/incremental/saveDegree/submit";
+import newExamReport from "./endpoints/callables/incremental/saveReport/exmaReport";
 import newSkillReport from "./endpoints/callables/incremental/saveReport/skillReport";
 import postSignForm from "./endpoints/callables/postSignForm";
 import signForm from "./endpoints/callables/signForm";
@@ -21,5 +22,6 @@ export {
   newSkillReport,
   degreeSubmit,
   degreeSave,
+  newExamReport,
   saveAll,
 };

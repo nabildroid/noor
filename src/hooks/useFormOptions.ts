@@ -12,6 +12,7 @@ interface Props {
   excludedIds?: string[];
   excludedNames?: string[];
   actionName?: string;
+  isPrimary:boolean;
 }
 
 type SubmitType = <
@@ -27,7 +28,7 @@ type SubmitType = <
 const createPath = (x: {}) => Object.values(x).join("-");
 
 // todo use label to cach data
-export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
+export default ({ isPrimary, excludedIds, excludedNames, actionName }: Props) => {
   const [form, setForm] = useState<Form>();
   const [inputs, setInputs] = useState<FormInput[]>([]);
   const [loadingIndex, setLoadinIndex] = useState(100);
@@ -105,6 +106,7 @@ export default ({ label, excludedIds, excludedNames, actionName }: Props) => {
       action: form!.action,
       actionButton: actionButton!,
       inputs: inputs,
+      isPrimary,
     });
 
     setLoadinIndex(1000);

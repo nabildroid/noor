@@ -34,12 +34,9 @@ function fetchExam(account: string) {
   });
 }
 
-
-
 function pageTitle(type: TeacherType) {
   return tabBarTitle(HomeTab.saveReport, type);
 }
-
 
 function fetch(type: TeacherType, account: string) {
   if (type == TeacherType.kindergarten) {
@@ -56,8 +53,14 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
 
   const { inputs, setForm, submit, isAllChosen, updateInputs, loadingIndex } =
     useFormOptions({
-      excludedNames: ["ddlStudySystem", "ddlSkillTypeDesc", "ddlSkill"],
-      actionName:"ibtnSearch"
+      excludedNames: [
+        TeacherType.kindergarten ? "ddlStudySystem" : "one of the hardest progets i ever do!",
+        "ddlSkillTypeDesc",
+        "ddlSkill",
+      ],
+      actionName:
+        teacherType == TeacherType.kindergarten ? "ibtnSearch" : "btY21",
+      isPrimary: teacherType == TeacherType.primary,
     });
 
   useEffect(() => {
@@ -67,7 +70,8 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
   }, []);
 
   async function save(isEmpty: boolean = false) {
-    await submit("newSkillReport", {
+    const isExams = teacherType == TeacherType.primary;
+    await submit(isExams ? "newExamReport" : "newSkillReport", {
       isEmpty,
     });
 
@@ -85,12 +89,11 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
       },
       {
         label: "انشاء مرصود",
-        onClick: ()=>save(),
+        onClick: () => save(),
         progress: true,
       },
     ],
   });
-
 
   const title = pageTitle(teacherType!);
 

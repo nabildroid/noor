@@ -48,6 +48,7 @@ export type BackgroundTask<T> = {
   user: string;
   completed: boolean;
   payload: T & BouncingNavigation;
+  isPrimary:boolean;
 };
 
 export type Report = {

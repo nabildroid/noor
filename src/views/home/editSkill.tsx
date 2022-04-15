@@ -61,6 +61,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     isAllChosen,
   } = useFormOptions({
     actionName: teacherType == TeacherType.primary ? "Rtb44" : "ibtnSearch",
+    isPrimary: teacherType == TeacherType.primary,
   });
 
   useEffect(() => {

@@ -7,7 +7,7 @@ import { IncrementalData } from "../../../../types";
 import { randomString } from "../../../../utils";
 import { fetchSkills } from "../editSkill/submit";
 import { fetchOptions } from "../formOptions";
-import { createCSV, createParmsFromInputs, createPDF, Item } from "./utils";
+import { createCSV, createParmsFromInputs, createSKillsPDF, Item } from "./utils";
 
 import path = require("path");
 
@@ -47,7 +47,7 @@ export default functions
           weirdData,
         };
 
-        const response = await fetchSkills(config, false,homePage);
+        const response = await fetchSkills(config, data.isPrimary,homePage);
         // get all the skills with thier ids
         action = response.toJson().action;
 
@@ -96,7 +96,7 @@ export default functions
     const fileName = randomString();
 
     const csv = createCSV(items, fileName);
-    const pdf = await createPDF(items, fileName, data.inputs);
+    const pdf = await createSKillsPDF(items, fileName, data.inputs);
 
     const config = (filePath: string) => ({
       metadata: {

@@ -12,4 +12,5 @@ export type IncrementalData = {
   weirdData?: weird;
   cookies: string[];
   from?: string;
+  isPrimary: boolean;
 };

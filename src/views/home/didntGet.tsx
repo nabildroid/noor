@@ -7,7 +7,7 @@ import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
 import Page from "../../layout/home/page";
-import { NoorSection, NoorSkill } from "../../models/home_model";
+import { NoorSection, NoorSkill, TeacherType } from "../../models/home_model";
 import Repository from "../../repository";
 
 interface DidntGetProps {}
@@ -46,6 +46,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
     useFormOptions({
       label: "DidntGet" + teacherType,
       actionName: "ibtnSearch",
+      isPrimary: teacherType == TeacherType.primary,
     });
 
   const [notyType, setNotyType] = useState<NotyType>();

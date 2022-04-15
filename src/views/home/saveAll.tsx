@@ -39,6 +39,8 @@ const SaveAll: React.FC<SaveAllProps> = () => {
 
   const { setForm, letMeHandleIt } = useFormOptions({
     actionName: "ibtnSearch",
+    isPrimary:teacherType == TeacherType.primary,
+
   });
 
   useEffect(() => {
@@ -60,6 +62,8 @@ const SaveAll: React.FC<SaveAllProps> = () => {
       completed: false,
       type: BackgroundTaskType.saveAll,
       user: user!.uid,
+      isPrimary:teacherType == TeacherType.primary,
+
     };
 
     wait(() => DB.instance.createTask(task), setLoading);

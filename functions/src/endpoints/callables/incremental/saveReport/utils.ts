@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as html_to_pdf from "html-pdf-node";
 import { FormInput } from "../../../../core/form";
 import Table from "../../../../core/table";
+import { Degrees } from "../saveDegree/utils";
 
 export type skill = {
   id: string;
@@ -67,7 +68,73 @@ export function createCSV(items: Item[], fileName: string) {
   return tempFilePath;
 }
 
-export async function createPDF(
+export async function createDegreesPDF(
+  degrees: Degrees[],
+  fileName: string,
+  inputs: FormInput[]
+) {
+
+  let modules = [
+    ...degrees.reduce((acc, i) => {
+      i.modules.reduce((a, s) => {
+        a.add(s.title);
+        return a;
+      }, acc);
+      return acc;
+    }, new Set<string>()),
+  ].filter(Boolean);
+
+
+
+  const texts:string[][] = [];
+
+
+  degrees.forEach(degree=>{
+    const temp = [degree.studentName];
+    degree.modules.forEach(m=>temp.push(m.input.value.toString()));
+    texts.push(temp)
+  });
+
+  const template = createPDFTemplate({
+    head: ["اسم الطالب", ...modules],
+    title: " كشف درجاة الفصل",
+    items: texts,
+    details: {
+      length: degrees.length,
+      class: formInputValue(inputs, "ctl00$PlaceHolderMain$ddlClass"),
+      semester: formInputValue(inputs, "ctl00$PlaceHolderMain$ddlSection"),
+      unit: formInputValue(inputs, "ctl00$PlaceHolderMain$ddlPeriodEnter"),
+      type: formInputValue(inputs, "ctl00$PlaceHolderMain$ddlCourse"),
+    },
+  });
+
+  console.log(texts);
+
+  
+
+  let options = {
+    printBackground: true,
+    format: "A3",
+    margin: {
+      top: "20px",
+    },
+  };
+
+  let file = { content: template };
+
+  const tempFilePath = path.join(os.tmpdir(), fileName + ".pdf");
+
+  await new Promise<void>((res) => {
+    html_to_pdf.generatePdf(file, options).then((pdfBuffer) => {
+      fs.writeFileSync(tempFilePath, pdfBuffer);
+      res();
+    });
+  });
+
+  return tempFilePath;
+}
+
+export async function createSKillsPDF(
   items: Item[],
   fileName: string,
   inputs: FormInput[]
@@ -161,9 +228,13 @@ function createPDFTemplate(config: {
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>${config.title}</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;500;900&display=swap" rel="stylesheet">
+
     </head>
     <body>
-      <div style=" padding: 0 3em">
+      <div style=" padding: 0 3em;font-family: 'Tajawal', sans-serif;">
         <div
           style="
             display: flex;

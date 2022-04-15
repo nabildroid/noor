@@ -12,7 +12,6 @@ interface NavigationData extends IncrementalData {
     skillId: string;
     value: number;
   }[];
-  isPrimary: boolean;
 }
 
 export default functions

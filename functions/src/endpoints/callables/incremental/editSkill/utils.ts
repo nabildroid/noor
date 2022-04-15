@@ -200,7 +200,7 @@ export class PrimarySkillForm extends SkillsForm {
       ctl00$ibtnYes: "نعم",
       ctl00$hdnData_Data: "",
       ctl00$hdnData_Operation: "Save",
-    });
+    },undefined,3000);
 
     return data;
   }

@@ -1,16 +1,11 @@
-import React, { createContext, useEffect, useReducer } from "react";
 import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  Auth,
-  onAuthStateChanged,
-  connectAuthEmulator,
+  Auth, connectAuthEmulator, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword
 } from "firebase/auth";
+import React, { createContext, useEffect, useReducer } from "react";
 import appAction from "../actions/appAction";
+import { emulator, firebaseApp } from "../main";
 import { AppStateInit, IAppProvider } from "../models/app_model";
 import Repository from "../repository";
-import { emulator, firebaseApp } from "../main";
 import { LoginCredential } from "../types/login_types";
 
 export const AppContext = createContext<IAppProvider>(null!);
@@ -31,7 +26,7 @@ const AppProvider: React.FC = ({ children }) => {
       if (user) {
         dispatch({ type: "login", payload: user });
       } else {
-        dispatch({ type: "logout" });
+        logout();
       }
     });
   }, [dispatch]);

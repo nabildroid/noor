@@ -8,7 +8,7 @@ import useIfIffect from "../../hooks/useIfEffect";
 import { createAction } from "../../layout/home/actionBar";
 import Page from "../../layout/home/page";
 import SlideTransition from "../../layout/home/slideTransition";
-import { NoorExam, NoorSection } from "../../models/home_model";
+import { NoorExam, NoorSection, TeacherType } from "../../models/home_model";
 import Repository from "../../repository";
 import { FormInput } from "../../types/communication_types";
 import { wait } from "../../utils";
@@ -44,7 +44,7 @@ function fetch(account: string) {
 }
 
 const SaveDegree: React.FC<SaveDegreeProps> = () => {
-  const { currentRole } = useContext(HomeContext);
+  const { currentRole, teacherType } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
   const {
@@ -57,6 +57,7 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
     loadingIndex,
   } = useFormOptions({
     actionName: "ibtnSearch",
+    isPrimary:teacherType == TeacherType.primary,
   });
 
   const [stage, setStage] = useState(0);
@@ -113,6 +114,7 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
       action: formAction!,
       inputs,
       degrees: degrees,
+      isPrimary:teacherType == TeacherType.primary,
     });
   };
 

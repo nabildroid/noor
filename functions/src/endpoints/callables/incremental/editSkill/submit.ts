@@ -15,7 +15,7 @@ export default functions
   .https.onCall(async (data: NavigationData) => {
     const homePage = Redirect.load(data);
 
-    const form = await fetchSkills(data, false, homePage);
+    const form = await fetchSkills(data, data.isPrimary, homePage);
 
     return homePage.sendForm(form);
   });

@@ -53,7 +53,7 @@ export async function executeVariant(
       return;
     } else {
       config.walked.add(currentPath);
-      await randomDelay(500);
+      await randomDelay(100);
       return config.execute(inputs, redirect);
     }
   } else if (i - inputs.length > 0) {

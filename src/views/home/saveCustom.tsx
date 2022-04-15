@@ -54,6 +54,8 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
   } = useFormOptions({
     excludedNames: ["ddlSkills"],
     actionName:teacherType == TeacherType.primary?"ibtnS10": "ibtnSearch",
+    isPrimary:teacherType == TeacherType.primary,
+
   });
 
   useEffect(() => {
@@ -70,6 +72,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
   const next = () => setSecondStage(true);
 
   const save = () => {
+
     const task: SaveCustomTask = {
       payload: {
         ...letMeHandleIt(),
@@ -78,8 +81,11 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
       completed: false,
       type: BackgroundTaskType.saveCustom,
       user: user!.uid,
+      isPrimary:teacherType == TeacherType.primary,
     };
 
+
+    console.log(task);
     wait(() => DB.instance.createTask(task), setLoading);
   };
 
