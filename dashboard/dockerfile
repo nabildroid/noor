@@ -1,0 +1,24 @@
+# Use a node 12 base image
+FROM node:12-slim
+
+
+WORKDIR /usr/src/app
+
+# Copy package.json and install node modules
+RUN npm install --only=production
+RUN npm run build
+
+ADD ./public /usr/src/app
+ADD server.js /usr/src/app
+
+COPY package*.json ./
+
+RUN npm install --only=production
+
+COPY . ./
+
+
+EXPOSE 5050
+
+
+ENTRYPOINT npm run start
