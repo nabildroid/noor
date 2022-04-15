@@ -51,13 +51,18 @@ export class SkillsForm extends Form {
 
     const action = this.getFormAction();
 
-    const data = await redirect.fork(action, {
-      ...payload,
-      __EVENTTARGET: "",
-      ctl00$ibtnYes: "نعم",
-      ctl00$hdnData_Data: "",
-      ctl00$hdnData_Operation: "Save",
-    },undefined,3000);
+    const data = await redirect.fork(
+      action,
+      {
+        ...payload,
+        __EVENTTARGET: "",
+        ctl00$ibtnYes: "نعم",
+        ctl00$hdnData_Data: "",
+        ctl00$hdnData_Operation: "Save",
+      },
+      undefined,
+      3000
+    );
 
     return data;
   }
@@ -193,14 +198,19 @@ export class PrimarySkillForm extends SkillsForm {
 
     const action = this.getFormAction();
 
-    const data = await redirect.fork(action, {
-      ...payload,
-      [`${perfix}$ctl01$ddlCurentPassFlag`]: ",0",
-      __EVENTTARGET: "",
-      ctl00$ibtnYes: "نعم",
-      ctl00$hdnData_Data: "",
-      ctl00$hdnData_Operation: "Save",
-    },undefined,3000);
+    const data = await redirect.fork(
+      action,
+      {
+        ...payload,
+        [`${perfix}$ctl01$ddlCurentPassFlag`]: ",0",
+        __EVENTTARGET: "",
+        ctl00$ibtnYes: "نعم",
+        ctl00$hdnData_Data: "",
+        ctl00$hdnData_Operation: "Save",
+      },
+      undefined,
+      3000
+    );
 
     return data;
   }
@@ -241,6 +251,7 @@ export class PrimarySkillsTable extends Table<skill, undefined> {
     return this.$(".StandardFontPlain", tr).length != 0;
   }
   protected processLine(tr: cheerio.Cheerio): skill {
+    const html = tr.html();
     const select = this.$("select", tr);
     const id = select.attr("name");
 
@@ -249,7 +260,8 @@ export class PrimarySkillsTable extends Table<skill, undefined> {
     const value = selectedValues[0];
     const skillId = selectedValues[1];
 
-    const title = this.$("td:nth-child(3)", tr).text();
+    const title =
+      this.$("td:nth-child(3)", tr).text() || this.$("td", tr).first().text();
 
     return {
       id,

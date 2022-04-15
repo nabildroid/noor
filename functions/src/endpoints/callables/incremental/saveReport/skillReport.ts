@@ -7,7 +7,7 @@ import { IncrementalData } from "../../../../types";
 import { randomString } from "../../../../utils";
 import { fetchSkills } from "../editSkill/submit";
 import { fetchOptions } from "../formOptions";
-import { createCSV, createParmsFromInputs, createSKillsPDF, Item } from "./utils";
+import { createParmsFromInputs, createSKillsPDF, Item } from "./utils";
 
 import path = require("path");
 
@@ -47,7 +47,7 @@ export default functions
           weirdData,
         };
 
-        const response = await fetchSkills(config, data.isPrimary,homePage);
+        const response = await fetchSkills(config, data.isPrimary, homePage);
         // get all the skills with thier ids
         action = response.toJson().action;
 
@@ -95,8 +95,12 @@ export default functions
 
     const fileName = randomString();
 
-    const csv = createCSV(items, fileName);
-    const pdf = await createSKillsPDF(items, fileName, data.inputs);
+    const pdf = await createSKillsPDF(
+      items,
+      fileName,
+      data.inputs,
+      data.isPrimary
+    );
 
     const config = (filePath: string) => ({
       metadata: {
@@ -108,7 +112,6 @@ export default functions
       destination: `reports/${path.basename(filePath)}`,
     });
 
-    const [onlineCSV] = await storage.upload(csv, config(csv));
     const [onlinePDF] = await storage.upload(pdf, config(pdf));
 
     const params = createParmsFromInputs(data.inputs);
@@ -116,7 +119,6 @@ export default functions
     await db.collection("reports").add({
       user: context.auth.uid,
       files: {
-        csv: onlineCSV.name,
         pdf: onlinePDF.name,
       },
       params,

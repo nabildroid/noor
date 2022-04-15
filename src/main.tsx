@@ -1,18 +1,19 @@
+import { initializeApp } from "firebase/app";
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
-import { initializeApp } from "firebase/app";
-
 import "./style/index.css";
+
 
 export const emulator = process.env.NODE_ENV == "development" && true;
 
 export const firebaseApp = initializeApp({
-  apiKey: "AIzaSyBjPAxxWuVvaCr7wXxE0nWputXZvT6bKhg",
-  authDomain: "noor-a4a7d.firebaseapp.com",
-  projectId: "noor-a4a7d",
-  storageBucket: "noor-a4a7d.appspot.com",
-  messagingSenderId: "133224766800",
-  appId: "1:133224766800:web:6bfbf76b956112ad832055",
+  apiKey: "AIzaSyAJv-Cjmz_nzv5KUtRjnJiO5h0imIbSZFw",
+  authDomain: "formal-ember-345513.firebaseapp.com",
+  projectId: "formal-ember-345513",
+  storageBucket: "formal-ember-345513.appspot.com",
+  messagingSenderId: "804272565837",
+  appId: "1:804272565837:web:61b7e1c24552ee748a3604",
+  measurementId: "G-BZ2BGX92YX",
   databaseURL: "192.168.43.198",
 });
 

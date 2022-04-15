@@ -45,10 +45,9 @@ interface RedirectionResponse {
 
 axiosRetry(http, {
   retryCondition: (err) => {
-    if(err.config.data.includes("ctl00$ibtnYes")){
-      return false;
-    }else return true
+    return !err.config.data.includes("ibtnYes");
   },
+  retryDelay: axiosRetry.exponentialDelay,
 });
 
 export default class Redirect {
@@ -175,7 +174,7 @@ export default class Redirect {
       "X-Requested-With": "XMLHttpRequest",
       ADRUM: "isAjax:true",
     } as {},
-    timeout: number = 30000
+    timeout: number = 60000
   ) {
     const cookies = mergeCookies(this.prevCookies, this.cookies);
     if (!(payload instanceof FormData)) {
@@ -193,10 +192,10 @@ export default class Redirect {
       },
 
       timeout,
-      proxy:{
-        host:"localhost",
-        port:8082,
-      }
+      proxy: {
+        host: "localhost",
+        port: 8082,
+      },
     });
 
     this.weirdData = hiddenInputs(loadHtml(data));

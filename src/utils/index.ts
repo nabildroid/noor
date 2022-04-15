@@ -17,6 +17,7 @@ export const tabBarTitle = (tab: HomeTab, type: TeacherType) =>
     [HomeTab.savedegree]: "رصد درجات الفصل",
     [HomeTab.savedReports]: "التقرارير",
     [HomeTab.home]: "الرئيسية",
+    [HomeTab.saveReportSkill]: "انشاء كشف المهاراة الفصل",
     [HomeTab.logout]: "خروج",
     [HomeTab.saveCustom]:
       type == TeacherType.primary

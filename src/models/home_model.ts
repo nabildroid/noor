@@ -78,6 +78,7 @@ export enum HomeTab {
   studentsNotAccepted = "notaccepted",
   savedReports = "reports",
   saveReport = "newreport",
+  saveReportSkill = "newreport1",
   saveCustom = "savecustom",
   logout = "out",
 }

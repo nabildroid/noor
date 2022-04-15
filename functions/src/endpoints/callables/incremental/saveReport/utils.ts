@@ -71,9 +71,9 @@ export function createCSV(items: Item[], fileName: string) {
 export async function createDegreesPDF(
   degrees: Degrees[],
   fileName: string,
-  inputs: FormInput[]
+  inputs: FormInput[],
+  isEmpty = false
 ) {
-
   let modules = [
     ...degrees.reduce((acc, i) => {
       i.modules.reduce((a, s) => {
@@ -84,15 +84,14 @@ export async function createDegreesPDF(
     }, new Set<string>()),
   ].filter(Boolean);
 
+  const texts: string[][] = [];
 
-
-  const texts:string[][] = [];
-
-
-  degrees.forEach(degree=>{
+  degrees.forEach((degree) => {
     const temp = [degree.studentName];
-    degree.modules.forEach(m=>temp.push(m.input.value.toString()));
-    texts.push(temp)
+    degree.modules.forEach((m) =>
+      temp.push(isEmpty ? "" : m.input.value.toString())
+    );
+    texts.push(temp);
   });
 
   const template = createPDFTemplate({
@@ -109,8 +108,6 @@ export async function createDegreesPDF(
   });
 
   console.log(texts);
-
-  
 
   let options = {
     printBackground: true,
@@ -137,18 +134,24 @@ export async function createDegreesPDF(
 export async function createSKillsPDF(
   items: Item[],
   fileName: string,
-  inputs: FormInput[]
+  inputs: FormInput[],
+  isPrimary = true
 ) {
   //  todo use the rating from front end
+
+  const RatingExamples = isPrimary
+    ? Ratins[1].map((e) => e.name)
+    : oneKindRating(items[0].students[0].value).map((e) => e.name);
 
   let ratings = [
     ...items.reduce((acc, i) => {
       i.students.reduce((a, s) => {
-        a.add(s.value);
+        const value = isPrimary ? RatingById(Ratins[1], s.value) : s.value;
+        a.add(value);
         return a;
       }, acc);
       return acc;
-    }, new Set<string>(Ratins[0].map((e) => e.name))),
+    }, new Set<string>(RatingExamples)),
   ].filter(Boolean);
 
   console.log(ratings);
@@ -159,13 +162,14 @@ export async function createSKillsPDF(
     .map((e) => e.students)
     .flat()
     .forEach((item) => {
+      const toValue = (x: string) => (isPrimary ? RatingById(Ratins[1], x) : x);
       if (students[item.title] == undefined) {
         students[item.title] = ratings.reduce((acc, v) => {
           acc[v] = 0;
           return acc;
         }, {});
       }
-      students[item.title][item.value]++;
+      students[item.title][toValue(item.value)]++;
     });
 
   const texts = Object.entries(students).map(([k, v]) => [
@@ -408,3 +412,11 @@ export const Ratins = [
     },
   ],
 ];
+
+const oneKindRating = (name: string) => {
+  return Ratins.find((i) => i.some((a) => a.name == name));
+};
+
+const RatingById = (rates: any[], id: string) => {
+  return rates.find((v) => v.id == id).name;
+};

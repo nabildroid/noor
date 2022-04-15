@@ -85,6 +85,14 @@ function App() {
                 }
               />
               <Route
+                path={HomeTab.saveReportSkill}
+                element={
+                  <Suspense fallback={<></>}>
+                    <SaveReport type1 />
+                  </Suspense>
+                }
+              />
+              <Route
                 path={HomeTab.savedegree}
                 element={
                   <Suspense fallback={<></>}>

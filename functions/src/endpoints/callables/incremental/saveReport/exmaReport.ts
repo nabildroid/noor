@@ -1,21 +1,27 @@
 import * as functions from "firebase-functions";
+import { db, storage } from "../../../../common";
 import Form, { FormInput } from "../../../../core/form";
 import Redirect from "../../../../core/redirect";
 import { IncrementalData } from "../../../../types";
 import { randomString } from "../../../../utils";
 import { DegreesForm } from "../saveDegree/utils";
-import { createDegreesPDF } from "./utils";
+import { createDegreesPDF, createParmsFromInputs } from "./utils";
+import path = require("path");
 
 interface NavigationData extends IncrementalData {
   action: string;
   inputs: FormInput[];
   actionButton: FormInput;
+  isEmpty:boolean,
 }
 
 // todo gzip the response data;
 export default functions
   .region("asia-south1")
-  .https.onCall(async (data: NavigationData) => {
+  .runWith({
+    memory: "512MB",
+  })
+  .https.onCall(async (data: NavigationData,context) => {
     const homePage = await Redirect.load(data);
 
     // CHECK i don't need this thing!
@@ -41,5 +47,34 @@ export default functions
     const { degrees } = DegreesForm.updateFromSreachSubmission(search);
 
     const fileName = randomString();
-    await createDegreesPDF(degrees, fileName, data.inputs);
+    const pdf = await createDegreesPDF(degrees, fileName, data.inputs,data.isEmpty);
+
+
+
+    const config = (filePath: string) => ({
+      metadata: {
+        metadata: {
+          userId: context.auth.uid,
+          from: "saveReport/newExamReport",
+        },
+      },
+      destination: `reports/${path.basename(filePath)}`,
+    });
+
+    const [onlinePDF] = await storage.upload(pdf, config(pdf));
+
+    const params = createParmsFromInputs(data.inputs);
+
+    await db.collection("reports").add({
+      user: context.auth.uid,
+      files: {
+        pdf: onlinePDF.name,
+      },
+      params,
+      isEmpty: data.isEmpty,
+    });
+
+    return homePage.send({});
+
+
   });

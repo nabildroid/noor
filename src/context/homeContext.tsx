@@ -75,6 +75,7 @@ const HomeProvider: React.FC = ({ children }) => {
       HomeTab.didntGet,
       HomeTab.savedegree,
       HomeTab.saveReport,
+      HomeTab.saveReportSkill,
       HomeTab.savedReports,
       HomeTab.logout,
     ];

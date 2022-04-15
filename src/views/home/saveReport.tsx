@@ -16,13 +16,15 @@ import {
 import Repository from "../../repository";
 import { tabBarTitle } from "../../utils";
 
-interface SaveReportProps {}
+interface SaveReportProps {
+  type1?: boolean;
+}
 
-function fetchSkill(account: string) {
+function fetchSkill(account: string, type1?: boolean) {
   return Repository.instance.navigateTo({
     account: account,
     nav1: NoorSection.skill,
-    nav2: NoorSkill.skillModuleSkill,
+    nav2: type1 ? NoorSkill.moduleSkill : NoorSkill.skillModuleSkill,
   });
 }
 
@@ -38,14 +40,14 @@ function pageTitle(type: TeacherType) {
   return tabBarTitle(HomeTab.saveReport, type);
 }
 
-function fetch(type: TeacherType, account: string) {
-  if (type == TeacherType.kindergarten) {
-    return fetchSkill(account);
+function fetch(type: TeacherType, account: string, type1?: boolean) {
+  if (type == TeacherType.kindergarten || type1) {
+    return fetchSkill(account, type1);
   }
   return fetchExam(account);
 }
 
-const SaveReport: React.FC<SaveReportProps> = ({}) => {
+const SaveReport: React.FC<SaveReportProps> = ({type1}) => {
   const navigate = useNavigate();
 
   const { teacherType, currentRole } = useContext(HomeContext);
@@ -54,28 +56,30 @@ const SaveReport: React.FC<SaveReportProps> = ({}) => {
   const { inputs, setForm, submit, isAllChosen, updateInputs, loadingIndex } =
     useFormOptions({
       excludedNames: [
-        TeacherType.kindergarten ? "ddlStudySystem" : "one of the hardest progets i ever do!",
+        TeacherType.kindergarten
+          ? "ddlStudySystem"
+          : "one of the hardest progets i ever do!",
         "ddlSkillTypeDesc",
         "ddlSkill",
       ],
       actionName:
-        teacherType == TeacherType.kindergarten ? "ibtnSearch" : "btY21",
+        teacherType == TeacherType.kindergarten  ? "ibtnSearch" :  type1 ? "10":"btY21",
       isPrimary: teacherType == TeacherType.primary,
     });
 
   useEffect(() => {
-    fetch(teacherType!, currentRole!)
+    fetch(teacherType!, currentRole!,type1)
       .then((r) => setForm(r.form))
       .catch(logout);
   }, []);
 
   async function save(isEmpty: boolean = false) {
-    const isExams = teacherType == TeacherType.primary;
+    const isExams = teacherType == TeacherType.primary && !type1;
     await submit(isExams ? "newExamReport" : "newSkillReport", {
       isEmpty,
     });
 
-    // navigate("/" + HomeTab.savedReports);
+    navigate("/" + HomeTab.savedReports);
   }
 
   const actions = createAction({
