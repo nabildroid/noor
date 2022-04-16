@@ -1,12 +1,8 @@
 const Express = require("express");
 const admin = require("firebase-admin");
 
-var serviceAccount = require("./serviceAccount.json");
 
-const firebaseApp = admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  projectId: "noor-a4a7d",
-});
+const firebaseApp = admin.initializeApp();
 
 const db = firebaseApp.firestore();
 const auth = firebaseApp.auth();
