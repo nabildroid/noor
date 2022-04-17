@@ -2,7 +2,6 @@ import axios from "axios";
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./app";
-import "./index.css";
 
 const dev = process.env.NODE_ENV == "development" && true;
 

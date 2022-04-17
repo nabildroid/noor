@@ -1,40 +1,31 @@
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 
-interface AppProps {}
-
-export type Teacher = {
-  name: string;
-  isPro: boolean;
-  id: string;
-  uid: string;
-  password: string;
-  created: Date;
-};
 
 async function fetchTeacher() {
   const { data } = await axios.get("api/users");
 
-  return (data as Teacher[]).map((d) => ({
+  return (data ).map((d) => ({
     ...d,
     created: new Date(d.created),
   }));
 }
 
-const App: React.FC<AppProps> = () => {
+const Dashboard = () => {
   const [search, setSearch] = useState("");
-  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [teachers, setTeachers] = useState([]);
 
   useEffect(() => {
     fetchTeacher().then(setTeachers);
   }, []);
 
-  const deleteTeacher = async (id: string) => {
+  const deleteTeacher = async (id) => {
     await axios.delete(`/api/user/${id}`);
     setTeachers((teachers) => teachers.filter((t) => t.id != id));
   };
 
-  const makePro = async (id: string) => {
+  const makePro = async (id) => {
     await axios.post(`/api/pro/${id}`);
     setTeachers((teachers) =>
       teachers.map((t) => {
@@ -44,7 +35,7 @@ const App: React.FC<AppProps> = () => {
     );
   };
 
-  const makeFree = async (id: string) => {
+  const makeFree = async (id) => {
     await axios.post(`/api/free/${id}`);
     setTeachers((teachers) =>
       teachers.map((t) => {
@@ -73,12 +64,12 @@ const App: React.FC<AppProps> = () => {
     <div className="min-h-screen w-full border-t-4 border-indigo-400 bg-indigo-50 py-4">
       <div className="mx-auto max-w-lg px-4 sm:px-0 lg:max-w-3xl">
         <div className="flex justify-between">
-          <a
-            href="#"
+          <Link
+            to="builder"
             className="flex items-center justify-center rounded-md bg-gray-800 px-4 text-sm font-bold tracking-wide text-white hover:bg-indigo-500"
           >
             <span>الةصميم</span>
-          </a>
+          </Link>
           <h1 className="items-center text-lg font-semibold text-zinc-800">
             لوحة الةحكم
           </h1>
@@ -148,7 +139,7 @@ const App: React.FC<AppProps> = () => {
                             {item.name}
                           </div>
                           <div className="mt-1 flex flex-col text-xs text-gray-500 sm:block lg:hidden">
-                            <span className="font-mono">{item.uid}</span> - 
+                            <span className="font-mono">{item.uid}</span> -
                             <span> {item.password}</span>
                           </div>
                         </td>
@@ -205,4 +196,4 @@ const App: React.FC<AppProps> = () => {
   );
 };
 
-export default App;
+export default Dashboard;

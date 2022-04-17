@@ -251,7 +251,6 @@ export class PrimarySkillsTable extends Table<skill, undefined> {
     return this.$(".StandardFontPlain", tr).length != 0;
   }
   protected processLine(tr: cheerio.Cheerio): skill {
-    const html = tr.html();
     const select = this.$("select", tr);
     const id = select.attr("name");
 

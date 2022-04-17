@@ -1,17 +1,35 @@
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const {PubSub} = require('@google-cloud/pubsub');
+
 const Express = require("express");
+
 const admin = require("firebase-admin");
+const isDev = process.env.NODE_ENV == "development";
+const firebaseConfig = isDev
+  ? {
+      credential: admin.credential.cert(require("./serviceAccount.json")),
+    }
+  : null;
+const firebaseApp = admin.initializeApp(firebaseConfig);
 
 
-const firebaseApp = admin.initializeApp();
+
 
 const db = firebaseApp.firestore();
 const auth = firebaseApp.auth();
+const storage = firebaseApp
+  .storage()
+  .bucket("gs://formal-ember-345513.appspot.com");
+
 
 var cors = require("cors");
 
 const PORT = process.env.PORT || 5050;
 
 const app = Express();
+app.use(Express.json());
 
 app.use(cors());
 
@@ -20,6 +38,10 @@ app.use(Express.static("public"));
 function checkIsPro(trying) {
   return trying - Date.now() > 100000000000;
 }
+
+
+
+
 app.get("/api/users", async (req, res) => {
   const userDocs = await db.collection("/users").get();
 
@@ -73,6 +95,57 @@ app.post("/api/pro/:id", async (req, res) => {
   res.send("ok");
 });
 
+
+
+const prefix = "builder/";
+
+
+
+app.get("/api/html", async (_, res) => {
+  const [files] = await storage.getFiles({ prefix });
+  const recent = files.pop();
+
+  let [data] = await recent.download();
+  data = data.toString();
+  data = JSON.parse(data);
+
+  return res.send(data);
+});
+
+
+
+const pubsub = new PubSub({
+  projectId:firebaseApp.options.projectId,
+});
+
+const topic = await pubsub.createTopic("build_landing_page");
+
+
+
+app.post("/api/html", async (req, res) => {
+  console.log(req.body);
+  const tempDir = os.tmpdir();
+  const name = Date.now() + ".ikm";
+
+  const p = path.join(tempDir, name);
+  fs.writeFileSync(p, JSON.stringify(req.body));
+
+  await storage.upload(p, {
+    destination: path.join(prefix, name),
+  });
+
+  topic[0].publishMessage("build");
+  
+  res.send("done");
+});
+
+
+
+
+
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
 });
+
+
+

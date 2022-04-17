@@ -13,8 +13,7 @@ export const firebaseApp = initializeApp({
   storageBucket: "formal-ember-345513.appspot.com",
   messagingSenderId: "804272565837",
   appId: "1:804272565837:web:61b7e1c24552ee748a3604",
-  measurementId: "G-BZ2BGX92YX",
-  databaseURL: "192.168.43.198",
+  measurementId: "G-BZ2BGX92YX"
 });
 
 const App = React.lazy(() => import("./app"));
