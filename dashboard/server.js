@@ -11,7 +11,7 @@ const firebaseConfig = isDev
   ? {
       credential: admin.credential.cert(require("./serviceAccount.json")),
     }
-  : null;
+  : undefined;
 const firebaseApp = admin.initializeApp(firebaseConfig);
 
 
@@ -117,7 +117,6 @@ app.get("/api/html", async (_, res) => {
 const pubsub = new PubSub({
   projectId:firebaseApp.options.projectId,
 });
-
 
 
 
