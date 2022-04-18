@@ -4,6 +4,9 @@ const path = require("path");
 const {PubSub} = require('@google-cloud/pubsub');
 
 const Express = require("express");
+const app = Express();
+app.use(Express.json());
+
 
 const admin = require("firebase-admin");
 const isDev = process.env.NODE_ENV == "development";
@@ -28,8 +31,7 @@ var cors = require("cors");
 
 const PORT = process.env.PORT || 5050;
 
-const app = Express();
-app.use(Express.json());
+
 
 app.use(cors());
 
