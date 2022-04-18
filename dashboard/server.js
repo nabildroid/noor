@@ -118,11 +118,12 @@ const pubsub = new PubSub({
   projectId:firebaseApp.options.projectId,
 });
 
-const topic = await pubsub.createTopic("build_landing_page");
 
 
 
 app.post("/api/html", async (req, res) => {
+  const topic = await pubsub.createTopic("build_landing_page");
+  
   console.log(req.body);
   const tempDir = os.tmpdir();
   const name = Date.now() + ".ikm";
