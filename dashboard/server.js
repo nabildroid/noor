@@ -11,7 +11,7 @@ const firebaseConfig = isDev
   ? {
       credential: admin.credential.cert(require("./serviceAccount.json")),
     }
-  : null;
+  : undefined;
 const firebaseApp = admin.initializeApp(firebaseConfig);
 
 
@@ -119,7 +119,6 @@ const pubsub = new PubSub({
 });
 
 const topic = await pubsub.createTopic("build_landing_page");
-
 
 
 app.post("/api/html", async (req, res) => {

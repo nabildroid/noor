@@ -1,11 +1,11 @@
 const fs = require("fs");
 
-const template = fs.readFileSync("./build.html");
-
-const { html, styles } = JSON.parse(fs.readFileSync("./data.html"));
+const template = fs.readFileSync("./build.html","utf-8");
+const { html, style } = JSON.parse(fs.readFileSync("./data.html"));
 
 const output = template
-  .replace("<style></style>", `<style>${styles}</style>`)
+  .replace("<style></style>", `<style>${style}</style>`)
   .replace("<content></content>", html);
 
-fs.writeFile("public/index.html", output);
+
+fs.writeFileSync("./public/index.html", output);
