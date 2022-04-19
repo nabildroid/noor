@@ -1,12 +1,11 @@
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const {PubSub} = require('@google-cloud/pubsub');
+const { PubSub } = require("@google-cloud/pubsub");
 
 const Express = require("express");
 const app = Express();
 app.use(Express.json());
-
 
 const admin = require("firebase-admin");
 const isDev = process.env.NODE_ENV == "development";
@@ -17,34 +16,49 @@ const firebaseConfig = isDev
   : undefined;
 const firebaseApp = admin.initializeApp(firebaseConfig);
 
-
-
-
 const db = firebaseApp.firestore();
 const auth = firebaseApp.auth();
 const storage = firebaseApp
   .storage()
   .bucket("gs://formal-ember-345513.appspot.com");
 
-
 var cors = require("cors");
 
 const PORT = process.env.PORT || 5050;
-
-
 
 app.use(cors());
 
 app.use(Express.static("public"));
 
+const API = Express.Router();
+
+API.use(async (req, res, next) => {
+  const redirect = () => res.redirect("https://orsodnour.com");
+  const { auth: token } = req.headers;
+
+  if (!token) return redirect();
+
+  const user = await auth.verifyIdToken(token);
+  if (!user.email_verified) return redirect();
+
+  const isAllowed = !(
+    await db
+      .collection("config")
+      .where("admin", "array-contains", user.email)
+      .get()
+  ).empty;
+
+  if (isAllowed) return next();
+  else return redirect();
+});
+
+app.use("/api", API);
+
 function checkIsPro(trying) {
   return trying - Date.now() > 100000000000;
 }
 
-
-
-
-app.get("/api/users", async (req, res) => {
+API.get("/users", async (req, res) => {
   const userDocs = await db.collection("/users").get();
 
   const teachers = userDocs.docs.map((doc) => {
@@ -63,14 +77,14 @@ app.get("/api/users", async (req, res) => {
   res.json(teachers);
 });
 
-app.delete("/api/user/:id", async (req, res) => {
+API.delete("/user/:id", async (req, res) => {
   const { id } = req.params;
   await auth.deleteUser(id);
   await db.collection("users").doc(id).delete();
   res.send("ok");
 });
 
-app.post("/api/free/:id", async (req, res) => {
+API.post("/free/:id", async (req, res) => {
   const free = 10000000;
   const { id } = req.params;
   await db.collection("users").doc(id).update({
@@ -84,7 +98,7 @@ app.post("/api/free/:id", async (req, res) => {
   res.send("ok");
 });
 
-app.post("/api/pro/:id", async (req, res) => {
+API.post("/pro/:id", async (req, res) => {
   const pro = 100000000000000;
   const { id } = req.params;
   await db.collection("users").doc(id).update({
@@ -97,13 +111,9 @@ app.post("/api/pro/:id", async (req, res) => {
   res.send("ok");
 });
 
-
-
 const prefix = "builder/";
 
-
-
-app.get("/api/html", async (_, res) => {
+API.get("/html", async (_, res) => {
   const [files] = await storage.getFiles({ prefix });
   const recent = files.pop();
 
@@ -114,17 +124,13 @@ app.get("/api/html", async (_, res) => {
   return res.send(data);
 });
 
-
-
 const pubsub = new PubSub({
-  projectId:firebaseApp.options.projectId,
+  projectId: firebaseApp.options.projectId,
 });
 
-
-
-app.post("/api/html", async (req, res) => {
+API.post("/html", async (req, res) => {
   const topic = pubsub.topic("build_landing_page");
-  
+
   console.log(req.body);
   const tempDir = os.tmpdir();
   const name = Date.now() + ".ikm";
@@ -136,18 +142,11 @@ app.post("/api/html", async (req, res) => {
     destination: path.join(prefix, name),
   });
 
-  topic.publishMessage("build");
-  
+  topic.publishMessage({ name: "build" });
+
   res.send("done");
 });
-
-
-
-
 
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
 });
-
-
-
