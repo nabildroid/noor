@@ -142,7 +142,9 @@ API.post("/html", async (req, res) => {
     destination: path.join(prefix, name),
   });
 
-  topic.publishMessage({ name: "build" });
+  topic.publishMessage({
+    data: Buffer.from("ftloikrm"),
+  });
 
   res.send("done");
 });
