@@ -1,11 +1,11 @@
 import { load } from "cheerio";
 import * as functions from "firebase-functions";
+import { isBlocked } from "../../../common";
 import Form from "../../../core/form";
 import Redirect from "../../../core/redirect";
 import { extractHomeData } from "../../../helpers";
 import { IncrementalData } from "../../../types";
 import { extractRoleIds } from "../../../utils";
-
 
 interface NavigationData extends IncrementalData {
   account: string;
@@ -15,8 +15,9 @@ interface NavigationData extends IncrementalData {
 
 export default functions
   .region("asia-south1")
-  
   .https.onCall(async (data: NavigationData, context) => {
+    if (isBlocked(context)) return null;
+
     const homePage = await Redirect.start({
       from:
         data.from ??

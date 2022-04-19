@@ -2,7 +2,7 @@ import {
   connectFunctionsEmulator,
   Functions,
   getFunctions,
-  httpsCallable
+  httpsCallable,
 } from "firebase/functions";
 import { emulator, firebaseApp } from "../main";
 import {
@@ -12,7 +12,7 @@ import {
   FormNavigateResponse,
   FormOptions,
   FormSubmitLookup,
-  NavigateTo
+  NavigateTo,
 } from "../types/communication_types";
 import { LoginFormParams, LoginSubmissionResponse } from "../types/login_types";
 import { mergeCookies } from "../utils";
@@ -141,7 +141,6 @@ export default class Repository {
     return response.data.payload;
   }
 
-
   async saveDegree(config: DegreeSave) {
     const response = await this.call<FormNavigateResponse>("degreeSave", {
       ...config,
@@ -155,6 +154,21 @@ export default class Repository {
     });
 
     return response.data.payload;
+  }
+
+  async getPrice() {
+    const response = await this.call<number>("price");
+    return response.data;
+  }
+
+  async createPaypalOrder() {
+    const response = await this.call<any>("paypalCreateOrder");
+    return response.data;
+  }
+
+  async paypalHandleOrder(orderId: any) {
+    const response = await this.call<any>("paypalHandleOrder", { orderId });
+    return response.data;
   }
 
   private updateBouncingData(config: Partial<BouncingNavigation>) {

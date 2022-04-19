@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import { db, storage } from "../../../../common";
+import { db, isBlocked, storage } from "../../../../common";
 import { FormInput } from "../../../../core/form";
 import Redirect from "../../../../core/redirect";
 import { executeVariant } from "../../../../core/variatForm";
@@ -24,6 +24,8 @@ export default functions
     memory: "512MB",
   })
   .https.onCall(async (data: NavigationData, context) => {
+    if (isBlocked(context)) return null;
+
     const homePage = await Redirect.load(data);
 
     let { action } = data;

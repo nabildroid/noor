@@ -45,8 +45,11 @@ export default functions
         displayName: userName,
       });
 
+      const config = (await db.doc("/config/default").get()).data();
+      const tryDays = config?.try ?? 3;
+
       await auth.setCustomUserClaims(user.uid, {
-        try: Date.now() + 30 * 24 * 3600 * 1000,
+        try: Date.now() + tryDays * 24 * 3600 * 1000,
       });
 
       await db
@@ -56,7 +59,7 @@ export default functions
           name: userName,
           username: name,
           password,
-          try: Date.now() + 30 * 24 * 3600 * 1000,
+          try: Date.now() + tryDays * 24 * 3600 * 1000,
           role: [...allAccounts.map((e) => e.text), currentAccount],
           currentRole: currentAccount,
           weirdData,

@@ -15,6 +15,8 @@ function dateDiffInDays(end: number, start: number) {
   return Math.round(diffDay) + " day" + (diffDay > 1 ? "s" : "");
 }
 
+
+
 const useFetchTeacher = ({ user }: params) => {
   const [teacher, setTeacher] = useState<Teacher>();
 
@@ -25,7 +27,7 @@ const useFetchTeacher = ({ user }: params) => {
       setTeacher({
         ...data,
         isPro:
-          data.try - Date.now() > 100000000000
+          data.try - Date.now() > 259200000
             ? true
             : data.try > Date.now()
             ? dateDiffInDays(data.try, Date.now())

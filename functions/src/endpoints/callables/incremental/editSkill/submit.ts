@@ -1,4 +1,5 @@
 import * as functions from "firebase-functions";
+import { isBlocked } from "../../../../common";
 import { FormInput } from "../../../../core/form";
 import Redirect from "../../../../core/redirect";
 import { IncrementalData } from "../../../../types";
@@ -12,7 +13,9 @@ interface NavigationData extends IncrementalData {
 
 export default functions
   .region("asia-south1")
-  .https.onCall(async (data: NavigationData) => {
+  .https.onCall(async (data: NavigationData, context) => {
+    if (isBlocked(context)) return null;
+
     const homePage = Redirect.load(data);
 
     const form = await fetchSkills(data, data.isPrimary, homePage);

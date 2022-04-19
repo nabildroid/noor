@@ -192,10 +192,6 @@ export default class Redirect {
       },
 
       timeout,
-      proxy: {
-        host: "localhost",
-        port: 8082,
-      },
     });
 
     this.weirdData = hiddenInputs(loadHtml(data));

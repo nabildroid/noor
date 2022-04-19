@@ -1,13 +1,28 @@
 /* This example requires Tailwind CSS v2.0+ */
+import { useEffect, useState } from "react";
 import { CheckCircle } from "react-feather";
+import Repository from "../../repository";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
-const includedFeatures = [
-  "الميزة الاولة",
-  "الميزة الثانية",
-  "الميزة الثالثة",
-];
+const includedFeatures = ["الميزة الاولة", "الميزة الثانية", "الميزة الثالثة"];
+
+const PaypalClientId =
+  "AV4gQ-jSryV-9cAV5Sgkl1HP0xcuybQ4Zds1L9Whez5jZsRFrpswaWVyOGa5xtlDpyVywgHoiS9LtaSM";
 
 export default function Example() {
+  const [price, setPrice] = useState<number>();
+  useEffect(() => {
+    Repository.instance.getPrice().then(setPrice);
+  }, []);
+
+  const createOrder = async () => {
+    return (await Repository.instance.createPaypalOrder()).id;
+  };
+
+  const handleOrder = async (id: any) => {
+    return await Repository.instance.paypalHandleOrder(id);
+  };
+
   return (
     <div className="bg-gray-100">
       <div className="pt-6 sm:pt-8 lg:pt-16 font-arabic">
@@ -17,7 +32,8 @@ export default function Example() {
               اشةري الان الوضع المدفةوع
             </h2>
             <p className="mt-4 text-xl text-gray-600">
-            أم ساعة مشروط وعُرفت هذه, تحرّك المدن سبتمبر ومن بل, الذود السيطرة لم فقد. أم إيو مشارف . عل وسفن الأمريكية ذات, طوكيو
+              أم ساعة مشروط وعُرفت هذه, تحرّك المدن سبتمبر ومن بل, الذود السيطرة
+              لم فقد. أم إيو مشارف . عل وسفن الأمريكية ذات, طوكيو
             </p>
           </div>
         </div>
@@ -32,7 +48,8 @@ export default function Example() {
                   الخطة الشهرية
                 </h3>
                 <p className="mt-6 text-base text-gray-500 text-right">
-                فشكّل الطرفين في, غريمه الأمور حين في. وتم بـ حلّت حالية لفرنسا, عل بالرّغم واعتلاء استطاعوا أضف,
+                  فشكّل الطرفين في, غريمه الأمور حين في. وتم بـ حلّت حالية
+                  لفرنسا, عل بالرّغم واعتلاء استطاعوا أضف,
                 </p>
                 <div className="mt-8">
                   <div className="flex flex-row-reverse items-center">
@@ -42,7 +59,7 @@ export default function Example() {
                     <div className="flex-1 border-t-2 border-gray-200" />
                   </div>
                   <ul
-                  style={{direction:"rtl"}}
+                    style={{ direction: "rtl" }}
                     role="list"
                     className="mt-8 space-y-5 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-5"
                   >
@@ -64,25 +81,24 @@ export default function Example() {
                 </div>
               </div>
               <div className="py-8 px-6 text-center bg-gray-50 lg:flex-shrink-0 lg:flex lg:flex-col lg:justify-center lg:p-12">
-                
-                <div className="mt-4 flex items-center justify-center text-5xl font-extrabold text-gray-900">
-                  <span>$349</span>
-                  <span className="ml-3 text-xl font-medium text-gray-500">
-                    USD
-                  </span>
-                </div>
-
-                <div className="mt-6">
-                  <div className="rounded-md shadow">
-                    <a
-                      href="#"
-                      className="flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-800 hover:bg-indigo-900"
-                    >
-                      ادفع الان
-                    </a>
+                <PayPalScriptProvider options={{ "client-id": PaypalClientId }}>
+                  <div className="mt-4 flex items-center justify-center text-5xl font-extrabold text-gray-900">
+                    <span>${price}</span>
+                    <span className="ml-3 text-xl font-medium text-gray-500">
+                      USD
+                    </span>
                   </div>
-                </div>
-                
+
+                  <div className="mt-6">
+                    <PayPalButtons
+                      createOrder={createOrder}
+                      onApprove={(data) => handleOrder(data.orderID)}
+                      className=" shadow flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-100 hover:bg-indigo-400"
+                    >
+                      <span>ادفع الان</span>
+                    </PayPalButtons>
+                  </div>
+                </PayPalScriptProvider>
               </div>
             </div>
           </div>

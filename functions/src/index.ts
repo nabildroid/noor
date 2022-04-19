@@ -11,6 +11,10 @@ import newSkillReport from "./endpoints/callables/incremental/saveReport/skillRe
 import postSignForm from "./endpoints/callables/postSignForm";
 import signForm from "./endpoints/callables/signForm";
 
+import price from "./endpoints/callables/price";
+import paypalCreateOrder from "./endpoints/callables/paypalCreateOrder";
+import paypalHandleOrder from "./endpoints/callables/paypalHandleOrder";
+
 export {
   signForm,
   postSignForm,
@@ -24,4 +28,7 @@ export {
   degreeSave,
   newExamReport,
   saveAll,
+  price,
+  paypalCreateOrder,
+  paypalHandleOrder,
 };
