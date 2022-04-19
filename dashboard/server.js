@@ -123,7 +123,7 @@ const pubsub = new PubSub({
 
 
 app.post("/api/html", async (req, res) => {
-  const topic = await pubsub.createTopic("build_landing_page");
+  const topic = pubsub.topic("build_landing_page");
   
   console.log(req.body);
   const tempDir = os.tmpdir();
@@ -136,7 +136,7 @@ app.post("/api/html", async (req, res) => {
     destination: path.join(prefix, name),
   });
 
-  topic[0].publishMessage("build");
+  topic.publishMessage("build");
   
   res.send("done");
 });
