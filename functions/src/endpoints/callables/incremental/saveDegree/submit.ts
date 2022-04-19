@@ -15,7 +15,7 @@ interface NavigationData extends IncrementalData {
 export default functions
   .region("asia-south1")
   .https.onCall(async (data: NavigationData,context) => {
-    if (isBlocked(context)) return null;
+    if (await isBlocked(context)) return null;
 
     const homePage = await Redirect.load(data);
 

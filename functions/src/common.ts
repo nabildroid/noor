@@ -17,6 +17,8 @@ export async function isBlocked(
   context: https.CallableContext,
   isFree = false
 ) {
+
+  
   if (!context.auth) return true;
   if (isFree) return false;
 

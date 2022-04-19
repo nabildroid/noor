@@ -24,7 +24,7 @@ export default functions
     memory: "512MB",
   })
   .https.onCall(async (data: NavigationData, context) => {
-    if (isBlocked(context)) return null;
+    if (await isBlocked(context)) return null;
 
     const homePage = await Redirect.load(data);
 
