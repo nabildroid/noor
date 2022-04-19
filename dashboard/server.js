@@ -55,7 +55,7 @@ API.use(async (req, res, next) => {
 app.use("/api", API);
 
 function checkIsPro(trying) {
-  return trying - Date.now() > 100000000000;
+  return trying - Date.now() > 259200000;
 }
 
 API.get("/users", async (req, res) => {
@@ -99,7 +99,10 @@ API.post("/free/:id", async (req, res) => {
 });
 
 API.post("/pro/:id", async (req, res) => {
-  const pro = 100000000000000;
+  const config = (await db.doc("/config/default").get()).data();
+  const tryDays = config?.pro ?? 3;
+
+  const pro = Date.now() + tryDays * 24 * 3600 * 1000;
   const { id } = req.params;
   await db.collection("users").doc(id).update({
     try: pro,

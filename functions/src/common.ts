@@ -17,17 +17,17 @@ export async function isBlocked(
   context: https.CallableContext,
   isFree = false
 ) {
-  if (!context.auth) return false;
-  if (isFree) return true;
+  if (!context.auth) return true;
+  if (isFree) return false;
 
   const user = await auth.getUser(context.auth.uid);
 
   const tryPeriod = parseInt(user.customClaims.try);
 
-  if(tryPeriod > Date.now()){
-      return true;
-  }else {
-      console.warn("unauthorised request from" + context.auth.uid);
-      return false;
+  if (tryPeriod > Date.now()) {
+    return false;
+  } else {
+    console.warn("unauthorised request from" + context.auth.uid);
+    return true;
   }
 }

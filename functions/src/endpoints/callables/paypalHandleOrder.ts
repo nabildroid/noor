@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 
 import * as Paypal from "@paypal/checkout-server-sdk";
-import { db, isBlocked } from "../../common";
+import { auth, db, isBlocked } from "../../common";
 
 const clientId =
   "AV4gQ-jSryV-9cAV5Sgkl1HP0xcuybQ4Zds1L9Whez5jZsRFrpswaWVyOGa5xtlDpyVywgHoiS9LtaSM";
@@ -18,17 +18,18 @@ export default functions
     const orderId = data.orderId;
     let request = new Paypal.orders.OrdersCaptureRequest(orderId);
 
-
     const pro = (await db.doc("config/default").get()).data()?.pro ?? 90;
     const fromNow = Date.now() + 1000 * 3600 * 24 * pro;
     await db.doc(`users/${context.auth.uid}`).update({
       try: fromNow,
     });
 
+    await auth.setCustomUserClaims(context.auth.uid, {
+      try: pro,
+    });
+
     // todo move this line up!
     const response = await client.execute(request);
-
-    
 
     return response.result;
   });
