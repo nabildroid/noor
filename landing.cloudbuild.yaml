@@ -24,3 +24,7 @@ steps:
       - |
        chmod a+x ./firebase
        ./firebase deploy --only hosting:orsodnour-landing
+
+       
+options:
+  logging: CLOUD_LOGGING_ONLY
