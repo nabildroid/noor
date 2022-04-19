@@ -1,5 +1,5 @@
 import React, { Suspense, useState } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import "./index.css";
@@ -36,7 +36,7 @@ const App = () => {
   if (loading) return <span>Loading ...</span>;
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         {!user && (
           <Route
@@ -72,7 +72,7 @@ const App = () => {
           </>
         )}
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 
