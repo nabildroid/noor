@@ -121,7 +121,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
     <Page
       title={title}
       size={secondStage ? "sm" : "lg"}
-      loading={!inputs.length}
+      loading={!inputs.length || loadingIndex == -1}
       actions={actions[secondStage ? 1 : 0]}
     >
       <SlideTransition

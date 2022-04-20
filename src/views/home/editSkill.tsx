@@ -220,7 +220,7 @@ const EditSkill: React.FC<EditSkillProps> = () => {
       size={stage == 0 ? "lg" : "sm"}
       title={title}
       actions={actions[Math.min(stage, 2)]}
-      loading={!inputs.length}
+      loading={!inputs.length || loadingIndex == -1}
     >
       <SlideTransition
         className="h-full w-full grid md:grid-cols-2 gap-3 gap-y-1"

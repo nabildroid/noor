@@ -96,7 +96,7 @@ export async function createDegreesPDF(
 
   const template = createPDFTemplate({
     head: ["اسم الطالب", ...modules],
-    title: " كشف درجاة الفصل",
+    title: " كشف درجات الفصل",
     items: texts,
     details: {
       length: degrees.length,
@@ -272,7 +272,7 @@ function createPDFTemplate(config: {
           <span>${config.details.unit}</span>
         </div>
         <div>
-          <span>عدد المهاراة</span>
+          <span>عدد المهارات</span>
           <span>${config.details.length}</span>
         </div>
       </div>

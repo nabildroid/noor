@@ -68,10 +68,10 @@ const Dashboard = () => {
             to="builder"
             className="flex items-center justify-center rounded-md bg-gray-800 px-4 text-sm font-bold tracking-wide text-white hover:bg-indigo-500"
           >
-            <span>الةصميم</span>
+            <span>التصميم</span>
           </Link>
           <h1 className="items-center text-lg font-semibold text-zinc-800">
-            لوحة الةحكم
+            لوحة التحكم
           </h1>
         </div>
         <div
@@ -109,7 +109,7 @@ const Dashboard = () => {
                         scope="col"
                         className="hidden px-3 py-3.5 text-right text-sm font-semibold text-gray-900 lg:table-cell"
                       >
-                        وقة انشاء الحساب
+                        وقت انشاء الحساب
                       </th>
                       <th
                         scope="col"

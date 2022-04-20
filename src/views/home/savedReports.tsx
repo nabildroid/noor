@@ -146,7 +146,7 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
         secondary: true,
       },
       {
-        label: "ةحميل",
+        label: "تحميل",
         onClick: () => download(),
         progress: true,
       },
@@ -174,7 +174,7 @@ const SavedReports: React.FC<SavedReportsProps> = () => {
 
       <CheckTable
         head={tableHead}
-        action="ةحميل"
+        action="تحميل"
         onAction={download}
         onSelecte={onSelected}
         items={visibleReports}

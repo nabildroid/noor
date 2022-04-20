@@ -241,7 +241,7 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
           onClick: back,
         },
         {
-          label: "الطاب الةالي",
+          label: "الطاب التالي",
           onClick: next,
           visible: !isLast,
         },
@@ -259,7 +259,7 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
     <Page
       title="رصد درجات الفصل"
       size={stage > 0 ? "lg" : "sm"}
-      loading={loading}
+      loading={loading  || loadingIndex == -1}
       actions={actions[Math.max(Math.min(stage, 2), 0)]}
     >
       <SlideTransition

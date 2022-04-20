@@ -78,7 +78,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
   const back = () => setStage(Math.max(stage - 1, 0));
 
   return (
-    <Page title="طلاب لم يةقوا" size={stage == 1 ? "md" : "sm"}>
+    <Page title="طلاب لم يتقنوا المهارات" size={stage == 1 ? "md" : "sm"}>
       {notyType == NotyType.empty && <Noti text="لا يوجد" color="red" />}
 
       <Transition className="flex-1" show={stage == 0}>
@@ -111,7 +111,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
 
       <Transition className={" flex-1"} show={stage == 1}>
         <h3 className="text-indigo-600 bg-indigo-50 py-1 font-arabic text-center text-md">
-          طلاب لم يتقنو المهاراة في {period}
+          طلاب لم يتقنو المهارات في {period}
         </h3>
 
         <div className="mt-8 w-full flex flex-col overflow-hidden">
@@ -176,7 +176,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
 
       <Transition className="flex-1" show={stage == 2}>
         <h3 className="text-indigo-600 mt-1 bg-indigo-50 py-1 font-arabic text-center text-md">
-          طلاب لم يتقنو المهاراة في {period}
+          طلاب لم يتقنوا المهارات في {period}
         </h3>
 
         <div className="flex justify-center space-x-6 mt-2 items-center">

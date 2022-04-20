@@ -102,7 +102,7 @@ const SaveReport: React.FC<SaveReportProps> = ({type1}) => {
   const title = pageTitle(teacherType!);
 
   return (
-    <Page title={title} loading={!inputs.length} actions={actions}>
+    <Page title={title} loading={!inputs.length ||  loadingIndex == -1} actions={actions}>
       {inputs.map((input, i) => (
         <div key={input.id}>
           <SelectBox

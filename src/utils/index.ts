@@ -12,24 +12,24 @@ export const tabBarTitle = (tab: HomeTab, type: TeacherType) =>
       type == TeacherType.elementery
         ? "انشاء كشف درجات"
         : type == TeacherType.primary
-        ? "انشاء كشف درجاة الفصل"
+        ? "انشاء كشف درجات الفصل"
         : "تقرير جديد",
     [HomeTab.savedegree]: "رصد درجات الفصل",
-    [HomeTab.savedReports]: "التقرارير",
+    [HomeTab.savedReports]: "التقارير",
     [HomeTab.home]: "الرئيسية",
-    [HomeTab.saveReportSkill]: "انشاء كشف المهاراة الفصل",
+    [HomeTab.saveReportSkill]: "انشاء كشف المهارات الفصل",
     [HomeTab.logout]: "خروج",
     [HomeTab.saveCustom]:
       type == TeacherType.primary
-        ? "رصد على مسةوة مادة ومهارة"
+        ? "رصد على مستوى مادة ومهارة"
         : "رصد وحدة ومهارة",
     [HomeTab.studentsNotAccepted]: "رصد وحدة ومهارة",
     [HomeTab.editSkill]:
       type == TeacherType.primary ? "تعديل المهارت الطالب" : "تعديل المهارت",
     [HomeTab.didntGet]:
       type == TeacherType.primary
-        ? "طلاب لم يةقنو المهارة"
-        : "لم يتقنو المهارت",
+        ? "طلاب لم يتقنوا المهارت"
+        : "لم يتقنوا المهارت",
   }[tab]);
 
 export const teacherTypeArabic = (type: TeacherType) => {
@@ -65,9 +65,9 @@ export function mergeCookies(...cookies: string[][]) {
 }
 
 export function taskTitle(taskType: BackgroundTaskType) {
-  if (taskType == BackgroundTaskType.saveAll) return "ةحصيل الكل";
+  if (taskType == BackgroundTaskType.saveAll) return "تحصيل الكل";
   else if (taskType == BackgroundTaskType.saveCustom)
-    return "ةحصيل وحدة ومهارة";
+    return "تحصيل وحدة ومهارة";
 }
 
 export function getPausedTab(tasks: BackgroundTask<any>[]) {
