@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import CheckBoxs from "../../components/home/checkboxs";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
@@ -11,7 +11,11 @@ import SlideTransition from "../../layout/home/slideTransition";
 import { NoorExam, NoorSection, TeacherType } from "../../models/home_model";
 import Repository from "../../repository";
 import { FormInput } from "../../types/communication_types";
-import { wait } from "../../utils";
+import { teacherTypeArabic, wait } from "../../utils";
+
+
+import { trace } from "firebase/performance";
+import { perf } from "../../main";
 
 interface SaveDegreeProps {}
 
@@ -44,8 +48,23 @@ function fetch(account: string) {
 }
 
 const SaveDegree: React.FC<SaveDegreeProps> = () => {
+  const tracePages = useRef(trace(perf, "saveDegree"));
   const { currentRole, teacherType } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
+
+
+
+  useEffect(() => {
+    tracePages.current.start();
+    tracePages.current.putAttribute(
+      "treacherType",
+      teacherTypeArabic(teacherType!)
+    );
+
+    tracePages.current.putMetric("stage", 0);
+    return () => tracePages.current.stop();
+  }, []);
+
 
   const {
     inputs,
@@ -61,6 +80,10 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
   });
 
   const [stage, setStage] = useState(0);
+  useEffect(() => {
+    tracePages.current.incrementMetric("stage", stage);
+  }, [stage]);
+
   const [loading, setLoading] = useState(false);
 
   const [degrees, setDegrees] = useState<Degrees[]>([]);

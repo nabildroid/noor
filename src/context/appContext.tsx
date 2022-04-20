@@ -1,12 +1,21 @@
 import {
-  Auth, connectAuthEmulator, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword
+  Auth,
+  connectAuthEmulator,
+  createUserWithEmailAndPassword,
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
-import React, { createContext, useEffect, useReducer } from "react";
+import React, { createContext, useEffect, useReducer, useRef } from "react";
 import appAction from "../actions/appAction";
 import { emulator, firebaseApp } from "../main";
 import { AppStateInit, IAppProvider } from "../models/app_model";
 import Repository from "../repository";
 import { LoginCredential } from "../types/login_types";
+
+import { trace } from "firebase/performance";
+
+import { perf } from "../main";
 
 export const AppContext = createContext<IAppProvider>(null!);
 
@@ -15,12 +24,19 @@ let auth: Auth;
 const AppProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(appAction, AppStateInit);
 
+  const traceLogin = useRef(trace(perf, "login"));
+
+  useEffect(() => {
+    traceLogin.current.start();
+  }, []);
+
   useEffect(() => {
     auth = getAuth(firebaseApp);
 
-    if (emulator) connectAuthEmulator(auth, "http://localhost:9099",{
-      disableWarnings:true,
-    });
+    if (emulator)
+      connectAuthEmulator(auth, "http://localhost:9099", {
+        disableWarnings: true,
+      });
 
     return onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -38,6 +54,8 @@ const AppProvider: React.FC = ({ children }) => {
     );
 
     if (operation == "success") {
+      traceLogin.current.stop();
+      
       signInWithEmailAndPassword(
         auth,
         credential.name + "@noor.com",

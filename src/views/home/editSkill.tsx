@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import RadioList from "../../components/home/radioList";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
@@ -13,10 +13,13 @@ import rates, {
   KinderRating,
   PrimaryRating,
   RateById,
-  RateByName
+  RateByName,
 } from "../../models/rating";
 import Repository from "../../repository";
 import { teacherTypeArabic, wait } from "../../utils";
+
+import { trace } from "firebase/performance";
+import { perf } from "../../main";
 
 interface EditSkillProps {}
 
@@ -45,8 +48,20 @@ function fetch(account: string, type: TeacherType) {
 }
 
 const EditSkill: React.FC<EditSkillProps> = () => {
+  const tracePages = useRef(trace(perf, "EditSkill"));
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
+
+  useEffect(() => {
+    tracePages.current.start();
+    tracePages.current.putAttribute(
+      "treacherType",
+      teacherTypeArabic(teacherType!)
+    );
+
+    tracePages.current.putMetric("stage", 0);
+    return () => tracePages.current.stop();
+  }, []);
 
   const ratingSystem =
     teacherType == TeacherType.kindergarten ? KinderRating : PrimaryRating;
@@ -72,6 +87,10 @@ const EditSkill: React.FC<EditSkillProps> = () => {
 
   const [loading, setLoading] = useState(false);
   const [stage, setStage] = useState(0);
+
+  useEffect(() => {
+    tracePages.current.incrementMetric("pageIndex", 1);
+  }, [stage]);
 
   const [student, setStudent] = useState("");
   const [allOneSkill, setAllOneSkill] = useState(ratingSystem[0]);

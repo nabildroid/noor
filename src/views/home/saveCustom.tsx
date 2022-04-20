@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import RadioList from "../../components/home/radioList";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
@@ -12,12 +12,15 @@ import {
   NoorSection,
   NoorSkill,
   SaveCustomTask,
-  TeacherType
+  TeacherType,
 } from "../../models/home_model";
 import rates, { Rating } from "../../models/rating";
 import Repository from "../../repository";
 import DB from "../../repository/db";
 import { teacherTypeArabic, wait } from "../../utils";
+
+import { trace } from "firebase/performance";
+import { perf } from "../../main";
 
 interface SaveCustomProps {}
 
@@ -35,14 +38,27 @@ function fetch(account: string, type: TeacherType) {
 }
 
 function pageTitle(type: TeacherType) {
-  if(type == TeacherType.kindergarten)
-  return `وحدة ومهارة ${teacherTypeArabic(type)}`;
+  if (type == TeacherType.kindergarten)
+    return `وحدة ومهارة ${teacherTypeArabic(type)}`;
   return `مادة ومهارة ${teacherTypeArabic(type)}`;
 }
 
 const SaveCustom: React.FC<SaveCustomProps> = () => {
+  const tracePages = useRef(trace(perf, "saveCustom"));
+
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout, user } = useContext(AppContext);
+
+  useEffect(() => {
+    tracePages.current.start();
+    tracePages.current.putAttribute(
+      "treacherType",
+      teacherTypeArabic(teacherType!)
+    );
+
+    tracePages.current.putAttribute("stage", "0");
+    return () => tracePages.current.stop();
+  }, []);
 
   const {
     inputs,
@@ -53,9 +69,8 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
     loadingIndex,
   } = useFormOptions({
     excludedNames: ["ddlSkills"],
-    actionName:teacherType == TeacherType.primary?"ibtnS10": "ibtnSearch",
-    isPrimary:teacherType == TeacherType.primary,
-
+    actionName: teacherType == TeacherType.primary ? "ibtnS10" : "ibtnSearch",
+    isPrimary: teacherType == TeacherType.primary,
   });
 
   useEffect(() => {
@@ -69,10 +84,12 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
   const [loading, setLoading] = useState(false);
   const [secondStage, setSecondStage] = useState(false);
 
+  useEffect(() => {
+    tracePages.current.putAttribute("stage", secondStage ? "1" : "0");
+  }, [secondStage]);
   const next = () => setSecondStage(true);
 
   const save = () => {
-
     const task: SaveCustomTask = {
       payload: {
         ...letMeHandleIt(),
@@ -81,9 +98,8 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
       completed: false,
       type: BackgroundTaskType.saveCustom,
       user: user!.uid,
-      isPrimary:teacherType == TeacherType.primary,
+      isPrimary: teacherType == TeacherType.primary,
     };
-
 
     console.log(task);
     wait(() => DB.instance.createTask(task), setLoading);

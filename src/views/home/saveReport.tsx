@@ -1,4 +1,5 @@
-import React, { useContext, useEffect } from "react";
+import { trace } from "firebase/performance";
+import React, { useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
@@ -6,15 +7,16 @@ import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
 import { createAction } from "../../layout/home/actionBar";
 import Page from "../../layout/home/page";
+import { perf } from "../../main";
 import {
   HomeTab,
   NoorExam,
   NoorSection,
   NoorSkill,
-  TeacherType
+  TeacherType,
 } from "../../models/home_model";
 import Repository from "../../repository";
-import { tabBarTitle } from "../../utils";
+import { tabBarTitle, teacherTypeArabic } from "../../utils";
 
 interface SaveReportProps {
   type1?: boolean;
@@ -47,8 +49,9 @@ function fetch(type: TeacherType, account: string, type1?: boolean) {
   return fetchExam(account);
 }
 
-const SaveReport: React.FC<SaveReportProps> = ({type1}) => {
+const SaveReport: React.FC<SaveReportProps> = ({ type1 }) => {
   const navigate = useNavigate();
+  const tracePages = useRef(trace(perf, "saveReport"));
 
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
@@ -63,17 +66,34 @@ const SaveReport: React.FC<SaveReportProps> = ({type1}) => {
         "ddlSkill",
       ],
       actionName:
-        teacherType == TeacherType.kindergarten  ? "ibtnSearch" :  type1 ? "10":"btY21",
+        teacherType == TeacherType.kindergarten
+          ? "ibtnSearch"
+          : type1
+          ? "10"
+          : "btY21",
       isPrimary: teacherType == TeacherType.primary,
     });
 
   useEffect(() => {
-    fetch(teacherType!, currentRole!,type1)
+    tracePages.current.start();
+    tracePages.current.putAttribute(
+      "treacherType",
+      teacherTypeArabic(teacherType!)
+    );
+
+    tracePages.current.putMetric("stage", 0);
+    return () => tracePages.current.stop();
+  }, []);
+
+  useEffect(() => {
+    fetch(teacherType!, currentRole!, type1)
       .then((r) => setForm(r.form))
       .catch(logout);
   }, []);
 
   async function save(isEmpty: boolean = false) {
+    tracePages.current.putAttribute("isEmpty", isEmpty ? "true" : "false");
+    
     const isExams = teacherType == TeacherType.primary && !type1;
     await submit(isExams ? "newExamReport" : "newSkillReport", {
       isEmpty,
@@ -102,7 +122,11 @@ const SaveReport: React.FC<SaveReportProps> = ({type1}) => {
   const title = pageTitle(teacherType!);
 
   return (
-    <Page title={title} loading={!inputs.length ||  loadingIndex == -1} actions={actions}>
+    <Page
+      title={title}
+      loading={!inputs.length || loadingIndex == -1}
+      actions={actions}
+    >
       {inputs.map((input, i) => (
         <div key={input.id}>
           <SelectBox

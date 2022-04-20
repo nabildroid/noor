@@ -2,6 +2,8 @@ import { initializeApp } from "firebase/app";
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
 import "./style/index.css";
+import { getPerformance } from "firebase/performance";
+
 
 
 export const emulator = process.env.NODE_ENV == "development" && true;
@@ -18,6 +20,9 @@ export const firebaseApp = initializeApp({
 
 const App = React.lazy(() => import("./app"));
 const AppProvider = React.lazy(() => import("./context/appContext"));
+
+export const perf = getPerformance(firebaseApp);
+
 
 ReactDOM.render(
   <Suspense fallback={<span></span>}>

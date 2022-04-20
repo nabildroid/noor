@@ -1,10 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import { trace } from "firebase/performance";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import RadioList from "../../components/home/radioList";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
 import { createAction } from "../../layout/home/actionBar";
 import Page from "../../layout/home/page";
+import { perf } from "../../main";
 import {
   BackgroundTaskType,
   NoorSection,
@@ -32,16 +34,30 @@ function pageTitle(type: TeacherType) {
 }
 
 const SaveAll: React.FC<SaveAllProps> = () => {
+  const tracePages = useRef(trace(perf, "saveAll"));
+
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout, user } = useContext(AppContext);
   const [selected, select] = useState<Rating>();
   const [loading, setLoading] = useState(false);
 
+  
   const { setForm, letMeHandleIt } = useFormOptions({
     actionName: "ibtnSearch",
     isPrimary:teacherType == TeacherType.primary,
 
   });
+
+  useEffect(() => {
+    tracePages.current.start();
+    tracePages.current.putAttribute(
+      "treacherType",
+      teacherTypeArabic(teacherType!)
+    );
+
+    tracePages.current.putMetric("stage", 0);
+    return () => tracePages.current.stop();
+  }, []);
 
   useEffect(() => {
     setLoading(true);

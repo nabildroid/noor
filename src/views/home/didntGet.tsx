@@ -1,5 +1,6 @@
 import { Transition } from "@headlessui/react";
-import React, { useContext, useEffect, useState } from "react";
+import { trace } from "firebase/performance";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import CustomButton from "../../components/home/customButton";
 import Noti from "../../components/home/noti";
 import SelectBox from "../../components/home/selectBox";
@@ -9,6 +10,8 @@ import useFormOptions from "../../hooks/useFormOptions";
 import Page from "../../layout/home/page";
 import { NoorSection, NoorSkill, TeacherType } from "../../models/home_model";
 import Repository from "../../repository";
+import { perf } from "../../main";
+import { teacherTypeArabic } from "../../utils";
 
 interface DidntGetProps {}
 
@@ -39,9 +42,24 @@ enum NotyType {
 }
 
 const DidntGet: React.FC<DidntGetProps> = () => {
+  const tracePages = useRef(trace(perf, "didntGet"));
+
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
+
+  useEffect(() => {
+    tracePages.current.start();
+    tracePages.current.putAttribute(
+      "treacherType",
+      teacherTypeArabic(teacherType!)
+    );
+
+    tracePages.current.putMetric("stage", 0);
+    return () => tracePages.current.stop();
+  }, []);
+
+  
   const { inputs, setForm, submit, updateInputs, loadingIndex } =
     useFormOptions({
       label: "DidntGet" + teacherType,
@@ -54,6 +72,12 @@ const DidntGet: React.FC<DidntGetProps> = () => {
   const [period, setPeriod] = useState("");
 
   const [stage, setStage] = useState(0);
+
+  useEffect(() => {
+    tracePages.current.incrementMetric("pageIndex", 1);
+  }, [stage]);
+
+  
 
   useEffect(() => {
     const isSecondStage = loadingIndex == inputs.length - 1;

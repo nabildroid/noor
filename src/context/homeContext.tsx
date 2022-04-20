@@ -5,7 +5,7 @@ import {
   HomeStateInit,
   HomeTab,
   IHomeProvider,
-  TeacherType
+  TeacherType,
 } from "../models/home_model";
 import Repository from "../repository";
 import DB from "../repository/db";
@@ -69,7 +69,7 @@ const HomeProvider: React.FC = ({ children }) => {
         HomeTab.savedReports,
         HomeTab.logout,
       ];
-      return [
+    return [
       HomeTab.saveCustom,
       HomeTab.editSkill,
       HomeTab.didntGet,
@@ -83,10 +83,10 @@ const HomeProvider: React.FC = ({ children }) => {
 
   const getTeacherType = (currentRole?: string) => {
     if (!currentRole) return TeacherType.elementery;
-    if (currentRole.includes("ابتدائية")) return TeacherType.primary;
+    if (currentRole.includes("متوسط")) return TeacherType.elementery;
     if (currentRole.includes("روضة")) return TeacherType.kindergarten;
 
-    return TeacherType.elementery;
+    return TeacherType.primary;
   };
 
   async function selectTab(tab: HomeTab) {
