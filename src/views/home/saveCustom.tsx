@@ -118,7 +118,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
     }),
     createAction({
       show: secondStage,
-      enable: loadingIndex != -1 && !!rating,
+      enable: loadingIndex != -1 && rating !== undefined,
       loading,
       buttons: [
         {

@@ -36,4 +36,6 @@ export interface IAppProvider extends AppState {
   loadLoginParams(): Promise<void>;
 
   logout(): Promise<void>;
+
+  refrechToken(tryPeriod?: number): Promise<void>;
 }

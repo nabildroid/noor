@@ -55,7 +55,7 @@ const AppProvider: React.FC = ({ children }) => {
 
     if (operation == "success") {
       traceLogin.current.stop();
-      
+
       signInWithEmailAndPassword(
         auth,
         credential.name + "@noor.com",
@@ -90,11 +90,20 @@ const AppProvider: React.FC = ({ children }) => {
     auth.signOut();
   }
 
+  async function refrechToken(tryPeroid?: number) {
+    const { user } = state;
+    const prevTryPeriod = (await user?.getIdTokenResult())?.claims?.try ?? 0;
+    if (!tryPeroid || prevTryPeriod != tryPeroid) {
+      await user?.getIdToken(true);
+    }
+  }
+
   const values: IAppProvider = {
     ...state,
     login,
     loadLoginParams,
     logout,
+    refrechToken,
   };
 
   return <AppContext.Provider value={values}>{children}</AppContext.Provider>;

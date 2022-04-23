@@ -13,8 +13,8 @@ service cloud.firestore {
     }
 
     match /tasks/{taskId} {
-      allow write: if false;
       allow read: if resource.data.user == request.auth.uid
+      allow write: if request.auth.uid != null && int(request.auth.token.try) > request.time.toMillis()
     }
 
     match /reports/{reportId} {
@@ -22,9 +22,5 @@ service cloud.firestore {
       allow write: if false 
     }
 
-    match /{document=**} {
-      allow read, write: if
-          request.time < timestamp.date(2022, 4, 21);
-    }
   }
 }

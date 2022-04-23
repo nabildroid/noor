@@ -12,7 +12,7 @@ import {
   NoorSection,
   NoorSkill,
   SaveAllTask,
-  TeacherType
+  TeacherType,
 } from "../../models/home_model";
 import rates, { Rating } from "../../models/rating";
 import Repository from "../../repository";
@@ -41,11 +41,9 @@ const SaveAll: React.FC<SaveAllProps> = () => {
   const [selected, select] = useState<Rating>();
   const [loading, setLoading] = useState(false);
 
-  
   const { setForm, letMeHandleIt } = useFormOptions({
     actionName: "ibtnSearch",
-    isPrimary:teacherType == TeacherType.primary,
-
+    isPrimary: teacherType == TeacherType.primary,
   });
 
   useEffect(() => {
@@ -78,8 +76,7 @@ const SaveAll: React.FC<SaveAllProps> = () => {
       completed: false,
       type: BackgroundTaskType.saveAll,
       user: user!.uid,
-      isPrimary:teacherType == TeacherType.primary,
-
+      isPrimary: teacherType == TeacherType.primary,
     };
 
     wait(() => DB.instance.createTask(task), setLoading);
@@ -89,7 +86,7 @@ const SaveAll: React.FC<SaveAllProps> = () => {
 
   const actions = createAction({
     loading: loading,
-    enable:!!selected,
+    enable: selected !== undefined,
     buttons: [
       {
         label: "رصد",

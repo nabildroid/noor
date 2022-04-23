@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useReducer } from "react";
 import homeAction from "../actions/homeAction";
 import useFetchTeacher from "../hooks/useFetchTeacher";
+import useIfIffect from "../hooks/useIfEffect";
 import {
   HomeStateInit,
   HomeTab,
@@ -16,9 +17,14 @@ export const HomeContext = createContext<IHomeProvider>(null!);
 const HomeProvider: React.FC = ({ children }) => {
   console.log("creating the context!");
   const [state, dispatch] = useReducer(homeAction, HomeStateInit);
-  const { user, logout } = useContext(AppContext);
+  const { user, logout,refrechToken } = useContext(AppContext);
 
   const teacher = useFetchTeacher({ user });
+
+  useIfIffect(() => {
+    refrechToken(teacher?.try)
+
+  }, [teacher != null]);
 
   useEffect(() => {
     if (Repository.instance.isExpired()) {
