@@ -9,18 +9,24 @@ const includedFeatures = ["الميزة الاولة", "الميزة الثان�
 const PaypalClientId =
   "AV4gQ-jSryV-9cAV5Sgkl1HP0xcuybQ4Zds1L9Whez5jZsRFrpswaWVyOGa5xtlDpyVywgHoiS9LtaSM";
 
+export type Prices = {
+  pro: number;
+  title: string;
+  price: number;
+}[];
+
 export default function Example() {
-  const [price, setPrice] = useState<number>();
+  const [price, setPrice] = useState<Prices>();
   useEffect(() => {
     Repository.instance.getPrice().then(setPrice);
   }, []);
 
-  const createOrder = async () => {
-    return (await Repository.instance.createPaypalOrder()).id;
+  const createOrder = async (price: number) => {
+    return (await Repository.instance.createPaypalOrder(price)).id;
   };
 
-  const handleOrder = async (id: any) => {
-    return await Repository.instance.paypalHandleOrder(id);
+  const handleOrder = async (id: any, price: number) => {
+    return await Repository.instance.paypalHandleOrder(id,price);
   };
 
   return (
@@ -42,7 +48,7 @@ export default function Example() {
         <div className="relative">
           <div className="absolute inset-0 h-1/2 bg-gray-100" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-lg mx-auto rounded-lg shadow-lg overflow-hidden lg:max-w-none lg:flex flex-row-reverse">
+            <div className="max-w-lg mx-auto rounded-lg shadow-lg overflow-hidden lg:max-w-none flex flex-col">
               <div className="flex-1 bg-white px-6 py-8 lg:p-12">
                 <h3 className="text-2xl text-right font-extrabold text-gray-900 sm:text-3xl">
                   الخطة الشهرية
@@ -80,25 +86,37 @@ export default function Example() {
                   </ul>
                 </div>
               </div>
-              <div className="py-8 px-6 text-center bg-gray-50 lg:flex-shrink-0 lg:flex lg:flex-col lg:justify-center lg:p-12">
-                <PayPalScriptProvider options={{ "client-id": PaypalClientId }}>
-                  <div className="mt-4 flex items-center justify-center text-5xl font-extrabold text-gray-900">
-                    <span>${price}</span>
-                    <span className="ml-3 text-xl font-medium text-gray-500">
-                      USD
-                    </span>
-                  </div>
-
-                  <div className="mt-6">
-                    <PayPalButtons
-                      createOrder={createOrder}
-                      onApprove={(data) => handleOrder(data.orderID)}
-                      className=" shadow flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-100 hover:bg-indigo-400"
+              <div className="py-8 px-6 space-y-12 lg:space-x-12 lg:space-y-0 text-center bg-gray-50 lg:flex-shrink-0 lg:flex lg:justify-center lg:p-12">
+                {price?.map((p) => (
+                  <div key={p.price}>
+                    <h3 className="text-xl text-center font-semibold text-gray-900 sm:text-3xl">
+                      {p.title}
+                    </h3>
+                    <PayPalScriptProvider
+                      options={{ "client-id": PaypalClientId }}
                     >
-                      <span>ادفع الان</span>
-                    </PayPalButtons>
+                      <div className="mt-4 flex items-center justify-center text-5xl font-extrabold text-gray-900">
+                        <span>${p.price}</span>
+                        <span className="ml-3 text-xl font-medium text-gray-500">
+                          USD
+                        </span>
+                      </div>
+
+                      <div className="mt-6">
+                        <PayPalButtons
+                          key={p.price}
+                          createOrder={() => createOrder(p.price)}
+                          onApprove={(data) =>
+                            handleOrder(data.orderID, p.price)
+                          }
+                          className=" shadow flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-100 hover:bg-indigo-400"
+                        >
+                          <span>ادفع الان</span>
+                        </PayPalButtons>
+                      </div>
+                    </PayPalScriptProvider>
                   </div>
-                </PayPalScriptProvider>
+                ))}
               </div>
             </div>
           </div>

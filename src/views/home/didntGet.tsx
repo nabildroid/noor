@@ -11,7 +11,10 @@ import Page from "../../layout/home/page";
 import { NoorSection, NoorSkill, TeacherType } from "../../models/home_model";
 import Repository from "../../repository";
 import { perf } from "../../main";
-import { teacherTypeArabic } from "../../utils";
+import { teacherTypeArabic, wait } from "../../utils";
+import SlideTransition from "../../layout/home/slideTransition";
+import { createAction } from "../../layout/home/actionBar";
+import useIfIffect from "../../hooks/useIfEffect";
 
 interface DidntGetProps {}
 
@@ -47,7 +50,6 @@ const DidntGet: React.FC<DidntGetProps> = () => {
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout } = useContext(AppContext);
 
-
   useEffect(() => {
     tracePages.current.start();
     tracePages.current.putAttribute(
@@ -59,11 +61,11 @@ const DidntGet: React.FC<DidntGetProps> = () => {
     return () => tracePages.current.stop();
   }, []);
 
-  
-  const { inputs, setForm, submit, updateInputs, loadingIndex } =
+  const { inputs, setForm, submit, isAllChosen, updateInputs, loadingIndex } =
     useFormOptions({
       label: "DidntGet" + teacherType,
       actionName: "ibtnSearch",
+      excludedNames: ["ddlStudySystem", "ddlSection"],
       isPrimary: teacherType == TeacherType.primary,
     });
 
@@ -72,16 +74,15 @@ const DidntGet: React.FC<DidntGetProps> = () => {
   const [period, setPeriod] = useState("");
 
   const [stage, setStage] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    tracePages.current.incrementMetric("pageIndex", 1);
-  }, [stage]);
-
-  
-
-  useEffect(() => {
-    const isSecondStage = loadingIndex == inputs.length - 1;
-  }, [loadingIndex]);
+  useIfIffect(() => {
+    setPeriod(
+      inputs
+        .find((i) => i.name?.includes("ddlPart"))
+        ?.options.find((e) => e.selected)?.text ?? ""
+    );
+  }, [stage == 1]);
 
   useEffect(() => {
     Repository.instance
@@ -94,18 +95,36 @@ const DidntGet: React.FC<DidntGetProps> = () => {
       .catch(logout);
   }, []);
 
-  async function fetchSkills() {
-    // const skills = await submit();
-  }
+  const fetchSkills = () =>
+    wait(async () => {
+      setStage(1);
+    }, setLoading);
 
   const checkSave = async () => {};
   const back = () => setStage(Math.max(stage - 1, 0));
 
+  const actions = [
+    createAction({
+      enable: isAllChosen,
+      buttons: [
+        {
+          label: "استعراض",
+          onClick: fetchSkills,
+        },
+      ],
+    }),
+  ];
+
   return (
-    <Page title="طلاب لم يتقنوا المهارات" size={stage == 1 ? "md" : "sm"}>
+    <Page
+      title="طلاب لم يتقنوا المهارات"
+      size={stage == 1 ? "md" : "sm"}
+      actions={actions[stage]}
+      loading={loadingIndex == -1 || !inputs.length || loading}
+    >
       {notyType == NotyType.empty && <Noti text="لا يوجد" color="red" />}
 
-      <Transition className="flex-1" show={stage == 0}>
+      <SlideTransition className="flex-1" show={stage == 0}>
         {inputs.map((input, i) => (
           <div key={input.id}>
             <SelectBox
@@ -120,20 +139,9 @@ const DidntGet: React.FC<DidntGetProps> = () => {
             />
           </div>
         ))}
+      </SlideTransition>
 
-        {notyType == NotyType.exists && (
-          <>
-            <Noti text="يوجد" color="green" />
-            <div className="mt-4 text-center">
-              <CustomButton onClick={() => setStage(1)} icon={false}>
-                استعراض
-              </CustomButton>
-            </div>
-          </>
-        )}
-      </Transition>
-
-      <Transition className={" flex-1"} show={stage == 1}>
+      <SlideTransition className={" flex-1"} show={stage == 1}>
         <h3 className="text-indigo-600 bg-indigo-50 py-1 font-arabic text-center text-md">
           طلاب لم يتقنو المهارات في {period}
         </h3>
@@ -196,9 +204,9 @@ const DidntGet: React.FC<DidntGetProps> = () => {
             </div>
           </div>
         </div>
-      </Transition>
+      </SlideTransition>
 
-      <Transition className="flex-1" show={stage == 2}>
+      <SlideTransition className="flex-1" show={stage == 2}>
         <h3 className="text-indigo-600 mt-1 bg-indigo-50 py-1 font-arabic text-center text-md">
           طلاب لم يتقنوا المهارات في {period}
         </h3>
@@ -244,7 +252,7 @@ const DidntGet: React.FC<DidntGetProps> = () => {
             <CustomButton onClick={() => {}}>رصد</CustomButton>
           </div>
         </div>
-      </Transition>
+      </SlideTransition>
     </Page>
   );
 };

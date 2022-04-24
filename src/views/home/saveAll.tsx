@@ -77,6 +77,7 @@ const SaveAll: React.FC<SaveAllProps> = () => {
       type: BackgroundTaskType.saveAll,
       user: user!.uid,
       isPrimary: teacherType == TeacherType.primary,
+      created:new Date()
     };
 
     wait(() => DB.instance.createTask(task), setLoading);

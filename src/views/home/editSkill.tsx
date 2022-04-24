@@ -148,7 +148,10 @@ const EditSkill: React.FC<EditSkillProps> = () => {
         isPrimary: teacherType == TeacherType.primary,
       });
 
-      setForm(data.form);
+      setForm((prevForm) => ({
+        ...data.form,
+        actionButtons: prevForm?.actionButtons ?? [],
+      }));
       setStage(0);
     }, setLoading);
 
@@ -167,7 +170,11 @@ const EditSkill: React.FC<EditSkillProps> = () => {
         isPrimary: teacherType == TeacherType.primary,
       });
 
-      setForm(data.form);
+      setForm((prevForm) => ({
+        ...data.form,
+        actionButtons: prevForm?.actionButtons ?? [],
+      }));
+
       setStage(0);
     }, setLoading);
 

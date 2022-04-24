@@ -99,6 +99,8 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
       type: BackgroundTaskType.saveCustom,
       user: user!.uid,
       isPrimary: teacherType == TeacherType.primary,
+      created:new Date()
+
     };
 
     console.log(task);

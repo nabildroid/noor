@@ -1,7 +1,7 @@
 import {
   BouncingNavigation,
   FormInput,
-  SaveAllSubmit
+  SaveAllSubmit,
 } from "../types/communication_types";
 
 export enum TeacherType {
@@ -48,7 +48,8 @@ export type BackgroundTask<T> = {
   user: string;
   completed: boolean;
   payload: T & BouncingNavigation;
-  isPrimary:boolean;
+  isPrimary: boolean;
+  created: Date;
 };
 
 export type Report = {

@@ -26,7 +26,6 @@ export default functions
     const data = docData.payload as NavigationData;
     const { isPrimary } = docData;
     
-    snapshot.ref.update({ completed: true, payload: {} });
 
     const homePage = Redirect.load(data);
 
@@ -82,6 +81,9 @@ export default functions
         },
       ],
     });
+
+    snapshot.ref.update({ completed: true, payload: {} });
+
 
     console.log("############################################");
   });

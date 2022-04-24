@@ -2,7 +2,7 @@ import {
   BackgroundTask,
   BackgroundTaskType,
   HomeTab,
-  TeacherType
+  TeacherType,
 } from "../models/home_model";
 
 export const tabBarTitle = (tab: HomeTab, type: TeacherType) =>
@@ -87,4 +87,11 @@ export async function wait(
   loading(true);
   await fc();
   loading(false);
+}
+
+export function diffInMinutes(d1: Date, d2: Date) {
+  const m1 = d1.getTime() / 1000 / 60;
+  const m2 = d2.getTime() / 1000 / 60;
+
+  return Math.floor(m1 - m2);
 }

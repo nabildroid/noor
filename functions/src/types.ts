@@ -14,3 +14,13 @@ export type IncrementalData = {
   from?: string;
   isPrimary: boolean;
 };
+
+export type Config = {
+  admin: string[];
+  try: number;
+  prices: {
+    pro: number;
+    title: string;
+    price: number;
+  }[];
+};

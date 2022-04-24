@@ -4,6 +4,7 @@ import {
   getFunctions,
   httpsCallable,
 } from "firebase/functions";
+import { Prices } from "../components/home/buyMessage";
 import { emulator, firebaseApp } from "../main";
 import {
   BouncingNavigation,
@@ -157,17 +158,17 @@ export default class Repository {
   }
 
   async getPrice() {
-    const response = await this.call<number>("price");
+    const response = await this.call<Prices>("price");
     return response.data;
   }
 
-  async createPaypalOrder() {
-    const response = await this.call<any>("paypalCreateOrder");
+  async createPaypalOrder(price: number) {
+    const response = await this.call<any>("paypalCreateOrder", { price });
     return response.data;
   }
 
-  async paypalHandleOrder(orderId: any) {
-    const response = await this.call<any>("paypalHandleOrder", { orderId });
+  async paypalHandleOrder(orderId: any,price:number) {
+    const response = await this.call<any>("paypalHandleOrder", { orderId,price });
     return response.data;
   }
 

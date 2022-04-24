@@ -1,6 +1,16 @@
 import {
-  addDoc, collection, connectFirestoreEmulator, deleteDoc, doc, Firestore, getDocs, getFirestore, onSnapshot, query,
-  where
+  addDoc,
+  collection,
+  connectFirestoreEmulator,
+  deleteDoc,
+  doc,
+  Firestore,
+  getDocs,
+  getFirestore,
+  onSnapshot,
+  query,
+  where,
+  Timestamp,
 } from "firebase/firestore";
 import { emulator, firebaseApp } from "../main";
 import { BackgroundTask, Report, Teacher } from "../models/home_model";
@@ -47,9 +57,11 @@ export default class DB {
 
     return onSnapshot(tasksquery, {}, (snapshot) => {
       snapshot.docChanges().forEach((doc) => {
+        const data = doc.doc.data();
         listener(
           {
-            ...doc.doc.data(),
+            ...data,
+            created: data.created.toDate(),
             id: doc.doc.id,
           } as any,
           doc.type == "removed"
@@ -62,6 +74,7 @@ export default class DB {
     const tasks = collection(this.firestore, "tasks");
     await addDoc(tasks, {
       ...task,
+      created:Timestamp.fromDate(task.created)
     });
   }
 

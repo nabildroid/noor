@@ -10,6 +10,7 @@ import {
 } from "../models/home_model";
 import Repository from "../repository";
 import DB from "../repository/db";
+import { diffInMinutes } from "../utils";
 import { AppContext } from "./appContext";
 
 export const HomeContext = createContext<IHomeProvider>(null!);
@@ -17,13 +18,12 @@ export const HomeContext = createContext<IHomeProvider>(null!);
 const HomeProvider: React.FC = ({ children }) => {
   console.log("creating the context!");
   const [state, dispatch] = useReducer(homeAction, HomeStateInit);
-  const { user, logout,refrechToken } = useContext(AppContext);
+  const { user, logout, refrechToken } = useContext(AppContext);
 
   const teacher = useFetchTeacher({ user });
 
   useIfIffect(() => {
-    refrechToken(teacher?.try)
-
+    refrechToken(teacher?.try);
   }, [teacher != null]);
 
   useEffect(() => {
@@ -32,10 +32,16 @@ const HomeProvider: React.FC = ({ children }) => {
     } else {
       console.log("subscribing to the task list");
       return DB.instance.subscribeToTasks(user!.uid, (task, isDeleted) => {
-        console.log(task.id, isDeleted ? "deleted" : "added");
-        if (isDeleted) dispatch({ type: "deleteTask", payload: task.id! });
-        else {
+        const oldByMinutes = 10;
+        const isNew = diffInMinutes(task.created, new Date()) < oldByMinutes;
+        if (isDeleted) {
+          dispatch({ type: "deleteTask", payload: task.id! });
+        } else if (isNew) {
           dispatch({ type: "addTask", payload: task });
+
+          setTimeout(() => {
+            dispatch({ type: "deleteTask", payload: task.id! });
+          }, 1000 * 60 * oldByMinutes);
         }
       });
     }
