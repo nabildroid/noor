@@ -182,6 +182,7 @@ export default class Redirect {
       payload = QueryEncode(payload);
     }
 
+    try {
     const { data, headers } = await http.post(to, payload, {
       headers: {
         ...defaultHeader(cookies),
@@ -203,6 +204,9 @@ export default class Redirect {
     );
 
     return data;
+    } catch (e) {
+      console.log("@@@@@@@@@@@@@@@@@@@@@");
+    }
   }
 
   private async do() {
