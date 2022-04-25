@@ -100,7 +100,7 @@ API.post("/free/:id", async (req, res) => {
 
 API.post("/pro/:id", async (req, res) => {
   const config = (await db.doc("/config/default").get()).data();
-  const tryDays = config?.pro ?? 3;
+  const tryDays = config?.prices[0]?.pro;
 
   const pro = Date.now() + tryDays * 24 * 3600 * 1000;
   const { id } = req.params;

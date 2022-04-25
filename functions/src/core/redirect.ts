@@ -9,7 +9,7 @@ import {
   hiddenInputs,
   mergeCookies,
   pageNameBase64,
-  replaceNullValues
+  replaceNullValues,
 } from "../utils";
 import Form from "./form";
 
@@ -183,27 +183,32 @@ export default class Redirect {
     }
 
     try {
-    const { data, headers } = await http.post(to, payload, {
-      headers: {
-        ...defaultHeader(cookies),
-        Referer: this.from,
-        "Content-Type": "application/x-www-form-urlencoded",
+      const { data, headers } = await http.post(to, payload, {
+        headers: {
+          ...defaultHeader(cookies),
+          Referer: this.from,
+          "Content-Type": "application/x-www-form-urlencoded",
 
-        ...config,
-      },
+          ...config,
+        },
 
-      timeout,
-    });
+        proxy: {
+          host: "localhost",
+          port: 8082,
+        },
 
-    this.weirdData = hiddenInputs(loadHtml(data));
+        timeout,
+      });
 
-    this.prevCookies = mergeCookies(
-      this.cookies,
-      this.prevCookies,
-      headers["set-cookie"]
-    );
+      this.weirdData = hiddenInputs(loadHtml(data));
 
-    return data;
+      this.prevCookies = mergeCookies(
+        this.cookies,
+        this.prevCookies,
+        headers["set-cookie"]
+      );
+
+      return data;
     } catch (e) {
       console.log("@@@@@@@@@@@@@@@@@@@@@");
     }

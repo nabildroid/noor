@@ -17,7 +17,7 @@ interface NavigationData extends IncrementalData {
 
 export default functions
   .region("asia-south1")
-  .https.onCall(async (data: NavigationData,context) => {
+  .https.onCall(async (data: NavigationData, context) => {
     if (await isBlocked(context)) return null;
 
     const homePage = await Redirect.load(data);
@@ -50,6 +50,7 @@ export async function saveSkills(data: NavigationData, homePage: Redirect) {
   }
 
   const response = await form.save(data.skills, homePage);
-  form.updateFromSubmission(response);
+  if (response) form.updateFromSubmission(response);
+  
   return form;
 }

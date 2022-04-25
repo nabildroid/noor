@@ -13,7 +13,7 @@ interface NavigationData extends IncrementalData {
 
 export default functions
   .region("asia-south1")
-  .https.onCall(async (data: NavigationData,context) => {
+  .https.onCall(async (data: NavigationData, context) => {
     if (await isBlocked(context)) return null;
 
     const homePage = await Redirect.load(data);
@@ -40,7 +40,9 @@ export default functions
       { courseId, period },
       homePage
     );
-    const response = DegreesForm.updateFromSreachSubmission(search);
-
-    return homePage.sendForm(response.form);
+    if (search) {
+      const response = DegreesForm.updateFromSreachSubmission(search);
+      return homePage.sendForm(response.form);
+    }
+    return homePage.send({});
   });

@@ -82,7 +82,7 @@ export default functions
       ],
     });
 
-    snapshot.ref.update({ completed: true, payload: {} });
+    await snapshot.ref.update({ completed: true, payload: {} });
 
 
     console.log("############################################");

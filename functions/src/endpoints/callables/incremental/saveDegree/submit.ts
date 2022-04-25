@@ -14,7 +14,7 @@ interface NavigationData extends IncrementalData {
 // todo gzip the response data;
 export default functions
   .region("asia-south1")
-  .https.onCall(async (data: NavigationData,context) => {
+  .https.onCall(async (data: NavigationData, context) => {
     if (await isBlocked(context)) return null;
 
     const homePage = await Redirect.load(data);
@@ -38,8 +38,12 @@ export default functions
 
     const search = await form.submit(data.actionButton.name!, homePage);
 
-    const response = DegreesForm.updateFromSreachSubmission(search);
-    return homePage.sendForm(response.form, {
-      degrees: response.degrees,
-    });
+    if (search) {
+      const response = DegreesForm.updateFromSreachSubmission(search);
+      return homePage.sendForm(response.form, {
+        degrees: response.degrees,
+      });
+    }
+
+    return homePage.send({});
   });

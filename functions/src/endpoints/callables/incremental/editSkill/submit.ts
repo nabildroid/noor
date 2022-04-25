@@ -49,7 +49,9 @@ export async function fetchSkills(
 
   const search = await form.submit(data.actionButton.name!, homePage);
 
-  const weirdData = form.updateFromSubmission(search);
-  homePage.setWeiredData(weirdData);
+  if (search) {
+    const weirdData = form.updateFromSubmission(search);
+    homePage.setWeiredData(weirdData);
+  }
   return form;
 }

@@ -61,7 +61,7 @@ export class SkillsForm extends Form {
         ctl00$hdnData_Operation: "Save",
       },
       undefined,
-      3000
+      5000
     );
 
     return data;
@@ -209,7 +209,7 @@ export class PrimarySkillForm extends SkillsForm {
         ctl00$hdnData_Operation: "Save",
       },
       undefined,
-      3000
+      5000
     );
 
     return data;

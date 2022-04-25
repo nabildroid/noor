@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import RadioList from "../../components/home/radioList";
 import SelectBox from "../../components/home/selectBox";
 import { AppContext } from "../../context/appContext";
@@ -46,7 +46,7 @@ function pageTitle(type: TeacherType) {
 const SaveCustom: React.FC<SaveCustomProps> = () => {
   const tracePages = useRef(trace(perf, "saveCustom"));
 
-  const { teacherType, currentRole } = useContext(HomeContext);
+  const { teacherType, currentRole, tasks } = useContext(HomeContext);
   const { logout, user } = useContext(AppContext);
 
   useEffect(() => {
@@ -68,7 +68,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
     updateInputs,
     loadingIndex,
   } = useFormOptions({
-    excludedNames: ["ddlSkills"],
+    excludedNames: ["ddlSkill", "ddlSkills"],
     actionName: teacherType == TeacherType.primary ? "ibtnS10" : "ibtnSearch",
     isPrimary: teacherType == TeacherType.primary,
   });
@@ -83,6 +83,12 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
 
   const [loading, setLoading] = useState(false);
   const [secondStage, setSecondStage] = useState(false);
+
+  const isBlocked = useMemo(() => {
+    return (
+      tasks.length && tasks.some((s) => s.type == BackgroundTaskType.saveCustom)
+    );
+  }, [tasks]);
 
   useEffect(() => {
     tracePages.current.putAttribute("stage", secondStage ? "1" : "0");
@@ -99,12 +105,11 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
       type: BackgroundTaskType.saveCustom,
       user: user!.uid,
       isPrimary: teacherType == TeacherType.primary,
-      created:new Date()
-
+      created: new Date(),
     };
 
-    console.log(task);
     wait(() => DB.instance.createTask(task), setLoading);
+    setSecondStage(false);
   };
 
   const actions = [
@@ -139,7 +144,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
     <Page
       title={title}
       size={secondStage ? "sm" : "lg"}
-      loading={!inputs.length || loadingIndex == -1}
+      loading={!inputs.length || loadingIndex == -1 || !!isBlocked}
       actions={actions[secondStage ? 1 : 0]}
     >
       <SlideTransition

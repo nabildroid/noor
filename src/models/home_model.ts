@@ -128,6 +128,7 @@ export type HomeState = {
   tab: HomeTab;
   tabs: HomeTab[];
   tasks: BackgroundTask<any>[];
+  showSuccess: boolean;
 };
 
 export const HomeStateInit: HomeState = {
@@ -135,9 +136,11 @@ export const HomeStateInit: HomeState = {
   loading: false,
   tabs: [],
   tasks: [],
+  showSuccess: false,
 };
 
 export interface IHomeProvider extends HomeState {
   selectTab(tab: HomeTab): void;
   selectRole(role: string): void;
+  closeSuccess(): void;
 }

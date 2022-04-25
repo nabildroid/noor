@@ -7,6 +7,7 @@ import NameLabel from "../../components/home/navigation/nameLabel";
 import PhoneMenu from "../../components/home/navigation/phoneMenu";
 import SelectRole from "../../components/home/navigation/selectRole";
 import Noti from "../../components/home/noti";
+import Success from "../../components/home/success";
 import { HomeContext } from "../../context/homeContext";
 import { HomeTab } from "../../models/home_model";
 import { getPausedTab, taskTitle } from "../../utils";
@@ -20,6 +21,8 @@ const Home: React.FC = ({ children }) => {
     tab,
     tabs,
     selectRole,
+    showSuccess,
+    closeSuccess,
     currentRole,
   } = useContext(HomeContext);
 
@@ -55,6 +58,8 @@ const Home: React.FC = ({ children }) => {
 
   return (
     <div className="min-h-screen flex  bg-slate-100">
+      <Success show={showSuccess} close={closeSuccess} />
+
       <div className="flex-1 flex flex-col">
         <div className="px-4 flex-col-reverse p-2 bg-white md:bg-transparent md:flex-row font-arabic md:h-16 w-full  flex items-center justify-between">
           <div className="w-full pr-2 md:w-auto justify-end flex">

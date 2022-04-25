@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useReducer } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 import homeAction from "../actions/homeAction";
 import useFetchTeacher from "../hooks/useFetchTeacher";
 import useIfIffect from "../hooks/useIfEffect";
@@ -20,6 +26,8 @@ const HomeProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(homeAction, HomeStateInit);
   const { user, logout, refrechToken } = useContext(AppContext);
 
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const teacher = useFetchTeacher({ user });
 
   useIfIffect(() => {
@@ -36,6 +44,8 @@ const HomeProvider: React.FC = ({ children }) => {
         const isNew = diffInMinutes(task.created, new Date()) < oldByMinutes;
         if (isDeleted) {
           dispatch({ type: "deleteTask", payload: task.id! });
+
+          setShowSuccess(true);
         } else if (isNew) {
           dispatch({ type: "addTask", payload: task });
 
@@ -118,6 +128,8 @@ const HomeProvider: React.FC = ({ children }) => {
     ...state,
     selectRole,
     selectTab,
+    closeSuccess: () => setShowSuccess(false),
+    showSuccess,
   };
 
   return <HomeContext.Provider value={values}>{children}</HomeContext.Provider>;
