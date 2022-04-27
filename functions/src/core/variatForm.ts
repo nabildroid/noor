@@ -125,7 +125,7 @@ export async function executeVariant(
 }
 
 // replace -- الكل -- to الكل
-function clean(x: string) {
+function clean(x: string) { 
   return x.replace(/--/g, "").trim();
 }
 

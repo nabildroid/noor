@@ -49,8 +49,8 @@ export async function saveSkills(data: NavigationData, homePage: Redirect) {
     });
   }
 
-  const response = await form.save(data.skills, homePage);
-  if (response) form.updateFromSubmission(response);
-  
+  await form.save(data.skills, homePage);
+  // if (response) form.updateFromSubmission(response);
+
   return form;
 }

@@ -115,7 +115,7 @@ const Home: React.FC = ({ children }) => {
             to={"/" + HomeTab.home}
             className="font-arabic text-2xl  text-center"
           >
-            نور
+            ارصد نور
           </Link>
         </div>
 

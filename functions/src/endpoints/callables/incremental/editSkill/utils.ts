@@ -51,20 +51,16 @@ export class SkillsForm extends Form {
 
     const action = this.getFormAction();
 
-    const data = await redirect.fork(
-      action,
-      {
+    const start = Date.now();
+    redirect
+      .fork(action, {
         ...payload,
         __EVENTTARGET: "",
         ctl00$ibtnYes: "نعم",
         ctl00$hdnData_Data: "",
         ctl00$hdnData_Operation: "Save",
-      },
-      undefined,
-      5000
-    );
-
-    return data;
+      })
+      .then(() => console.log((Date.now() - start) / 1000));
   }
 
   updateFromSubmission(data: string) {
@@ -198,21 +194,17 @@ export class PrimarySkillForm extends SkillsForm {
 
     const action = this.getFormAction();
 
-    const data = await redirect.fork(
-      action,
-      {
+    const start = Date.now();
+    redirect
+      .fork(action, {
         ...payload,
         [`${perfix}$ctl01$ddlCurentPassFlag`]: ",0",
         __EVENTTARGET: "",
         ctl00$ibtnYes: "نعم",
         ctl00$hdnData_Data: "",
         ctl00$hdnData_Operation: "Save",
-      },
-      undefined,
-      5000
-    );
-
-    return data;
+      })
+      .then(() => console.log((Date.now() - start) / 1000));
   }
 
   static fromJson(config: {

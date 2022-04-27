@@ -27,6 +27,7 @@ export default functions
     const { isPrimary } = docData;
     
 
+
     const homePage = Redirect.load(data);
 
     // CHECK get the skillsIDS and the form variante, you don't have to fetch all skills everytime, but the skills my vary depending on the form paramters!

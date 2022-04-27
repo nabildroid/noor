@@ -192,11 +192,6 @@ export default class Redirect {
           ...config,
         },
 
-        proxy: {
-          host: "localhost",
-          port: 8082,
-        },
-
         timeout,
       });
 
