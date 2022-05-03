@@ -32,6 +32,11 @@ export default class Repository {
 
   isExpired() {
     const expirationTime = 50 * 60; // 5mins
+    console.log(
+      "checking expiration date:",
+      Date.now() - (new Date(this.bouncingData?.date ?? "").getTime() ?? 0),
+      expirationTime * 1000
+    );
     return (
       Date.now() - (new Date(this.bouncingData?.date ?? "").getTime() ?? 0) >
       expirationTime * 1000
@@ -167,8 +172,11 @@ export default class Repository {
     return response.data;
   }
 
-  async paypalHandleOrder(orderId: any,price:number) {
-    const response = await this.call<any>("paypalHandleOrder", { orderId,price });
+  async paypalHandleOrder(orderId: any, price: number) {
+    const response = await this.call<any>("paypalHandleOrder", {
+      orderId,
+      price,
+    });
     return response.data;
   }
 

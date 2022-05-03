@@ -65,6 +65,10 @@ export interface SaveAllSubmit {
   isPrimary: boolean;
 }
 
+export interface SavePeriodSubmit extends SaveAllSubmit {
+  period: string;
+}
+
 export interface DegreeSave {
   action: string;
   inputs: FormInput[];

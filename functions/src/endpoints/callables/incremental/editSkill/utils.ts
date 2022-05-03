@@ -53,13 +53,17 @@ export class SkillsForm extends Form {
 
     const start = Date.now();
     redirect
-      .fork(action, {
-        ...payload,
-        __EVENTTARGET: "",
-        ctl00$ibtnYes: "نعم",
-        ctl00$hdnData_Data: "",
-        ctl00$hdnData_Operation: "Save",
-      })
+      .fork(
+        action,
+        {
+          ...payload,
+          __EVENTTARGET: "",
+          ctl00$ibtnYes: "نعم",
+          ctl00$hdnData_Data: "",
+          ctl00$hdnData_Operation: "Save",
+        },
+        undefined,
+      )
       .then(() => console.log((Date.now() - start) / 1000));
   }
 

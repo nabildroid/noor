@@ -11,6 +11,7 @@ interface NavigationData extends IncrementalData {
   action: string;
   inputs: FormInput[];
 
+  period?: string;
   rate: number;
 }
 
@@ -18,15 +19,13 @@ export default functions
   .region("asia-south1")
   .runWith({
     timeoutSeconds: 60 * 9,
-    memory:"512MB"
+    memory: "512MB",
   })
   .firestore.document("tasks/{taskId}")
   .onCreate(async (snapshot) => {
     const docData = snapshot.data();
     const data = docData.payload as NavigationData;
     const { isPrimary } = docData;
-    
-
 
     const homePage = Redirect.load(data);
 
@@ -45,13 +44,9 @@ export default functions
           cookies,
           from: redirected,
           weirdData,
-          isPrimary
-        };
-        const response = await executeSkillEdits(
-          config,
           isPrimary,
-          redirect
-        );
+        };
+        const response = await executeSkillEdits(config, isPrimary, redirect);
 
         action = response.action; // CHECK this is might be the cause of paralism not working
         redirect.setWeiredData(response.weirdData);
@@ -73,18 +68,23 @@ export default functions
           redirect
         );
 
-        return response.toJson().inputs;
+        return response.toJson().inputs.filter((e) => e.options.length);
       },
       customSelect: [
         {
           name: "ctl00$PlaceHolderMain$ddlStudySystem",
           value: "منتظم",
         },
+        {
+          name: data.period
+            ? "ctl00$PlaceHolderMain$ddlPeriod"
+            : "edzedze",
+          value: data.period ?? "dsdsdsd",
+        },
       ],
     });
 
     await snapshot.ref.update({ completed: true, payload: {} });
-
 
     console.log("############################################");
   });

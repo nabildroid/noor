@@ -40,6 +40,7 @@ const AppProvider: React.FC = ({ children }) => {
 
     return onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.log("fetched user",user);
         dispatch({ type: "login", payload: user });
       } else {
         logout();

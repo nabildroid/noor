@@ -49,7 +49,7 @@ export async function saveSkills(data: NavigationData, homePage: Redirect) {
     });
   }
 
-  await form.save(data.skills, homePage);
+  await form.save(data.skills, homePage.clone());
   // if (response) form.updateFromSubmission(response);
 
   return form;

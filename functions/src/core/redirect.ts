@@ -1,5 +1,4 @@
 import http from "axios";
-import axiosRetry from "axios-retry";
 import { load as loadHtml } from "cheerio";
 import * as FormData from "form-data";
 import { stringify as QueryEncode } from "querystring";
@@ -10,9 +9,15 @@ import {
   mergeCookies,
   pageNameBase64,
   replaceNullValues,
+  retryFailedRequests,
 } from "../utils";
 import Form from "./form";
 
+import axiosRetry from "axios-retry";
+
+axiosRetry(http);
+
+import { FailedRequest } from "../common"; // todo anti-pattern
 type RedirectionType =
   | "MenuItemRedirect"
   | "OperationOnMenu"
@@ -43,13 +48,6 @@ interface RedirectionResponse {
   prevCookies: string[];
 }
 
-axiosRetry(http, {
-  retryCondition: (err) => {
-    return !err.config.data.includes("ibtnYes");
-  },
-  retryDelay: axiosRetry.exponentialDelay,
-});
-
 export default class Redirect {
   private from: string;
   private to: string;
@@ -68,6 +66,19 @@ export default class Redirect {
     });
 
     return instance;
+  }
+
+  clone() {
+    return new Redirect({
+      cookies: this.cookies,
+      from: this.from,
+      target: this.target,
+      to: this.to,
+      weirdData: {} as any,
+      html: this.html,
+      redirected: this.redirected,
+      prevCookies: this.prevCookies,
+    });
   }
 
   static async start(config: RedirectionInitParams) {
@@ -174,26 +185,33 @@ export default class Redirect {
       "X-Requested-With": "XMLHttpRequest",
       ADRUM: "isAjax:true",
     } as {},
-    timeout: number = 60000
+    timeout: number = 30000
   ) {
     const cookies = mergeCookies(this.prevCookies, this.cookies);
+    const isSaveAndForget = payload["ctl00$ibtnYes"] != undefined;
     if (!(payload instanceof FormData)) {
       payload = replaceNullValues(payload, "");
       payload = QueryEncode(payload);
     }
 
     try {
-      const { data, headers } = await http.post(to, payload, {
-        headers: {
-          ...defaultHeader(cookies),
-          Referer: this.from,
-          "Content-Type": "application/x-www-form-urlencoded",
-
-          ...config,
-        },
-
-        timeout,
-      });
+      const { data, headers } = await retryFailedRequests(
+        () =>
+          http.post(to, payload, {
+            headers: {
+              ...defaultHeader(cookies),
+              Referer: this.from,
+              "Content-Type": "application/x-www-form-urlencoded",
+              ...config,
+            },
+            proxy: {
+              host: "localhost",
+              port: 8082,
+            },
+            timeout: Math.abs(timeout),
+          }),
+        isSaveAndForget ? 1 : 3
+      );
 
       this.weirdData = hiddenInputs(loadHtml(data));
 
@@ -205,7 +223,20 @@ export default class Redirect {
 
       return data;
     } catch (e) {
-      console.log("@@@@@@@@@@@@@@@@@@@@@");
+      const failedRequest = {
+        to,
+        payload,
+        headers: {
+          ...defaultHeader(cookies),
+          Referer: this.from,
+          "Content-Type": "application/x-www-form-urlencoded",
+          ...config,
+        },
+      };
+
+      FailedRequest.publishMessage({
+        json: failedRequest,
+      });
     }
   }
 

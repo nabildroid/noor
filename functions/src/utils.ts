@@ -94,12 +94,32 @@ export function clone<T>(ob: T) {
   return undefined;
 }
 
-export function randomDelay(max: number) {
-  const rand = Math.floor(Math.random() * max);
+export function randomDelay(max: number, min: number = 0) {
+  const rand = Math.floor(Math.random() * max) + min;
   return new Promise((res) => {
     setTimeout(res, rand);
   });
 }
 
+export async function retryFailedRequests<T>(
+  fc: () => Promise<T>,
+  max: number = 3
+) {
+  let result: T;
+  let error;
+  for (let i = 0; i < max; i++) {
+    try {
+      result = await fc();
+      return result;
+    } catch (e) {
+      error = e;
+      console.log("Trying aging #", i);
+      await randomDelay(1000 * i)
+    }
+  }
 
-
+  if (result == null) {
+    throw new Error(error);
+  }
+  return result;
+}

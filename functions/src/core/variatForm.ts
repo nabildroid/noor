@@ -70,6 +70,10 @@ export async function executeVariant(
   const left = inputs.slice(0, i);
   const right = inputs.slice(i + 1);
 
+  if (current == undefined) {
+    console.log("hello world!");
+    console.log(inputs);
+  }
   const options = removeEmpty(current.options);
   const nextInputOptions = removeEmpty(inputs[i + 1]?.options ?? []);
   // custom values
@@ -78,7 +82,6 @@ export async function executeVariant(
     current.options = selectOpt(options, isTarget.value);
     return await executeVariant(inputs, redirect, config, i + 1);
   }
-
   // select all if this option exists
   if (!getSelected(options) && containExactOpt(options, "الكل")) {
     current.options = selectOpt(options, "الكل");
@@ -91,8 +94,19 @@ export async function executeVariant(
       inputs[i - 1].name,
       redirect
     );
-    return await executeVariant(filled, redirect, config, i);
-  } else if (getSelected(options) && !nextInputOptions.length && i + 1 < inputs.length) {
+
+    const gotNewInputField = filled.length != inputs.length;
+    return await executeVariant(
+      filled,
+      redirect,
+      config,
+      i + (gotNewInputField ? -1 : 0)
+    );
+  } else if (
+    getSelected(options) &&
+    !nextInputOptions.length &&
+    i + 1 < inputs.length
+  ) {
     const filled = await config.fetchOptions(inputs, current.name, redirect);
     return await executeVariant(filled, redirect, config, i + 2);
   } else if (getSelected(options)) {
@@ -125,16 +139,16 @@ export async function executeVariant(
 }
 
 // replace -- الكل -- to الكل
-function clean(x: string) { 
+function clean(x: string) {
   return x.replace(/--/g, "").trim();
 }
 
 function selectOpt(ops: FormInput["options"], text: string) {
-  return ops.map((e) => ({ ...e, selected: clean(e.text) == text }));
+  return ops.map((e) => ({ ...e, selected: clean(e.text) == clean(text) }));
 }
 
 function containExactOpt(ops: FormInput["options"], text: string) {
-  return ops.some((e) => clean(e.text) == text);
+  return ops.some((e) => clean(e.text) == clean(text));
 }
 
 function removeEmpty(ops: FormInput["options"]) {

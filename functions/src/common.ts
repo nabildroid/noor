@@ -1,5 +1,13 @@
 import * as admin from "firebase-admin";
 import { https } from "firebase-functions";
+
+import { PubSub } from "@google-cloud/pubsub";
+
+const pubsub = new PubSub();
+
+export const FailedRequest = pubsub.topic("failed_requests");
+
+
 const app = admin.initializeApp();
 
 export const db = app.firestore();
@@ -17,8 +25,6 @@ export async function isBlocked(
   context: https.CallableContext,
   isFree = false
 ) {
-
-  
   if (!context.auth) return true;
   if (isFree) return false;
 

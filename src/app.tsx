@@ -5,7 +5,7 @@ import { AppContext } from "./context/appContext";
 import { HomeTab } from "./models/home_model";
 import Login from "./views/login";
 
-
+const SavePeriod = React.lazy(() => import("./views/home/savePeriod"));
 const DidntGet = React.lazy(() => import("./views/home/didntGet"));
 const EditSkill = React.lazy(() => import("./views/home/editSkill"));
 const Onboarding = React.lazy(() => import("./views/home/onboarding"));
@@ -14,7 +14,6 @@ const SaveCustom = React.lazy(() => import("./views/home/saveCustom"));
 const SaveDegree = React.lazy(() => import("./views/home/saveDegree"));
 const SavedReports = React.lazy(() => import("./views/home/savedReports"));
 const SaveReport = React.lazy(() => import("./views/home/saveReport"));
-
 
 const Home = React.lazy(() => import("./views/home"));
 const HomeProvider = React.lazy(() => import("./context/homeContext"));
@@ -56,6 +55,14 @@ function App() {
                 element={
                   <Suspense fallback={<></>}>
                     <SaveAll />
+                  </Suspense>
+                }
+              />
+              <Route
+                path={HomeTab.savePeriod}
+                element={
+                  <Suspense fallback={<></>}>
+                    <SavePeriod />
                   </Suspense>
                 }
               />
@@ -116,10 +123,7 @@ function App() {
                   </Suspense>
                 }
               />
-              <Route
-                path={HomeTab.logout}
-                element={<span>bay bay</span>}
-              />
+              <Route path={HomeTab.logout} element={<span>bay bay</span>} />
 
               <Route
                 index

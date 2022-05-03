@@ -135,16 +135,12 @@ export class DegreesForm extends Form {
       }
     );
 
-    const response = await redirect.fork(
+    redirect.fork(
       action,
       formData,
 
       formData.getHeaders()
     );
-
-    // const response = await redirect.fork(action, payload);
-
-    return response;
   }
 
   static updateFromSreachSubmission(data: string) {

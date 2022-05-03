@@ -8,6 +8,7 @@ import {
 export const tabBarTitle = (tab: HomeTab, type: TeacherType) =>
   ({
     [HomeTab.saveAll]: "رصد الكل",
+    [HomeTab.savePeriod]: "رصد جميع المواد والفصول",
     [HomeTab.saveReport]:
       type == TeacherType.elementery
         ? "انشاء كشف درجات"

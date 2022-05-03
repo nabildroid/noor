@@ -2,6 +2,7 @@ import {
   BouncingNavigation,
   FormInput,
   SaveAllSubmit,
+  SavePeriodSubmit,
 } from "../types/communication_types";
 
 export enum TeacherType {
@@ -40,6 +41,7 @@ export type Teacher = {
 export enum BackgroundTaskType {
   saveAll = "saveAll",
   saveCustom = "saveCustom",
+  savePeriod = "savePeriod",
 }
 
 export type BackgroundTask<T> = {
@@ -70,9 +72,14 @@ export interface SaveCustomTask extends BackgroundTask<SaveAllSubmit> {
   type: BackgroundTaskType.saveCustom;
 }
 
+export interface SavePeriodTask extends BackgroundTask<SavePeriodSubmit> {
+  type: BackgroundTaskType.savePeriod;
+}
+
 export enum HomeTab {
   home = "/",
   saveAll = "saveall",
+  savePeriod = "savePeriod",
   savedegree = "savedegree",
   editSkill = "editSkill",
   didntGet = "didntget",

@@ -94,6 +94,7 @@ const HomeProvider: React.FC = ({ children }) => {
     return [
       HomeTab.saveCustom,
       HomeTab.editSkill,
+      HomeTab.savePeriod,
       HomeTab.didntGet,
       HomeTab.savedegree,
       HomeTab.saveReport,

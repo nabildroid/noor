@@ -35,14 +35,7 @@ export default functions
       .find((i) => i.name.includes("ddlPeriodEnter"))
       .options.find((s) => s.selected).value;
 
-    const search = await form.save(
-      data.degrees,
-      { courseId, period },
-      homePage
-    );
-    if (search) {
-      const response = DegreesForm.updateFromSreachSubmission(search);
-      return homePage.sendForm(response.form);
-    }
+    await form.save(data.degrees, { courseId, period }, homePage);
+
     return homePage.send({});
   });

@@ -15,7 +15,10 @@ import price from "./endpoints/callables/price";
 import paypalCreateOrder from "./endpoints/callables/paypalCreateOrder";
 import paypalHandleOrder from "./endpoints/callables/paypalHandleOrder";
 
+import failedRequests from "./endpoints/background/failedRequests";
+
 export {
+  failedRequests,
   signForm,
   postSignForm,
   newAccount,
