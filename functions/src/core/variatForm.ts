@@ -70,19 +70,33 @@ export async function executeVariant(
   const left = inputs.slice(0, i);
   const right = inputs.slice(i + 1);
 
-  if (current == undefined) {
-    console.log("hello world!");
-    console.log(inputs);
-  }
   const options = removeEmpty(current.options);
   const nextInputOptions = removeEmpty(inputs[i + 1]?.options ?? []);
+
   // custom values
   const isTarget = config.customSelect.find((e) => e.name == current.name);
   if (isTarget) {
     current.options = selectOpt(options, isTarget.value);
-    return await executeVariant(inputs, redirect, config, i + 1);
+    
+    // fetch the previous one
+    if (i > 1) {
+      await config.fetchOptions(inputs, inputs[i - 1].name, redirect);
+      const filled = await config.fetchOptions(
+        inputs,
+        inputs[i - 1].name,
+        redirect
+      );
+      filled[i].options = selectOpt(
+        removeEmpty(filled[i].options),
+        isTarget.value
+      );
+      return await executeVariant(filled, redirect, config, i + 1);
+    } else {
+      return await executeVariant(inputs, redirect, config, i + 1);
+    }
   }
   // select all if this option exists
+
   if (!getSelected(options) && containExactOpt(options, "الكل")) {
     current.options = selectOpt(options, "الكل");
     return await executeVariant(inputs, redirect, config, i + 1);
@@ -95,6 +109,9 @@ export async function executeVariant(
       redirect
     );
 
+    if (!removeEmpty(filled[i].options).length) {
+      return;
+    }
     const gotNewInputField = filled.length != inputs.length;
     return await executeVariant(
       filled,
