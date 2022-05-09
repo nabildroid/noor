@@ -92,9 +92,9 @@ const HomeProvider: React.FC = ({ children }) => {
         HomeTab.logout,
       ];
     return [
+      HomeTab.savePeriod,
       HomeTab.saveCustom,
       HomeTab.editSkill,
-      HomeTab.savePeriod,
       HomeTab.didntGet,
       HomeTab.savedegree,
       HomeTab.saveReport,

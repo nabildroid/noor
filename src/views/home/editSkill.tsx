@@ -31,7 +31,9 @@ export type Skill = {
 };
 
 function pageTitle(type: TeacherType) {
-  return `تعديل ${teacherTypeArabic(type)}`;
+  return type == TeacherType.kindergarten
+    ? "تعديل مهارات الطفل"
+    : `تعديل مهارات طالب`;
 }
 
 function fetch(account: string, type: TeacherType) {

@@ -12,6 +12,9 @@ import { HomeContext } from "../../context/homeContext";
 import { HomeTab } from "../../models/home_model";
 import { getPausedTab, taskTitle } from "../../utils";
 
+
+import LogoImage from "../../assets/logo.png";
+
 const Home: React.FC = ({ children }) => {
   const {
     teacher,
@@ -109,12 +112,13 @@ const Home: React.FC = ({ children }) => {
         <div></div>
       </div>
       <nav className="max-w-xs hidden md:block w-full bg-slate-50 shadow-md">
-        <div className="pr-4 h-16 w-full bg-indigo-400 flex items-center justify-end">
+        <div className="w-full bg-indigo-400 flex items-center justify-end">
           {loading && <Loader className="animate-spin" />}
           <Link
             to={"/" + HomeTab.home}
-            className="font-arabic text-2xl  text-center"
+            className="font-arabic text-2xl  w-full text-center"
           >
+            <img src={LogoImage} className="w-24 mx-auto aspect-square bg-transparent"/>
             ارصد نور
           </Link>
         </div>

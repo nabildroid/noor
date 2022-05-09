@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Loader } from "react-feather";
 import { AppContext } from "../context/appContext";
 
-
+import Logo from "../assets/logo.png";
 
 const Login: React.FC = ({}) => {
   const [username, setUsername] = useState("");
@@ -57,12 +57,23 @@ const Login: React.FC = ({}) => {
   return (
     <div className="w-screen h-screen bg-gray-200 flex items-center justify-center">
       <div className="mx-auto rounded max-w-lg p-4 shadow bg-white">
-        <h1 className="text-center font-bold text-lg  text-indigo-600 ">
-          Login
+        <img
+          src={Logo}
+          className="w-28 aspect-square mx-auto"
+        />
+        <h1 className="mt-4 text-center font-bold text-md  text-indigo-600 ">
+          سجل دخول بنفس معلومات دخولك على نور
         </h1>
-        <form onSubmit={submit}>
+        <form
+          onSubmit={submit}
+          className="mx-auto text-right"
+          style={{ direction: "rtl" }}
+        >
           <div>
-            <label className="text-gray-600 text-sm">Username</label>
+            <label className="text-gray-600 text-sm w-full">
+              {" "}
+              اسم المستخدم
+            </label>
 
             <input
               className="block bg-gray-100 rounded-md p-1 ring-1 ring-indigo-400"
@@ -73,7 +84,7 @@ const Login: React.FC = ({}) => {
             />
           </div>
           <div className="mt-2">
-            <label className="text-gray-600 text-sm">password</label>
+            <label className="text-gray-600 text-sm w-full">كلمة المرور</label>
 
             <input
               className="block bg-gray-100 rounded-md p-1 ring-1 ring-indigo-400"

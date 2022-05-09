@@ -1,5 +1,6 @@
 import { trace } from "firebase/performance";
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import RadioList from "../../components/home/radioList";
 import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
@@ -36,12 +37,13 @@ function pageTitle(type: TeacherType) {
 const SaveAll: React.FC<SaveAllProps> = () => {
   const tracePages = useRef(trace(perf, "saveAll"));
 
+  const navigate = useNavigate();
   const { teacherType, currentRole } = useContext(HomeContext);
   const { logout, user } = useContext(AppContext);
   const [selected, select] = useState<Rating>();
   const [loading, setLoading] = useState(false);
 
-  const { setForm, letMeHandleIt } = useFormOptions({
+  const { setForm, letMeHandleIt,inputs } = useFormOptions({
     actionName: "ibtnSearch",
     isPrimary: teacherType == TeacherType.primary,
   });
@@ -77,7 +79,7 @@ const SaveAll: React.FC<SaveAllProps> = () => {
       type: BackgroundTaskType.saveAll,
       user: user!.uid,
       isPrimary: teacherType == TeacherType.primary,
-      created:new Date()
+      created: new Date(),
     };
 
     wait(() => DB.instance.createTask(task), setLoading);
@@ -95,11 +97,15 @@ const SaveAll: React.FC<SaveAllProps> = () => {
         progress: true,
         icon: true,
       },
+      {
+        label: "رجوع",
+        onClick: () => navigate(-1),
+      },
     ],
   });
 
   return (
-    <Page title={title} actions={actions}>
+    <Page title={title} actions={actions} loading={loading}>
       <RadioList
         disabled={loading}
         title={title}

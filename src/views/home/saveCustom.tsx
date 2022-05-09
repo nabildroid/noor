@@ -21,6 +21,7 @@ import { teacherTypeArabic, wait } from "../../utils";
 
 import { trace } from "firebase/performance";
 import { perf } from "../../main";
+import { useNavigate } from "react-router-dom";
 
 interface SaveCustomProps {}
 
@@ -48,6 +49,7 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
 
   const { teacherType, currentRole, tasks } = useContext(HomeContext);
   const { logout, user } = useContext(AppContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     tracePages.current.start();
@@ -121,6 +123,10 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
           label: "التالي",
           onClick: next,
         },
+        {
+          label: "رجوع",
+          onClick: () => navigate(-1),
+        },
       ],
     }),
     createAction({
@@ -133,6 +139,10 @@ const SaveCustom: React.FC<SaveCustomProps> = () => {
           onClick: save,
           icon: true,
           progress: true,
+        },
+        {
+          label: "رجوع",
+          onClick: () => setSecondStage(false),
         },
       ],
     }),

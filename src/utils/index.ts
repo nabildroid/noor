@@ -13,12 +13,12 @@ export const tabBarTitle = (tab: HomeTab, type: TeacherType) =>
       type == TeacherType.elementery
         ? "انشاء كشف درجات"
         : type == TeacherType.primary
-        ? "انشاء كشف درجات الفصل"
+        ? "انشاء كشف درجات فصل"
         : "تقرير جديد",
-    [HomeTab.savedegree]: "رصد درجات الفصل",
+    [HomeTab.savedegree]: "رصد درجات فصل",
     [HomeTab.savedReports]: " التقارير المحفوظة",
     [HomeTab.home]: "الرئيسية",
-    [HomeTab.saveReportSkill]: "انشاء كشف المهارات الفصل",
+    [HomeTab.saveReportSkill]: "انشاء كشف المهارات فصل",
     [HomeTab.logout]: "خروج",
     [HomeTab.saveCustom]:
       type == TeacherType.primary
@@ -26,7 +26,7 @@ export const tabBarTitle = (tab: HomeTab, type: TeacherType) =>
         : "رصد وحدة ومهارة",
     [HomeTab.studentsNotAccepted]: "رصد وحدة ومهارة",
     [HomeTab.editSkill]:
-      type == TeacherType.primary ? "تعديل المهارت الطالب" : "تعديل مهارات الطفل",
+      type == TeacherType.primary ? "تعديل مهارات طالب" : "تعديل مهارات الطفل",
     [HomeTab.didntGet]:
       type == TeacherType.primary
         ? "طلاب لم يتقنوا المهارت"

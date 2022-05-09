@@ -204,10 +204,6 @@ export default class Redirect {
               "Content-Type": "application/x-www-form-urlencoded",
               ...config,
             },
-            proxy: {
-              host: "localhost",
-              port: 8082,
-            },
             timeout: Math.abs(timeout),
           }),
         isSaveAndForget ? 1 : 3
