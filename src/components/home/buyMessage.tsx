@@ -4,7 +4,12 @@ import { CheckCircle } from "react-feather";
 import Repository from "../../repository";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
-const includedFeatures = ["الميزة الاولة", "الميزة الثانية", "الميزة الثالثة"];
+const includedFeatures = [
+  "رصد كل المهارات والدرجات بضغطة زر واحدة",
+  "دخول من أي شاشة أيفون أو أندرويد أو حاسوب",
+  "تقارير مرصودة و فارغة للطلاب والفصول",
+  "مزايا أخرى اكتشفها داخل الموقع"
+];
 
 const PaypalClientId =
   "AV4gQ-jSryV-9cAV5Sgkl1HP0xcuybQ4Zds1L9Whez5jZsRFrpswaWVyOGa5xtlDpyVywgHoiS9LtaSM";
@@ -26,7 +31,7 @@ export default function Example() {
   };
 
   const handleOrder = async (id: any, price: number) => {
-    return await Repository.instance.paypalHandleOrder(id,price);
+    return await Repository.instance.paypalHandleOrder(id, price);
   };
 
   return (
@@ -35,12 +40,8 @@ export default function Example() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl lg:text-5xl">
-              اشتري الان الوضع المدفوع
+              اشتري الان
             </h2>
-            <p className="mt-4 text-xl text-gray-600">
-              أم ساعة مشروط وعُرفت هذه, تحرّك المدن سبتمبر ومن بل, الذود السيطرة
-              لم فقد. أم إيو مشارف . عل وسفن الأمريكية ذات, طوكيو
-            </p>
           </div>
         </div>
       </div>
@@ -51,16 +52,13 @@ export default function Example() {
             <div className="max-w-lg mx-auto rounded-lg shadow-lg overflow-hidden lg:max-w-none flex flex-col">
               <div className="flex-1 bg-white px-6 py-8 lg:p-12">
                 <h3 className="text-2xl text-right font-extrabold text-gray-900 sm:text-3xl">
-                  الخطة الشهرية
+                  اشترك في ارصد نور
                 </h3>
-                <p className="mt-6 text-base text-gray-500 text-right">
-                  فشكّل الطرفين في, غريمه الأمور حين في. وتم بـ حلّت حالية
-                  لفرنسا, عل بالرّغم واعتلاء استطاعوا أضف,
-                </p>
+
                 <div className="mt-8">
                   <div className="flex flex-row-reverse items-center">
                     <h4 className="flex-shrink-0 pl-4 bg-white text-sm tracking-wider font-semibold uppercase text-indigo-600">
-                      الميزاة
+                      المميزات
                     </h4>
                     <div className="flex-1 border-t-2 border-gray-200" />
                   </div>

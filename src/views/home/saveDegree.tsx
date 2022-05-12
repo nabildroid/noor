@@ -280,7 +280,7 @@ const SaveDegree: React.FC<SaveDegreeProps> = () => {
 
   return (
     <Page
-      title="رصد درجات الفصل"
+      title="رصد درجات فصل"
       size={stage > 0 ? "lg" : "sm"}
       loading={loading  || loadingIndex == -1}
       actions={actions[Math.max(Math.min(stage, 2), 0)]}
