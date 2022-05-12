@@ -101,6 +101,7 @@ export default functions
       items,
       fileName,
       data.inputs,
+      data.isEmpty,
       data.isPrimary
     );
 

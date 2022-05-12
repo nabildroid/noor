@@ -108,12 +108,12 @@ export async function createDegreesPDF(
         value: formInputValue(inputs, "ctl00$PlaceHolderMain$ddlSection"),
       },
       {
-        title: "نوع الوحدة",
-        value: formInputValue(inputs, "ctl00$PlaceHolderMain$ddlPeriodEnter"),
+        title: "المادة",
+        value: formInputValue(inputs, "ctl00$PlaceHolderMain$ddlCourse"),
       },
       {
-        title: "الوحدة الدراسية",
-        value: formInputValue(inputs, "ctl00$PlaceHolderMain$ddlCourse"),
+        title: "الفترة",
+        value: formInputValue(inputs, "ctl00$PlaceHolderMain$ddlPeriodEnter"),
       },
     ],
   });
@@ -144,6 +144,7 @@ export async function createSKillsPDF(
   items: Item[],
   fileName: string,
   inputs: FormInput[],
+  isEmpty = false,
   isPrimary = true
 ) {
   //  todo use the rating from front end
@@ -164,27 +165,31 @@ export async function createSKillsPDF(
   ].filter(Boolean);
 
   console.log(ratings);
+  let texts: string[][] = [];
+  if (!isEmpty) {
+    const students = {};
+    items
+      .map((e) => e.students)
+      .flat()
+      .forEach((item) => {
+        const toValue = (x: string) =>
+          isPrimary ? RatingById(Ratins[1], x) : x;
+        if (students[item.title] == undefined) {
+          students[item.title] = ratings.reduce((acc, v) => {
+            acc[v] = 0;
+            return acc;
+          }, {});
+        }
+        students[item.title][toValue(item.value)]++;
+      });
 
-  const students = {};
-
-  items
-    .map((e) => e.students)
-    .flat()
-    .forEach((item) => {
-      const toValue = (x: string) => (isPrimary ? RatingById(Ratins[1], x) : x);
-      if (students[item.title] == undefined) {
-        students[item.title] = ratings.reduce((acc, v) => {
-          acc[v] = 0;
-          return acc;
-        }, {});
-      }
-      students[item.title][toValue(item.value)]++;
-    });
-
-  const texts = Object.entries(students).map(([k, v]) => [
-    k,
-    ...Object.values(v),
-  ]);
+    texts = Object.entries(students).map(([k, v]) => [
+      k,
+      ...Object.values(v),
+    ]) as any;
+  } else {
+    texts = items.map((i) => i.students.map((s) => s.title));
+  }
 
   let details: any = [];
   if (!isPrimary) {
@@ -233,11 +238,20 @@ export async function createSKillsPDF(
     ];
   }
 
+  let head: string[] = [];
+
+  if (!isEmpty) {
+    head = ["اسم الطالب", ...ratings];
+  } else {
+    head = ["اسم الطالب", ...items.map((i) => i.title)];
+  }
+
   const template = createPDFTemplate({
-    head: ["اسم الطالب", ...ratings],
+    head,
     title: "كشف المهارات",
     items: texts,
     details,
+    isMulti: isEmpty,
   });
 
   let options = {
@@ -276,6 +290,7 @@ function createPDFTemplate(config: {
   head: string[];
   items: string[][];
   details: { title: string; value: string }[];
+  isMulti?: boolean;
 }) {
   return `
   <!DOCTYPE html>
@@ -316,53 +331,80 @@ function createPDFTemplate(config: {
       </div>
       </div>
   
-      <table style="border: 1px solid black;padding: 0px;  width: 100%; direction: rtl; text-align: right;border-collapse: collapse;">
-              
-          <thead>
-  
-  
-              <tr style=" text-align:center; background-color: rgb(199, 199, 199); margin: -2px;">
-${config.head
-  .map(
-    (head, i) => `
-<th style="padding: 6px 0;${i == 0 ? "text-align:center" : ""}">${head}</th>
-
-`
-  )
-  .join("")}  
-
-              </tr>
-          </thead>
-          <tbody>
-
-          ${config.items
-            .map(
-              (item) => `
-          <tr style="padding-right: 10px; text-align: center; ">
-
-          ${item
-            .map(
-              (text, i) => `
-          
-          <td style="padding: 3px 0; ${
-            i == 0 ? "padding-right: 3px; text-align: right;" : ""
-          } border: 1px solid rgb(108, 108, 108);" >${text}</td>
-          `
-            )
-            .join("")}
-          </tr>
-          `
-            )
-            .join("")}
-  
-              </tbody>
-      </table>
+      ${
+        config.isMulti
+          ? createMultiPDFTables(config.head, config.items)
+          : createPDFTable(config.head, config.items)
+      }
       </div>  
   </body>
   </html>
   
   
   `;
+}
+
+function createPDFTable(head: string[], items: string[][]) {
+  return `
+  <table style="border: 1px solid black;padding: 0px;  width: 100%; direction: rtl; text-align: right;border-collapse: collapse;">
+          
+      <thead>
+
+
+          <tr style=" text-align:center; background-color: rgb(199, 199, 199); margin: -2px;">
+${head
+  .map(
+    (h, i) => `
+<th style="padding: 6px 0;${i == 0 ? "text-align:center" : ""}">${h}</th>
+
+`
+  )
+  .join("")}  
+
+          </tr>
+      </thead>
+      <tbody>
+
+      ${items
+        .map(
+          (item) => `
+      <tr style="padding-right: 10px; text-align: center; ">
+
+      ${item
+        .map(
+          (text, i) => `
+      
+      <td style="padding: 3px 0; ${
+        i == 0 ? "padding-right: 3px; text-align: right;" : ""
+      } border: 1px solid rgb(108, 108, 108);" >${text}</td>
+      `
+        )
+        .join("")}
+      </tr>
+      `
+        )
+        .join("")}
+
+          </tbody>
+  </table>`;
+}
+
+function createMultiPDFTables(head: string[], items: string[][]) {
+  const title = head.shift();
+
+  let html = "";
+  const max = 5;
+  const names = items[0];
+  for (let i = 0; i < head.length; i += max) {
+    const slice = head.slice(i, i + max);
+    const page = createPDFTable(
+      [title, ...slice],
+      names.map((i) => [i, ...Array(max).fill("")])
+    );
+    html += page + '<div style="page-break-before: always;"></div>';
+  }
+
+  return html;
 }
 
 function formInputValue(inputs: FormInput[], name: string) {
@@ -452,7 +494,7 @@ export const Ratins = [
 ];
 
 const oneKindRating = (name: string) => {
-  return Ratins.find((i) => i.some((a) => a.name == name));
+  return Ratins.find((i) => i.some((a) => a.name == name)) ?? Ratins[0];
 };
 
 const RatingById = (rates: any[], id: string) => {

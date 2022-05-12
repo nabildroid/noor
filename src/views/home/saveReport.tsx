@@ -38,8 +38,10 @@ function fetchExam(account: string) {
   });
 }
 
-function pageTitle(type: TeacherType) {
-  return tabBarTitle(HomeTab.saveReport, type);
+function pageTitle(type: TeacherType, type1: boolean) {
+  let title = tabBarTitle(HomeTab.saveReport, type);
+  if (type1) title = title.replace("درجات", "المهارات");
+  return title;
 }
 
 function fetch(type: TeacherType, account: string, type1?: boolean) {
@@ -86,6 +88,14 @@ const SaveReport: React.FC<SaveReportProps> = ({ type1 }) => {
   }, []);
 
   useEffect(() => {
+    if (loadingIndex != -1 && inputs.length) {
+      updateInputs(
+        inputs[0].name!,
+        inputs[0].options.find((s) => s.selected)?.value!
+      );
+    }
+  }, [type1]);
+  useEffect(() => {
     fetch(teacherType!, currentRole!, type1)
       .then((r) => setForm(r.form))
       .catch(logout);
@@ -93,7 +103,7 @@ const SaveReport: React.FC<SaveReportProps> = ({ type1 }) => {
 
   async function save(isEmpty: boolean = false) {
     tracePages.current.putAttribute("isEmpty", isEmpty ? "true" : "false");
-    
+
     const isExams = teacherType == TeacherType.primary && !type1;
     await submit(isExams ? "newExamReport" : "newSkillReport", {
       isEmpty,
@@ -119,7 +129,7 @@ const SaveReport: React.FC<SaveReportProps> = ({ type1 }) => {
     ],
   });
 
-  const title = pageTitle(teacherType!);
+  const title = pageTitle(teacherType!, type1 ?? false);
 
   return (
     <Page
