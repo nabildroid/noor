@@ -5,7 +5,10 @@ const { PubSub } = require("@google-cloud/pubsub");
 
 const Express = require("express");
 const app = Express();
-app.use(Express.bodyParser({limit: '50mb'}));
+
+app.use(express.json({limit: '25mb'}));
+app.use(express.urlencoded({limit: '25mb'}));
+
 app.use(Express.json());
 
 const admin = require("firebase-admin");
