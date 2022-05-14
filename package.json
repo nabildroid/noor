@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=dev vite --host",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && cp logo.png ./public/ && cp presentation.png ./public/",
     "preview": "vite preview",
     "deploy": "npm run build && firebase deploy",
     "deploy:hosting": "npm run build &&  firebase deploy --only hosting"
