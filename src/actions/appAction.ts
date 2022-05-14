@@ -17,6 +17,7 @@ export default (state: AppState, action: AppActions): AppState => {
       ...state,
       loading: false,
       user: undefined,
+      loginFormParams: undefined,
     };
   else if (action.type == "loading_off")
     return {

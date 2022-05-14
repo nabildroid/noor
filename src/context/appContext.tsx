@@ -40,10 +40,14 @@ const AppProvider: React.FC = ({ children }) => {
 
     return onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("fetched user",user);
+        console.log("fetched user", user);
         dispatch({ type: "login", payload: user });
       } else {
-        logout();
+        logout().then(() => {
+          if (state.user) {
+            window.location.reload();
+          }
+        });
       }
     });
   }, [dispatch]);
@@ -55,7 +59,9 @@ const AppProvider: React.FC = ({ children }) => {
     );
 
     if (operation == "success") {
-      traceLogin.current.stop();
+      try {
+        traceLogin.current.stop();
+      } catch (e) {}
 
       signInWithEmailAndPassword(
         auth,
@@ -70,11 +76,12 @@ const AppProvider: React.FC = ({ children }) => {
           );
         })
         .catch((e) => {
+          window.location.reload();
           // todo catch this error
         });
       return true;
     }
-
+    localStorage.removeItem("bouncing");
     return false;
   }
 
@@ -85,10 +92,11 @@ const AppProvider: React.FC = ({ children }) => {
   }
 
   async function logout() {
-    dispatch({ type: "logout" });
     localStorage.removeItem("bouncing");
 
-    auth.signOut();
+    await auth.signOut();
+
+    dispatch({ type: "logout" });
   }
 
   async function refrechToken(tryPeroid?: number) {
