@@ -5,7 +5,7 @@ import { AppContext } from "../../context/appContext";
 import { HomeContext } from "../../context/homeContext";
 import useFormOptions from "../../hooks/useFormOptions";
 import useIfIffect from "../../hooks/useIfEffect";
-import { createAction } from "../../layout/home/actionBar";
+import ActionButtons, { createAction } from "../../layout/home/actionBar";
 import Page from "../../layout/home/page";
 import SlideTransition from "../../layout/home/slideTransition";
 import { NoorSection, NoorSkill, TeacherType } from "../../models/home_model";
@@ -20,6 +20,8 @@ import { teacherTypeArabic, wait } from "../../utils";
 
 import { trace } from "firebase/performance";
 import { perf } from "../../main";
+import PageTitle from "../../components/home/pageTitle";
+import Card from "../../components/home/card";
 
 interface EditSkillProps {}
 
@@ -94,10 +96,18 @@ const EditSkill: React.FC<EditSkillProps> = () => {
     tracePages.current.incrementMetric("pageIndex", 1);
   }, [stage]);
 
-  const [student, setStudent] = useState("");
   const [allOneSkill, setAllOneSkill] = useState(ratingSystem[0]);
 
   const [skills, setSkills] = useState<Skill[]>([]);
+
+  useEffect(() => {
+    setSkills((s) =>
+      s.map((a) => ({
+        ...a,
+        value: allOneSkill.name,
+      }))
+    );
+  }, [allOneSkill]);
 
   function setSkillsById(skillId: number, ratingId: number) {
     setSkills((skills) =>
@@ -117,7 +127,6 @@ const EditSkill: React.FC<EditSkillProps> = () => {
       .find((i) => i.id.includes("PanelStudent"))
       ?.options.find((e) => e.selected)?.text;
 
-    setStudent(name ?? "");
     fetchSkills();
   }, [stage == 1]);
 
@@ -157,154 +166,98 @@ const EditSkill: React.FC<EditSkillProps> = () => {
       setStage(0);
     }, setLoading);
 
-  const back = () => setStage(Math.max(stage - 1, 0));
-  const next = () => setStage(Math.min(stage + 1, skills.length + 1));
-
-  const save = () =>
-    wait(async () => {
-      const data = await Repository.instance.editSkillSave({
-        action: formAction!,
-        inputs,
-        skills: skills.map((s) => ({
-          ...s,
-          value: allOneSkill.id as any,
-        })),
-        isPrimary: teacherType == TeacherType.primary,
-      });
-
-      setForm((prevForm) => ({
-        ...data.form,
-        actionButtons: prevForm?.actionButtons ?? [],
-      }));
-
-      setStage(0);
-    }, setLoading);
-
-  const skill = stage > 1 && skills.length ? skills[stage - 2].title : "";
-  const isLastSkill = stage == skills.length + 1;
 
   const title = pageTitle(teacherType!);
 
-  const actions = [
-    createAction({
-      enable: isAllChosen,
-      show: stage == 0,
-      buttons: [
-        {
-          label: "التالي",
-          onClick: () => setStage(1),
-        },
-      ],
-    }),
-    createAction({
-      show: stage == 1,
-      loading: false && (loading || loadingIndex == -1),
-      buttons: [
-        {
-          label: "رجوع",
-          onClick: back,
-          secondary: true,
-        },
-        {
-          label: "مهارة على حدة",
-          onClick: () => setStage(2),
-        },
-        {
-          label: "رصد",
-          onClick: save,
-          icon: true,
-          progress: true,
-        },
-      ],
-    }),
+  const actions = createAction({
+    enable: isAllChosen,
+    show: stage == 0 && !!inputs.length,
+    buttons: [
+      {
+        label: "بحث",
+        onClick: () => setStage(1),
+      },
+    ],
+  });
 
-    createAction({
-      loading: loading || loadingIndex == -1,
-      buttons: [
-        {
-          label: "رصد",
-          progress: true,
-          onClick: saveCustom,
-          icon: true,
-          visible: isLastSkill,
-        },
-        {
-          label: "رجوع",
-          secondary: true,
-          progress: true,
-          onClick: back,
-        },
-        {
-          label: "التالي",
-          onClick: next,
-          visible: !isLastSkill,
-        },
-      ],
-    }),
-  ];
+  const saveAction = createAction({
+    enable: isAllChosen,
+    show: !!skills.length,
+    buttons: [
+      {
+        label: "رصد التقيم",
+        onClick: saveCustom,
+      },
+    ],
+  });
 
   return (
-    <Page
-      size={stage == 0 ? "lg" : "sm"}
-      title={title}
-      actions={actions[Math.min(stage, 2)]}
-      loading={!inputs.length || loadingIndex == -1}
-    >
-      <SlideTransition
-        className="h-full w-full grid md:grid-cols-2 gap-3 gap-y-1"
-        show={stage == 0}
-        isRtl
+    <div className="flex flex-1 h-full flex-col">
+      <PageTitle title={title!} />
+
+      <div
+        className={`mt-4 h-full flex flex-col max-w-lg mx-auto w-full overflow-hidden rounded-md
+      `}
       >
-        {inputs.map((input, i) => (
-          <div key={input.id}>
-            <SelectBox
-              loading={i > loadingIndex}
-              select={(e) => updateInputs(input.name!, e)}
-              label={input.title}
-              options={input.options.map((e) => ({
-                id: e.value,
-                name: e.text,
-                selected: e.selected,
-              }))}
-            />
+        <Card loading={!inputs.length || loading || loadingIndex == -1}>
+          <div
+            className=" grid grid-cols-2 gap-2 gap-y-2"
+            style={{ direction: "rtl" }}
+          >
+            {inputs.map((input, i) => (
+              <div key={input.id}>
+                <SelectBox
+                  loading={i > loadingIndex}
+                  select={(e) => updateInputs(input.name!, e)}
+                  label={input.title}
+                  options={input.options.map((e) => ({
+                    id: e.value,
+                    name: e.text,
+                    selected: e.selected,
+                  }))}
+                />
+              </div>
+            ))}
           </div>
-        ))}
-      </SlideTransition>
+          <ActionButtons {...actions} />
 
-      <SlideTransition className="flex-1" show={stage == 1}>
-        <h3 className="text-indigo-500 font-arabic text-center text-sm">
-          {student}
-        </h3>
-        <div className="mt-2">
-          <RadioList
-            disabled={loading}
-            title={title}
-            onSelect={(e) => setAllOneSkill(RateById(ratingSystem, e as any))}
-            items={rates(teacherType!)}
-          />
-        </div>
-      </SlideTransition>
+          {!!skills.length && (
+            <>
+              <div className="border-t-2 border-gray-200 mt-2 py-2 my-2">
+                <SelectBox
+                  select={(e) => {
+                    setAllOneSkill(ratingSystem.find((i) => i.id == e)!);
+                  }}
+                  options={rates(teacherType!).map((r) => ({
+                    description: "dsd",
+                    id: r.id.toString(),
+                    name: r.name,
+                    selected: allOneSkill.name == r.name,
+                  }))}
+                  label="تقيم كل المهارات"
+                />
+              </div>
 
-      {skills.map((s, i) => (
-        <SlideTransition key={s.id} className="flex-1" show={stage == i + 2}>
-          <h3 className="text-indigo-500 font-arabic text-center text-sm">
-            {student}
-          </h3>
-          <h3 className="text-indigo-600 bg-indigo-50 py-1 font-arabic text-center text-md">
-            {skill}
-          </h3>
-          <div className="mt-2">
-            <RadioList
-              current={RateByName(ratingSystem, s.value)}
-              disabled={loading}
-              title={s.title}
-              onSelect={(e) => setSkillsById(s.skillId, e as any)}
-              items={rates(teacherType!)}
-            />
-          </div>
-        </SlideTransition>
-      ))}
-    </Page>
+              <div className="border-t-2 border-gray-200 mt-2 py-2 space-y-2">
+                {skills.map((s) => (
+                  <SelectBox
+                    label={s.title}
+                    select={(e: any) => setSkillsById(s.skillId, e as any)}
+                    options={rates(teacherType!).map((r) => ({
+                      description: "dsd",
+                      id: r.id.toString(),
+                      name: r.name,
+                      selected: r.name == s.value,
+                    }))}
+                  />
+                ))}
+              </div>
+              <ActionButtons {...saveAction} />
+            </>
+          )}
+        </Card>
+      </div>
+    </div>
   );
 };
 
